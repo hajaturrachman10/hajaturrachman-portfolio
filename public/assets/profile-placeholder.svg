@@ -1,0 +1,32 @@
+<svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="1500" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DBEAFE"/>
+      <stop offset="0.52" stop-color="#F8FAFC"/>
+      <stop offset="1" stop-color="#FEF3C7"/>
+    </linearGradient>
+    <linearGradient id="main" x1="315" y1="250" x2="900" y2="1115" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="0.48" stop-color="#0EA5E9"/>
+      <stop offset="1" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="shadow" x="180" y="150" width="900" height="1120" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="60" stdDeviation="70" flood-color="#0F172A" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="1500" fill="url(#bg)"/>
+  <circle cx="165" cy="210" r="165" fill="#2563EB" opacity="0.13"/>
+  <circle cx="1020" cy="1160" r="220" fill="#F59E0B" opacity="0.14"/>
+  <path d="M105 1052C300 884 560 840 787 915C933 963 1052 1065 1132 1210V1500H105V1052Z" fill="#07111F" opacity="0.92"/>
+  <g filter="url(#shadow)">
+    <rect x="280" y="260" width="640" height="895" rx="320" fill="url(#main)"/>
+    <circle cx="600" cy="555" r="182" fill="#F8FAFC"/>
+    <path d="M385 1040C422 828 502 726 600 726C698 726 778 828 815 1040H385Z" fill="#F8FAFC"/>
+    <circle cx="535" cy="535" r="18" fill="#0F172A"/>
+    <circle cx="665" cy="535" r="18" fill="#0F172A"/>
+    <path d="M533 630C575 666 625 666 667 630" stroke="#0F172A" stroke-width="22" stroke-linecap="round"/>
+  </g>
+  <rect x="240" y="1205" width="720" height="132" rx="66" fill="white" opacity="0.78"/>
+  <text x="600" y="1271" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="48" font-weight="900" fill="#0F172A">Hajaturrachman</text>
+  <text x="600" y="1323" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="800" fill="#475569">Personal Portfolio</text>
+</svg>

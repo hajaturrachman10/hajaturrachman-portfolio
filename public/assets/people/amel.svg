@@ -1,0 +1,17 @@
+<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g_amel" x1="0" y1="0" x2="900" y2="900">
+      <stop stop-color="#e11d48"/>
+      <stop offset="1" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="900" rx="80" fill="url(#g_amel)"/>
+  <circle cx="155" cy="150" r="155" fill="white" opacity=".14"/>
+  <circle cx="775" cy="760" r="210" fill="white" opacity=".16"/>
+  <circle cx="450" cy="340" r="150" fill="white" opacity=".86"/>
+  <path d="M210 740C245 575 330 505 450 505C570 505 655 575 690 740H210Z" fill="white" opacity=".86"/>
+  <text x="450" y="363" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="70" font-weight="900" fill="#0F172A">A</text>
+  <rect x="100" y="675" width="700" height="128" rx="64" fill="white" opacity=".88"/>
+  <text x="450" y="728" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="900" fill="#0F172A">Amel</text>
+  <text x="450" y="770" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800" fill="#475569">Pacar</text>
+</svg>
