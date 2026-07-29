@@ -1,45 +1,26 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-import { verifySessionToken } from "@/lib/security";
+import { cvService } from "@/services/cvService";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const token = cookies().get("cv_unlocked")?.value;
-  const isUnlocked = verifySessionToken(token, "cv");
+  const { searchParams } = new URL(request.url);
+  const download = searchParams.get("download") === "true";
 
-  if (!isUnlocked) {
-    return new Response("Akses ditolak. Silakan masukkan kata sandi terlebih dahulu.", { status: 401 });
+  const result = cvService.getCVFile(token, download);
+
+  if (!result.success) {
+    return new Response(result.error, { status: result.status });
   }
 
-  try {
-    const filePath = path.join(process.cwd(), "data", "Hajaturrachman-CV.pdf");
+  const headers = new Headers();
+  headers.set("Content-Type", result.contentType);
+  headers.set("Content-Disposition", result.disposition);
+  headers.set("Cache-Control", "no-store, max-age=0");
 
-    if (!fs.existsSync(filePath)) {
-      return new Response("File CV tidak ditemukan.", { status: 404 });
-    }
-
-    const fileBuffer = fs.readFileSync(filePath);
-
-    const { searchParams } = new URL(request.url);
-    const download = searchParams.get("download") === "true";
-
-    const headers = new Headers();
-    headers.set("Content-Type", "application/pdf");
-
-    if (download) {
-      headers.set("Content-Disposition", 'attachment; filename="CV-Hajaturrachman.pdf"');
-    } else {
-      headers.set("Content-Disposition", 'inline; filename="CV-Hajaturrachman.pdf"');
-    }
-
-    return new Response(fileBuffer, {
-      status: 200,
-      headers,
-    });
-  } catch (error) {
-    return new Response("Gagal memproses file CV.", { status: 500 });
-  }
+  return new Response(new Uint8Array(result.fileBuffer), {
+    status: result.status,
+    headers
+  });
 }

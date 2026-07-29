@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ProjectsSection } from "@/components/ProjectsSection";
-import { AchievementsSection } from "@/components/AchievementsSection";
+import { ProjectsSection } from "@/components/sections/ProjectsSection";
+import { AchievementsSection } from "@/components/sections/AchievementsSection";
 
 export const metadata: Metadata = {
   title: "Karya & Proyek Kreatif — Hajaturrachman",

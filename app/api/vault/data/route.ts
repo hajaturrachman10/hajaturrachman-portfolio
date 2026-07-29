@@ -1,20 +1,19 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { privateVaultData } from "@/data/privateVaultServer";
-import { verifySessionToken } from "@/lib/security";
+import { vaultService } from "@/services/vaultService";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const token = cookies().get("vault_unlocked")?.value;
-  const isUnlocked = verifySessionToken(token, "private-vault");
+  const result = vaultService.getVaultContent(token);
 
-  if (!isUnlocked) {
-    return NextResponse.json({ success: false, error: "Akses ditolak. Silakan masukkan kata sandi terlebih dahulu." }, { status: 401 });
+  if (!result.success) {
+    return NextResponse.json({ success: false, error: result.error }, { status: 401 });
   }
 
   return NextResponse.json({
     success: true,
-    data: privateVaultData,
+    data: result.data
   });
 }

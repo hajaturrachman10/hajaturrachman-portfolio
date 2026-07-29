@@ -1,4 +1,3 @@
-// Re-export domain data modules for backward compatibility
 export * from "./siteConfigData";
 export * from "./projectsData";
 export * from "./skillsData";

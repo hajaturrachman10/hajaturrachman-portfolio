@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { JourneySection } from "@/components/JourneySection";
-import { AboutSection } from "@/components/AboutSection";
-import { SkillsSection } from "@/components/SkillsSection";
-import { TimelineSection } from "@/components/TimelineSection";
+import { JourneySection } from "@/components/sections/JourneySection";
+import { AboutSection } from "@/components/sections/AboutSection";
+import { SkillsSection } from "@/components/sections/SkillsSection";
+import { TimelineSection } from "@/components/sections/TimelineSection";
 
 export const metadata: Metadata = {
   title: "Cerita & Arah Hidup — Hajaturrachman",

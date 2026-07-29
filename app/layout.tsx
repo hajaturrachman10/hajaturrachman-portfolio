@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Providers } from "@/components/Providers";
+import { Providers } from "@/components/providers/Providers";
 import { siteConfig } from "@/data/site";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { PageTransition } from "@/components/PageTransition";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { PageTransition } from "@/components/layout/PageTransition";
 
 
 export const metadata: Metadata = {
@@ -70,8 +70,8 @@ export const viewport: Viewport = {
   ]
 };
 
-import { ScrollRestoration } from "@/components/ScrollRestoration";
-import { PageRestoreOverlay } from "@/components/PageRestoreOverlay";
+import { ScrollRestoration } from "@/components/providers/ScrollRestoration";
+import { PageRestoreOverlay } from "@/components/providers/PageRestoreOverlay";
 
 export default function RootLayout({
   children

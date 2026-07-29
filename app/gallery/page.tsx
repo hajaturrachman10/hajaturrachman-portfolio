@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GallerySection } from "@/components/GallerySection";
+import { GallerySection } from "@/components/sections/GallerySection";
 
 export const metadata: Metadata = {
   title: "Galeri Visual & Kenangan — Hajaturrachman",
