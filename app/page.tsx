@@ -1,6 +1,6 @@
-import { HeroSection } from "@/components/HeroSection";
-import { PortalHub } from "@/components/PortalHub";
-import { ContactSection } from "@/components/ContactSection";
+import { HeroSection } from "@/components/sections/HeroSection";
+import { PortalHub } from "@/components/sections/PortalHub";
+import { ContactSection } from "@/components/sections/ContactSection";
 
 export default function HomePage() {
   return (

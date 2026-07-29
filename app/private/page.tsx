@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PrivateVaultSection } from "@/components/PrivateVaultSection";
+import { PrivateVaultSection } from "@/features/vault";
 
 export const metadata: Metadata = {
   title: "Ruang Personal Terproteksi — Hajaturrachman",

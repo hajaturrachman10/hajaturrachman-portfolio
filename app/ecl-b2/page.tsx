@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ECLMaterialSection } from "@/components/ECLMaterialSection";
+import { ECLMaterialSection } from "@/features/ecl";
 
 export const metadata: Metadata = {
   title: "Materi & Latihan ECL Deutsch B2 — Hajaturrachman",
