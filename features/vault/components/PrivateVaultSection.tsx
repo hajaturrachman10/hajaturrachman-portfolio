@@ -132,6 +132,17 @@ export function PrivateVaultSection() {
           if (data.toggles) {
             syncLocalToggles(data.toggles, data.globalEpoch);
           }
+
+          // Mobile/Polling change detection for transition overlays
+          const nextOverride = !!data.overrides?.vault;
+          const hasOverrideChanged = !isInitial && (isAdminOverride !== nextOverride);
+          
+          if (hasOverrideChanged) {
+            const isEnabling = !nextOverride;
+            setAdminTransition({ active: true, isEnabling });
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+
           if (data.overrides?.vault) {
             setIsAdminOverride(true);
             await fetchVaultData();
@@ -179,10 +190,13 @@ export function PrivateVaultSection() {
             setUnlocked(false);
             setCheckingAuth(false);
           }
+
+          setAdminTransition(null);
         }
       } catch (err) {
-        console.error("Gagal memvalidasi status login:", err);
+        console.error("Gagal memeriksa status login:", err);
         setCheckingAuth(false);
+        setAdminTransition(null);
       }
     }
     checkAuth(true);

@@ -80,9 +80,34 @@ export function ECLMaterialSection() {
           if (data.toggles) {
             syncLocalToggles(data.toggles, data.globalEpoch);
           }
+
+          // Mobile/Polling change detection for transition overlays
+          const nextOverride = !!data.overrides?.ecl;
+          const hasOverrideChanged = !isInitial && (isAdminOverride !== nextOverride);
+          
+          if (hasOverrideChanged) {
+            const isEnabling = !nextOverride;
+            setAdminTransition({ active: true, isEnabling, type: "ecl" });
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+
+          let changedDocKey: "doc1" | "doc2" | "doc3" | null = null;
+          if (!isInitial && data.docToggles && unlockedRef.current) {
+            if (data.docToggles.doc1 !== docToggles.doc1) changedDocKey = "doc1";
+            else if (data.docToggles.doc2 !== docToggles.doc2) changedDocKey = "doc2";
+            else if (data.docToggles.doc3 !== docToggles.doc3) changedDocKey = "doc3";
+          }
+
+          if (changedDocKey && data.docToggles) {
+            const isEnabling = Boolean(data.docToggles[changedDocKey]);
+            setAdminTransition({ active: true, isEnabling, type: "document" });
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+
           if (data.docToggles) {
             setDocToggles(data.docToggles);
           }
+
           if (data.overrides?.ecl) {
             setIsAdminOverride(true);
             setUnlocked(true);
@@ -127,10 +152,13 @@ export function ECLMaterialSection() {
             setUnlocked(false);
             setCheckingAuth(false);
           }
+
+          setAdminTransition(null);
         }
       } catch (err) {
         console.error("Gagal memeriksa status login ECL:", err);
         setCheckingAuth(false);
+        setAdminTransition(null);
       }
     }
     checkAuth(true);

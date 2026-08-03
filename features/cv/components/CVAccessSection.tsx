@@ -68,6 +68,17 @@ export function CVAccessSection() {
           if (data.toggles) {
             syncLocalToggles(data.toggles, data.globalEpoch);
           }
+
+          // Mobile/Polling change detection for transition overlays
+          const nextOverride = !!data.overrides?.cv;
+          const hasOverrideChanged = !isInitial && (isAdminOverride !== nextOverride);
+          
+          if (hasOverrideChanged) {
+            const isEnabling = !nextOverride;
+            setAdminTransition({ active: true, isEnabling });
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+
           if (data.overrides?.cv) {
             // Admin Override Active: Instant transition, no restore session animation!
             setIsAdminOverride(true);
@@ -113,10 +124,13 @@ export function CVAccessSection() {
             setUnlocked(false);
             setCheckingAuth(false);
           }
+
+          setAdminTransition(null);
         }
       } catch (err) {
         console.error("Gagal memeriksa status login:", err);
         setCheckingAuth(false);
+        setAdminTransition(null);
       }
     }
     checkAuth(true);
