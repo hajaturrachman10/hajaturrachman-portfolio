@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import { adminRepository } from "@/services/admin/adminRepository";
+import { FeatureType } from "@/services/admin/adminTypes";
 
 // Secret key for HMAC signing (uses environment variable or secure default)
 const SECRET = process.env.AUTH_SECRET || "hajaturrachman_secure_session_secret_v2_2026";
@@ -13,30 +15,54 @@ type RateLimitRecord = {
 const authRateLimitMap = new Map<string, RateLimitRecord>();
 const contactRateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
+function mapPublicTypeToFeature(type: string): FeatureType {
+  if (type === "private-vault") return "vault";
+  if (type === "ecl-material") return "ecl";
+  return "cv";
+}
+
 /**
  * Generate HMAC-SHA256 signature for session type
  */
 export function generateSessionToken(type: string): string {
-  const payload = `${type}:unlocked:${Math.floor(Date.now() / 86400000)}`;
+  const now = Date.now();
+  const payload = `${type}:unlocked:${now}`;
   const signature = crypto.createHmac("sha256", SECRET).update(payload).digest("hex");
   return `${payload}.${signature}`;
 }
 
 /**
- * Verify signed session token
+ * Verify signed session token with Live Feature Toggle & Global Epoch Check
  */
 export function verifySessionToken(token: string | undefined, expectedType: string): boolean {
-  if (!token) return false;
-  
-  // Support legacy "true" for smooth transition or match signed token
-  if (token === "true") return true;
-
   try {
+    const adminState = adminRepository.read();
+    const featureKey = mapPublicTypeToFeature(expectedType);
+    const featureState = adminState.toggles[featureKey];
+
+    // If feature toggle is UNPROTECTED (OFF), allow instant public access
+    if (featureState && !featureState.protected) {
+      return true;
+    }
+
+    if (!token) return false;
+
+    // Support legacy "true" token if created prior to epoch
+    if (token === "true") {
+      return featureState ? !featureState.protected : false;
+    }
+
     const [payload, signature] = token.split(".");
     if (!payload || !signature) return false;
 
-    const [type, status] = payload.split(":");
+    const [type, status, tokenTimestampStr] = payload.split(":");
     if (type !== expectedType || status !== "unlocked") return false;
+
+    // Session Revocation: Invalidate session if created before globalEpoch
+    const tokenTimestamp = Number(tokenTimestampStr) || 0;
+    if (tokenTimestamp > 0 && tokenTimestamp < adminState.globalEpoch) {
+      return false;
+    }
 
     const expectedSignature = crypto.createHmac("sha256", SECRET).update(payload).digest("hex");
     return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
@@ -122,6 +148,24 @@ export function recordFailedAuthAttempt(ip: string): { lockedOut: boolean; remai
  */
 export function resetAuthRateLimit(ip: string) {
   authRateLimitMap.delete(ip);
+}
+
+/**
+ * Clear all lockout rate limits
+ */
+export function clearAllAuthRateLimits() {
+  authRateLimitMap.clear();
+}
+
+/**
+ * Get all active lockout rate limit records
+ */
+export function getAllAuthRateLimits(): Array<{ ip: string; attempts: number; lockoutUntil: number }> {
+  const result: Array<{ ip: string; attempts: number; lockoutUntil: number }> = [];
+  authRateLimitMap.forEach((record, ip) => {
+    result.push({ ip, attempts: record.attempts, lockoutUntil: record.lockoutUntil });
+  });
+  return result;
 }
 
 /**

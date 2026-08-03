@@ -42,7 +42,7 @@ export function ProjectsSection() {
 
   return (
     <>
-      <Reveal id="projects" className="container-page section-space pt-0 overflow-hidden">
+      <Reveal id="projects" className="container-page section-space overflow-hidden">
         <SectionHeader
           eyebrow={language === "id" ? "Portofolio" : "Portfolio"}
           title={language === "id" ? "Karya dan proyek yang bisa dibuka seperti cerita." : "Werke und Projekte, die wie Geschichten erzählt werden."}
@@ -151,20 +151,18 @@ function ProjectCard({ project, onOpen }: { project: PortofolioProject; onOpen: 
       <div className="p-6 flex flex-col flex-grow">
         <div className="mb-3 flex items-start justify-between gap-4">
           <h3 className="font-display text-xl font-black leading-tight">{project.title}</h3>
-          <MagneticButton className="shrink-0">
-            <motion.div
-              whileHover="hover"
-              whileTap="press"
-              variants={{
-                hover: { scale: 1.08, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)" },
-                press: { scale: 0.88, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)" }
-              }}
-              transition={{ type: "spring", stiffness: 450, damping: 18 }}
-              className="icon-orbit grid h-10 w-10 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
-            >
-              <Layers3 className="h-5 w-5" />
-            </motion.div>
-          </MagneticButton>
+          <motion.div
+            whileHover="hover"
+            whileTap="press"
+            variants={{
+              hover: { scale: 1.06, rotate: 6, boxShadow: "0 0 18px rgb(var(--color-primary) / 0.35)" },
+              press: { scale: 0.94, rotate: 3, boxShadow: "0 0 12px rgb(var(--color-primary) / 0.5)" }
+            }}
+            transition={{ type: "spring", stiffness: 450, damping: 18 }}
+            className="icon-orbit grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
+          >
+            <Layers3 className="h-5 w-5" />
+          </motion.div>
         </div>
         <p className="leading-7 text-muted">{project.description}</p>
         <p className="mt-4 rounded-3xl border border-line bg-surface/82 p-4 text-sm font-bold leading-6 text-muted">{project.impact}</p>
@@ -181,19 +179,10 @@ function ProjectCard({ project, onOpen }: { project: PortofolioProject; onOpen: 
                 press: { scale: 0.97 }
               }}
               transition={{ type: "spring", stiffness: 450, damping: 18 }}
-              className="button-primary shimmer-constant focus-ring px-4 py-2 text-sm border-0"
+              className="button-primary shimmer-constant focus-ring px-4 py-2 text-sm border-0 flex items-center justify-center gap-1.5"
             >
-              {language === "id" ? "Buka Cerita" : "Details anzeigen"}
-              <motion.span
-                variants={{
-                  hover: { x: 3, y: -3 },
-                  press: { x: 3, y: -3 }
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                className="inline-flex items-center"
-              >
-                <ArrowUpRight className="h-4 w-4" />
-              </motion.span>
+              <span>{language === "id" ? "Buka Cerita" : "Details anzeigen"}</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0" />
             </motion.button>
           </MagneticButton>
           {project.demoLinks?.[0] ? (
@@ -207,19 +196,10 @@ function ProjectCard({ project, onOpen }: { project: PortofolioProject; onOpen: 
                   press: { scale: 0.97 }
                 }}
                 transition={{ type: "spring", stiffness: 450, damping: 18 }}
-                className="button-secondary focus-ring px-4 py-2 text-sm border-0"
+                className="button-secondary focus-ring px-4 py-2 text-sm border-0 flex items-center justify-center gap-1.5"
               >
-                {project.demoLinks[0].label}
-                <motion.span
-                  variants={{
-                    hover: { x: 3, y: -3 },
-                    press: { x: 3, y: -3 }
-                  }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  className="inline-flex items-center ml-1.5"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </motion.span>
+                <span>{project.demoLinks[0].label}</span>
+                <ExternalLink className="h-4 w-4 shrink-0" />
               </motion.a>
             </MagneticButton>
           ) : null}
@@ -231,6 +211,15 @@ function ProjectCard({ project, onOpen }: { project: PortofolioProject; onOpen: 
 
 function ProjectModal({ project, onClose }: { project: PortofolioProject | null; onClose: () => void }) {
   const { language } = useLanguage();
+
+  useEffect(() => {
+    if (!project) return;
+    lockScroll();
+    return () => {
+      unlockScroll();
+    };
+  }, [project]);
+
   return (
     <AnimatePresence>
       {project ? (
@@ -307,19 +296,10 @@ function ProjectModal({ project, onClose }: { project: PortofolioProject | null;
                                   press: { scale: 0.97 }
                                 }}
                                 transition={{ type: "spring", stiffness: 450, damping: 18 }}
-                                className="button-secondary focus-ring text-sm border-0"
+                                className="button-secondary focus-ring text-sm border-0 flex items-center justify-center gap-1.5"
                               >
-                                {link.label}
-                                <motion.span
-                                  variants={{
-                                    hover: { x: 3, y: -3 },
-                                    press: { x: 3, y: -3 }
-                                  }}
-                                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                                  className="inline-flex items-center ml-1.5"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </motion.span>
+                                <span>{link.label}</span>
+                                <ExternalLink className="h-4 w-4 shrink-0" />
                               </motion.a>
                             </MagneticButton>
                           ))}
@@ -357,16 +337,7 @@ function ProjectModal({ project, onClose }: { project: PortofolioProject | null;
                       transition={{ type: "spring", stiffness: 450, damping: 18 }}
                       className="rounded-full bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white px-6 py-3.5 text-sm font-black transition-colors duration-300 w-full flex items-center justify-center gap-1.5 cursor-pointer select-none shadow-md shadow-rose-600/10 border-0"
                     >
-                      <motion.span
-                        variants={{
-                          hover: { rotate: 90, scale: 1.1 },
-                          press: { rotate: 90, scale: 0.9 }
-                        }}
-                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                        className="inline-flex items-center mr-1"
-                      >
-                        <X className="h-4 w-4" />
-                      </motion.span>
+                      <X className="h-4 w-4 shrink-0" />
                       <span>{language === "id" ? "Tutup Detail" : "Schließen"}</span>
                     </motion.button>
                   </MagneticButton>

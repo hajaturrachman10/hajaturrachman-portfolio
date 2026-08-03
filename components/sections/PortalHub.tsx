@@ -77,7 +77,7 @@ export function PortalHub() {
   ];
 
   return (
-    <Reveal id="chapters" className="container-page section-space pt-0 overflow-hidden">
+    <Reveal id="chapters" className="container-page section-space overflow-hidden">
       <SectionHeader
         eyebrow={language === "id" ? "Daftar Isi Perjalanan" : "Inhaltsverzeichnis"}
         title={language === "id" ? "Pilih bab cerita yang ingin Anda baca." : "Wählen Sie ein Kapitel zum Lesen aus."}
@@ -106,9 +106,18 @@ export function PortalHub() {
               <div>
                 <div className="flex items-center justify-between">
                   {/* Icon box - active-styled on mobile by default, hover interactive on desktop, spins and glows on tap */}
-                  <div className={`icon-orbit grid h-12 w-12 place-items-center rounded-2xl border border-line bg-surface shadow-sm transition duration-300 group-hover:scale-105 group-hover:rotate-6 ${chapter.textColor}`}>
+                  <motion.div
+                    whileHover="hover"
+                    whileTap="press"
+                    variants={{
+                      hover: { scale: 1.06, rotate: 6, boxShadow: "0 0 18px rgb(var(--color-primary) / 0.35)" },
+                      press: { scale: 0.94, rotate: 3, boxShadow: "0 0 12px rgb(var(--color-primary) / 0.5)" }
+                    }}
+                    transition={{ type: "spring", stiffness: 450, damping: 18 }}
+                    className={`icon-orbit grid h-12 w-12 place-items-center rounded-2xl border border-line bg-primary/10 ${chapter.textColor}`}
+                  >
                     <Icon className="h-6 w-6" />
-                  </div>
+                  </motion.div>
 
                   {chapter.badge && (
                     <span className="rounded-full bg-rose-500/10 px-3 py-1 text-xs font-black text-rose-500 border border-rose-500/15">
@@ -144,17 +153,8 @@ export function PortalHub() {
                     transition={{ type: "spring", stiffness: 450, damping: 18 }}
                     className="button-primary shimmer-constant focus-ring flex items-center justify-center gap-2 px-4 py-3 text-sm font-black w-full shadow-md shadow-primary/15 border-0"
                   >
-                    {language === "id" ? "Buka Bab Ini" : "Kapitel öffnen"}
-                    <motion.span
-                      variants={{
-                        hover: { x: 5 },
-                        press: { x: 5 }
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      className="inline-flex items-center"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </motion.span>
+                    <span>{language === "id" ? "Buka Bab Ini" : "Kapitel öffnen"}</span>
+                    <ArrowRight className="h-4 w-4 shrink-0" />
                   </MotionLink>
                 </MagneticButton>
               </div>

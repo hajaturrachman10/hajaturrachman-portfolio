@@ -13,7 +13,7 @@ export function JourneySection() {
   const { siteConfig, journeyCards, featureHighlights } = useSiteData();
   const { language } = useLanguage();
   return (
-    <Reveal id="journey" className="container-page section-space pt-0 overflow-hidden">
+    <Reveal id="journey" className="container-page section-space overflow-hidden">
       <SectionHeader
         eyebrow={language === "id" ? "Cerita & Arah Hidup" : "Lebensweg & Werte"}
         title={language === "id" ? "Lebih dari portofolio: ini adalah peta perjalanan Hajaturrachman." : "Mehr als ein Portfolio: Dies ist die Lebenskarte von Hajaturrachman."}
@@ -64,20 +64,18 @@ export function JourneySection() {
               className="premium-card rounded-4xl p-5 cursor-pointer select-none"
             >
               <div className="flex gap-4">
-                <MagneticButton className="shrink-0">
-                  <motion.div
-                    whileHover="hover"
-                    whileTap="press"
-                    variants={{
-                      hover: { scale: 1.08, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)" },
-                      press: { scale: 0.88, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)" }
-                    }}
-                    transition={{ type: "spring", stiffness: 450, damping: 18 }}
-                    className="icon-orbit grid h-12 w-12 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
-                  >
-                    <card.icon className="h-6 w-6" />
-                  </motion.div>
-                </MagneticButton>
+                <motion.div
+                  whileHover="hover"
+                  whileTap="press"
+                  variants={{
+                    hover: { scale: 1.06, rotate: 6, boxShadow: "0 0 18px rgb(var(--color-primary) / 0.35)" },
+                    press: { scale: 0.94, rotate: 3, boxShadow: "0 0 12px rgb(var(--color-primary) / 0.5)" }
+                  }}
+                  transition={{ type: "spring", stiffness: 450, damping: 18 }}
+                  className="icon-orbit grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
+                >
+                  <card.icon className="h-6 w-6" />
+                </motion.div>
                 <div>
                   <h3 className="font-display text-lg font-black">
                     {card.title}

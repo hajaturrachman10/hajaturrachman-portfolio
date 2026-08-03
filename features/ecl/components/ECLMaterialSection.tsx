@@ -11,6 +11,7 @@ import { MagneticButton } from "@/components/ui/MagneticButton";
 import { useSiteData } from "@/data/site";
 import { useLanguage } from "@/components/providers/LanguageContext";
 import { cn } from "@/lib/utils";
+import { subscribeCrossTabSync } from "@/lib/crossTabSync";
 
 export function ECLMaterialSection() {
   const { siteConfig } = useSiteData();
@@ -30,41 +31,56 @@ export function ECLMaterialSection() {
     }
   }, []);
 
+  const [isAdminOverride, setIsAdminOverride] = useState(false);
+  const [adminTransition, setAdminTransition] = useState<{ active: boolean; isEnabling: boolean } | null>(null);
+  const [docToggles, setDocToggles] = useState<{ doc1: boolean; doc2: boolean; doc3: boolean }>({
+    doc1: true,
+    doc2: true,
+    doc3: true
+  });
+
   useEffect(() => {
     async function checkAuth() {
       try {
         const response = await fetch("/api/auth/status");
         if (response.ok) {
           const data = await response.json();
+          if (data.docToggles) {
+            setDocToggles(data.docToggles);
+          }
           if (data.eclUnlocked) {
-            const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
-            if (!remember) {
-              // Sesi aktif di server tapi tidak dipilih untuk diingat -> Tampilkan animasi mengunci!
-              setIsLocking(true);
-              setCheckingAuth(false);
-              try {
-                await fetch("/api/auth/lock", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ type: "ecl-material" }),
-                });
-              } catch (e) {
-                console.error(e);
-              }
-              await new Promise((resolve) => setTimeout(resolve, 1800));
-              setUnlocked(false);
-              setIsLocking(false);
-            } else {
-              // Sesi diingat -> Tampilkan animasi memulihkan sesi!
-              setIsUnlocking(true);
-              setCheckingAuth(false);
-              await new Promise((resolve) => setTimeout(resolve, 1500));
+            if (data.overrides?.ecl) {
+              setIsAdminOverride(true);
               setUnlocked(true);
-              setIsUnlocking(false);
+              setCheckingAuth(false);
+            } else {
+              setIsAdminOverride(false);
+              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
+              if (!remember) {
+                setIsLocking(true);
+                setCheckingAuth(false);
+                try {
+                  await fetch("/api/auth/lock", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ type: "ecl-material" })
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
+                await new Promise((resolve) => setTimeout(resolve, 1800));
+                setUnlocked(false);
+                setIsLocking(false);
+              } else {
+                setIsUnlocking(true);
+                setCheckingAuth(false);
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+                setUnlocked(true);
+                setIsUnlocking(false);
+              }
             }
           } else {
+            setIsAdminOverride(false);
             setUnlocked(false);
             setCheckingAuth(false);
           }
@@ -75,6 +91,71 @@ export function ECLMaterialSection() {
       }
     }
     checkAuth();
+
+    const unsubscribe = subscribeCrossTabSync(async (msg) => {
+      if (msg.event === "TOGGLE_CHANGED") {
+        const feat = msg.data?.feature;
+        if (feat === "ecl" || feat?.startsWith("ecl_doc") || !feat) {
+          if (feat?.startsWith("ecl_doc")) {
+            try {
+              const res = await fetch("/api/auth/status", { cache: "no-store" });
+              if (res.ok) {
+                const data = await res.json();
+                if (data.docToggles) {
+                  setDocToggles(data.docToggles);
+                }
+              }
+            } catch {
+              // Handled
+            }
+          } else {
+            const isEnabling = !!msg.data?.protected;
+            setAdminTransition({ active: true, isEnabling });
+            await new Promise((r) => setTimeout(r, 1600));
+            try {
+              const res = await fetch("/api/auth/status", { cache: "no-store" });
+              if (res.ok) {
+                const data = await res.json();
+                if (data.docToggles) {
+                  setDocToggles(data.docToggles);
+                }
+                if (data.eclUnlocked) {
+                  setUnlocked(true);
+                  setIsAdminOverride(!!data.overrides?.ecl);
+                } else {
+                  setUnlocked(false);
+                  setIsAdminOverride(false);
+                  setModalOpen(false);
+                }
+              }
+            } catch {
+              // Handled
+            } finally {
+              setAdminTransition(null);
+            }
+          }
+        }
+      } else if (
+        msg.event === "SESSION_REVOKED" ||
+        msg.event === "CONFIG_RESTORED" ||
+        msg.event === "PUBLIC_SESSION_INVALID"
+      ) {
+        try {
+          const res = await fetch("/api/auth/status", { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            if (!data.eclUnlocked) {
+              setUnlocked(false);
+              setModalOpen(false);
+            }
+          }
+        } catch {
+          // Handled
+        }
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   async function handleLockConfirm() {
@@ -101,7 +182,7 @@ export function ECLMaterialSection() {
 
   return (
     <>
-      <Reveal id="ecl-b2" className="container-page section-space pt-0">
+      <Reveal id="ecl-b2" className="container-page section-space overflow-hidden">
         <SectionHeader
           eyebrow={language === "id" ? "Materi Persiapan" : "Vorbereitungsmaterialien"}
           title="ECL Deutsch B2"
@@ -109,170 +190,118 @@ export function ECLMaterialSection() {
             ? "Kumpulan materi belajar, latihan intensif, dan bocoran soal resmi untuk persiapan ujian sertifikasi bahasa Jerman ECL tingkat B2."
             : "Sammlung von Lernmaterialien, intensiven Übungen und offiziellen Vorbereitungsfragen für die ECL Deutsch B2-Zertifizierungsprüfung."}
         />
-        {isLocking ? (
-          /* SECURING SESSION ANIMATED VIEW (UPGRADED) */
-          <motion.div 
-            key="locking"
-            initial={{ opacity: 0, scale: 0.94, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: -20 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="premium-card rounded-4xl p-6 sm:p-10 flex flex-col items-center justify-center py-16 gap-6 text-center border border-rose-500/30 bg-gradient-to-b from-rose-500/[0.04] via-surface to-surface shadow-[0_0_45px_-10px_rgba(244,63,94,0.18)] w-full relative overflow-hidden"
+        {adminTransition?.active ? (
+          /* ADMIN OVERRIDE TRANSITION ANIMATED OVERLAY */
+          <motion.div
+            key="admin-transition"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
           >
-            {/* Background ambient glow orb */}
-            <div className="absolute h-40 w-40 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
-
-            {/* Central Badge with Dual Spinning Radar Rings */}
-            <div className="relative h-20 w-20 flex items-center justify-center">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0.5 }}
-                animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
-                className="absolute inset-0 rounded-3xl bg-rose-500/25"
-              />
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0.5 }}
-                animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
-                className="absolute inset-0 rounded-3xl bg-rose-500/25"
-              />
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
-                className="absolute -inset-2 rounded-[26px] border-2 border-dashed border-rose-500/40 z-10"
-              />
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ repeat: Infinity, duration: 1.0, ease: "linear" }}
-                className="absolute -inset-3.5 rounded-[30px] border-2 border-t-rose-500 border-r-transparent border-b-transparent border-l-transparent z-10"
-              />
-              <motion.div 
-                initial={{ rotate: 180, scale: 0.3 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 220, damping: 14 }}
-                className="icon-orbit relative grid h-20 w-20 place-items-center rounded-3xl border border-rose-500/30 bg-rose-500/15 text-rose-500 shadow-glow shadow-rose-500/10 z-20"
-              >
-                <motion.span
-                  animate={{ scale: [1, 0.9, 1.12, 1] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                  className="inline-flex"
-                >
-                  <LockKeyhole className="h-9 w-9" />
-                </motion.span>
-              </motion.div>
+            <div className={cn(
+              "grid h-12 w-12 place-items-center rounded-2xl border shadow-glow",
+              adminTransition.isEnabling
+                ? "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
+                : "border-blue-500/30 bg-blue-500/10 text-blue-500 shadow-blue-500/20"
+            )}>
+              <RefreshCw className="h-6 w-6 animate-spin" />
             </div>
 
-            {/* Status Text & Dynamic Progress Bar */}
-            <div className="space-y-2 max-w-sm w-full z-20 mt-2">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="inline-flex items-center gap-2 rounded-full bg-rose-500/10 border border-rose-500/20 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-rose-500"
-              >
-                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                <span>ENKRIPSI SESI AKTIF</span>
-              </motion.div>
+            <div>
+              <div className={cn(
+                "inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 border",
+                adminTransition.isEnabling
+                  ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                  : "bg-blue-500/10 text-blue-500 border-blue-500/20"
+              )}>
+                <span>PENEGASAN ADMINISTRATOR</span>
+              </div>
+              <h4 className={cn(
+                "font-display text-sm sm:text-base font-black",
+                adminTransition.isEnabling ? "text-rose-500" : "text-blue-500"
+              )}>
+                {adminTransition.isEnabling
+                  ? "🔒 Proteksi Dipulihkan oleh Administrator..."
+                  : "🌐 Akses Ditingkatkan oleh Administrator..."}
+              </h4>
+            </div>
 
-              <h4 className="font-display text-2xl font-black text-rose-500 tracking-tight">
+            <div className={cn(
+              "w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border",
+              adminTransition.isEnabling ? "bg-rose-500/15 border-rose-500/20" : "bg-blue-500/15 border-blue-500/20"
+            )}>
+              <motion.div
+                className={cn("h-full rounded-full", adminTransition.isEnabling ? "bg-rose-500" : "bg-blue-500")}
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 1.4, ease: "easeInOut" }}
+              />
+            </div>
+          </motion.div>
+        ) : isLocking ? (
+          /* SECURING SESSION ANIMATED VIEW (ADMIN STYLE OVERLAY) */
+          <motion.div
+            key="locking"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
+          >
+            <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
+              <RefreshCw className="h-6 w-6 animate-spin" />
+            </div>
+
+            <div>
+              <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                <span>ENKRIPSI SESI</span>
+              </div>
+              <h4 className="font-display text-sm sm:text-base font-black text-rose-500">
                 {language === "id" ? "Mengamankan Sesi..." : "Sitzung sichern..."}
               </h4>
-              <p className="text-xs font-bold text-muted leading-5">
-                {language === "id" ? "Memusnahkan token sesi dan mengunci kembali akses server." : "Token wird vernichtet und Zugang wieder gesperrt."}
-              </p>
+            </div>
 
-              {/* Animated Progress Bar */}
-              <div className="w-full bg-rose-500/15 h-2 rounded-full mt-4 overflow-hidden border border-rose-500/20">
-                <motion.div
-                  className="bg-rose-500 h-full rounded-full"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 1.1, ease: "easeInOut" }}
-                />
-              </div>
+            <div className="w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border bg-rose-500/15 border-rose-500/20">
+              <motion.div
+                className="bg-rose-500 h-full rounded-full"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 1.1, ease: "easeInOut" }}
+              />
             </div>
           </motion.div>
         ) : isUnlocking ? (
-          /* RESTORING SESSION ANIMATED VIEW (UPGRADED) */
-          <motion.div 
+          /* RESTORING SESSION ANIMATED VIEW (ADMIN STYLE OVERLAY) */
+          <motion.div
             key="unlocking"
-            initial={{ opacity: 0, scale: 0.94, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: -20 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="premium-card rounded-4xl p-6 sm:p-10 flex flex-col items-center justify-center py-16 gap-6 text-center border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.04] via-surface to-surface shadow-[0_0_45px_-10px_rgba(16,185,129,0.18)] w-full relative overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
           >
-            {/* Background ambient glow orb */}
-            <div className="absolute h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-
-            {/* Central Badge with Dual Spinning Radar Rings */}
-            <div className="relative h-20 w-20 flex items-center justify-center">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0.5 }}
-                animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
-                className="absolute inset-0 rounded-3xl bg-emerald-500/25"
-              />
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0.5 }}
-                animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
-                className="absolute inset-0 rounded-3xl bg-emerald-500/25"
-              />
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
-                className="absolute -inset-2 rounded-[26px] border-2 border-dashed border-emerald-500/40 z-10"
-              />
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ repeat: Infinity, duration: 1.0, ease: "linear" }}
-                className="absolute -inset-3.5 rounded-[30px] border-2 border-t-emerald-500 border-r-transparent border-b-transparent border-l-transparent z-10"
-              />
-              <motion.div 
-                initial={{ rotate: -180, scale: 0.3 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 220, damping: 14 }}
-                className="icon-orbit relative grid h-20 w-20 place-items-center rounded-3xl border border-emerald-500/30 bg-emerald-500/15 text-emerald-500 shadow-glow shadow-emerald-500/10 z-20"
-              >
-                <motion.span
-                  animate={{ scale: [1, 0.9, 1.12, 1] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                  className="inline-flex"
-                >
-                  <ShieldCheck className="h-9 w-9" />
-                </motion.span>
-              </motion.div>
+            <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20">
+              <RefreshCw className="h-6 w-6 animate-spin" />
             </div>
 
-            {/* Status Text & Dynamic Progress Bar */}
-            <div className="space-y-2 max-w-sm w-full z-20 mt-2">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-emerald-500"
-              >
-                <Sparkles className="h-3.5 w-3.5 animate-pulse text-emerald-400" />
-                <span>MEMULIHKAN OTENTIKASI SERVER</span>
-              </motion.div>
-
-              <h4 className="font-display text-2xl font-black text-emerald-500 tracking-tight">
+            <div>
+              <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                <span>OTENTIKASI</span>
+              </div>
+              <h4 className="font-display text-sm sm:text-base font-black text-emerald-500">
                 {language === "id" ? "Memulihkan Sesi Aman..." : "Sitzung wird wiederhergestellt..."}
               </h4>
-              <p className="text-xs font-bold text-muted leading-5">
-                {language === "id" ? "Akses otomatis dipulihkan karena sesi diingat di browser ini." : "Zugang wird automatisch wiederhergestellt."}
-              </p>
+            </div>
 
-              {/* Animated Progress Bar */}
-              <div className="w-full bg-emerald-500/15 h-2 rounded-full mt-4 overflow-hidden border border-emerald-500/20">
-                <motion.div
-                  className="bg-emerald-500 h-full rounded-full"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 1.4, ease: "easeInOut" }}
-                />
-              </div>
+            <div className="w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border bg-emerald-500/15 border-emerald-500/20">
+              <motion.div
+                className="bg-emerald-500 h-full rounded-full"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              />
             </div>
           </motion.div>
         ) : checkingAuth ? (
@@ -306,20 +335,18 @@ export function ECLMaterialSection() {
           <div className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 sm:p-8 select-none">
             <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
               <div>
-                <MagneticButton className="w-fit">
-                  <motion.div
-                    whileHover="hover"
-                    whileTap="press"
-                    variants={{
-                      hover: { scale: 1.08, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)" },
-                      press: { scale: 0.88, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)" }
-                    }}
-                    transition={{ type: "spring", stiffness: 450, damping: 18 }}
-                    className="icon-orbit grid h-12 w-12 sm:h-16 sm:w-16 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
-                  >
-                    <LockKeyhole className="h-7 w-7 sm:h-8 sm:w-8" />
-                  </motion.div>
-                </MagneticButton>
+                <motion.div
+                  whileHover="hover"
+                  whileTap="press"
+                  variants={{
+                    hover: { scale: 1.06, rotate: 6, boxShadow: "0 0 18px rgb(var(--color-primary) / 0.35)" },
+                    press: { scale: 0.94, rotate: 3, boxShadow: "0 0 12px rgb(var(--color-primary) / 0.5)" }
+                  }}
+                  transition={{ type: "spring", stiffness: 450, damping: 18 }}
+                  className="icon-orbit grid h-14 w-14 sm:h-16 sm:w-16 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
+                >
+                  <LockKeyhole className="h-7 w-7 sm:h-8 sm:w-8" />
+                </motion.div>
                 <h3 className="mt-4 sm:mt-6 font-display text-2xl sm:text-3xl font-black">
                   {language === "id" ? "Materi Terkunci" : "Inhalte gesperrt"}
                 </h3>
@@ -342,7 +369,8 @@ export function ECLMaterialSection() {
                       transition={{ type: "spring", stiffness: 380, damping: 12 }}
                       className="button-primary focus-ring w-full sm:w-auto border-0 py-3 text-sm font-black flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <LockKeyhole className="h-4.5 w-4.5" /> <span>{language === "id" ? "Masukkan Kata Sandi" : "Code Eingeben"}</span>
+                      <LockKeyhole className="h-4 w-4 shrink-0" />
+                      <span>{language === "id" ? "Masukkan Kata Sandi" : "Code Eingeben"}</span>
                     </motion.button>
                   </MagneticButton>
                 </div>
@@ -401,114 +429,116 @@ export function ECLMaterialSection() {
           <div
             className={cn(
               "premium-card rounded-3xl sm:rounded-4xl p-4 sm:p-8 select-none transition-all duration-500 border-2",
-              rememberSession
+              isAdminOverride
+                ? "border-blue-500/60 dark:border-blue-500/45 shadow-[0_0_55px_-5px_rgba(59,130,246,0.25)] bg-gradient-to-br from-blue-500/[0.05] via-surface to-blue-500/[0.015] dark:from-blue-500/[0.06] dark:via-slate-950"
+                : rememberSession
                 ? "border-emerald-500/60 dark:border-emerald-500/45 shadow-[0_0_55px_-5px_rgba(16,185,129,0.25)] bg-gradient-to-br from-emerald-500/[0.05] via-surface to-emerald-500/[0.015] dark:from-emerald-500/[0.06] dark:via-slate-950"
                 : "border-rose-500/60 dark:border-rose-500/45 shadow-[0_0_55px_-5px_rgba(244,63,94,0.25)] bg-gradient-to-br from-rose-500/[0.05] via-surface to-rose-500/[0.015] dark:from-rose-500/[0.06] dark:via-slate-950"
             )}
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-[11px] sm:text-xs font-black uppercase tracking-[0.14em] text-primary">
-                  <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-pulse" /> <span>Server-side Authenticated</span>
+                <p className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] sm:text-xs font-black uppercase tracking-[0.14em] ${
+                  isAdminOverride
+                    ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                    : "bg-primary/10 text-primary"
+                }`}>
+                  <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-pulse" />
+                  <span>
+                    {isAdminOverride
+                      ? (language === "id" ? "🌐 Akses Terbuka (Administrator)" : "🌐 Offener Zugang (Administrator)")
+                      : "Server-side Authenticated"}
+                  </span>
                 </p>
                 <h3 className="mt-2.5 sm:mt-4 font-display text-2xl sm:text-3xl font-black">
                   {language === "id" ? "Bahan Belajar ECL Deutsch B2" : "ECL Deutsch B2 Lernmaterialien"}
                 </h3>
               </div>
               
-              <div className="flex flex-col gap-2.5 sm:items-end w-full sm:w-auto">
-                <MagneticButton className="w-full sm:w-[240px]">
-                  <motion.button
-                    type="button"
-                    whileHover="hover"
-                    whileTap="press"
-                    variants={{
-                      hover: {
-                        scale: 1.03,
-                        y: -3,
-                        borderColor: "rgba(239, 68, 68, 0.5)",
-                        backgroundColor: "rgba(239, 68, 68, 0.12)"
-                      },
-                      press: {
-                        scale: 0.95,
-                        borderColor: "rgb(239, 68, 68)",
-                        backgroundColor: "rgba(239, 68, 68, 0.25)"
-                      }
-                    }}
-                    transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                    onClick={() => setConfirmLock(true)}
-                    className="flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black transition-colors duration-300 focus-ring cursor-pointer select-none w-full sm:w-[240px]"
-                  >
-                    <motion.span
+              {!isAdminOverride ? (
+                <div className="flex flex-col gap-2.5 sm:items-end w-full sm:w-auto">
+                  <MagneticButton className="w-full sm:w-[240px]">
+                    <motion.button
+                      type="button"
+                      whileHover="hover"
+                      whileTap="press"
                       variants={{
-                        hover: { rotate: 15, scale: 1.2 },
-                        press: { rotate: 0, scale: 0.85 }
+                        hover: { scale: 1.03, y: -2 },
+                        press: { scale: 0.95 }
                       }}
-                      transition={{ type: "spring", stiffness: 450, damping: 10 }}
-                      className="inline-flex items-center"
+                      transition={{ type: "spring", stiffness: 380, damping: 12 }}
+                      onClick={() => setConfirmLock(true)}
+                      className="flex items-center justify-center gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white hover:border-rose-600 active:bg-rose-700 shadow-sm hover:shadow-md hover:shadow-rose-600/20 px-5 py-3 text-xs sm:text-sm font-black transition-all duration-300 focus-ring cursor-pointer select-none w-full sm:w-[240px]"
                     >
-                      <LockKeyhole className="h-4 w-4" />
-                    </motion.span>
-                    <span>{language === "id" ? "Kunci Sesi" : "Sitzung sperren"}</span>
-                  </motion.button>
-                </MagneticButton>
-                
-                <div className="flex items-center justify-between sm:justify-end gap-2.5 w-full sm:w-[240px]">
-                  <span className="text-[11px] sm:text-xs font-black text-muted leading-tight">
-                    {language === "id" ? "Ingat kata sandi & sesi akses di browser ini" : "Sitzung & Passwort auf diesem Browser merken"}
-                  </span>
-                  <div
-                    className={cn(
-                      "relative inline-flex h-5 w-10 sm:h-6 sm:w-12 cursor-pointer rounded-full border-2 transition-all duration-300 ease-in-out select-none items-center touch-pan-x shrink-0",
-                      rememberSession
-                        ? "bg-emerald-500 border-emerald-500 ring-2 ring-emerald-400/30 shadow-[0_0_15px_rgba(16,185,129,0.45)]"
-                        : "bg-rose-500 border-rose-500 ring-2 ring-rose-400/30 shadow-[0_0_15px_rgba(244,63,94,0.45)]"
-                    )}
-                    onClick={() => {
-                      const nextVal = !rememberSession;
-                      setRememberSession(nextVal);
-                      localStorage.setItem("remember_session_ecl-material", nextVal ? "true" : "false");
-                    }}
-                    aria-label={rememberSession ? "Ingat sesi aktif" : "Ingat sesi nonaktif"}
-                  >
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      initial={{ x: rememberSession ? (typeof window !== 'undefined' && window.innerWidth < 640 ? 20 : 24) : 0 }}
-                      animate={{ x: rememberSession ? (typeof window !== 'undefined' && window.innerWidth < 640 ? 20 : 24) : 0 }}
-                      transition={{ type: "spring", stiffness: 600, damping: 32 }}
-                      className="pointer-events-auto h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-white shadow ring-0 cursor-pointer"
-                    />
+                      <LockKeyhole className="h-4 w-4 shrink-0" />
+                      <span>{language === "id" ? "Kunci Sesi" : "Sperren"}</span>
+                    </motion.button>
+                  </MagneticButton>
+                  
+                  {/* Switch bar for Remember Session (Hidden during Admin Override) */}
+                  <div className="flex items-center justify-between gap-2.5 w-full sm:w-[240px]">
+                    <span className="text-[11px] sm:text-xs font-black text-muted leading-tight">
+                      {language === "id" ? "Ingat kata sandi & sesi akses di browser ini" : "Sitzung & Passwort auf diesem Browser merken"}
+                    </span>
+                    <div
+                      className={cn(
+                        "relative inline-flex h-5 w-10 sm:h-6 sm:w-12 cursor-pointer rounded-full border-2 transition-all duration-300 ease-in-out select-none items-center touch-pan-x shrink-0",
+                        rememberSession
+                          ? "bg-emerald-500 border-emerald-500 ring-2 ring-emerald-400/30 shadow-[0_0_15px_rgba(16,185,129,0.45)]"
+                          : "bg-rose-500 border-rose-500 ring-2 ring-rose-400/30 shadow-[0_0_15px_rgba(244,63,94,0.45)]"
+                      )}
+                      onClick={() => {
+                        const nextVal = !rememberSession;
+                        setRememberSession(nextVal);
+                        localStorage.setItem("remember_session_ecl-material", nextVal ? "true" : "false");
+                      }}
+                      aria-label={rememberSession ? "Ingat sesi aktif" : "Ingat sesi nonaktif"}
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        initial={{ x: rememberSession ? (typeof window !== 'undefined' && window.innerWidth < 640 ? 20 : 24) : 0 }}
+                        animate={{ x: rememberSession ? (typeof window !== 'undefined' && window.innerWidth < 640 ? 20 : 24) : 0 }}
+                        transition={{ type: "spring", stiffness: 600, damping: 32 }}
+                        className="pointer-events-auto h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-white shadow ring-0 cursor-pointer"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : null}
             </div>
 
             <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-6 md:grid-cols-2">
               <motion.article
                 whileHover={{ y: -4 }}
                 whileTap={{ scale: 0.985 }}
-                className="premium-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-line flex flex-col justify-between cursor-pointer select-none"
+                className="premium-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-line flex flex-col justify-between select-none overflow-hidden"
               >
                 <div>
                   <motion.div
                     whileTap={{ scale: 0.88, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)" }}
-                    className="icon-orbit grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl sm:rounded-2xl border border-line bg-primary/10 text-primary"
+                    className="icon-orbit grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
                   >
                     <FileText className="h-5.5 w-5.5 sm:h-6 sm:w-6" />
                   </motion.div>
-                  <h4 className="mt-3.5 sm:mt-4 font-display text-lg sm:text-xl font-black">
-                    {language === "id" ? "Dokumen 1 — Cerita SUKI & Ujian Berbicara B2" : "Dokument 1 — SUKI-Geschichten & B2-Sprechen"}
+                  <h4 className="mt-3.5 sm:mt-4 font-display text-base sm:text-xl font-black leading-snug break-words">
+                    {language === "id" ? "Dokumen 1 — Kumpulan Contoh Soal Ujian ECL B2" : "Dokument 1 — ECL B2 Beispielaufgaben Sammlung"}
                   </h4>
-                  <p className="mt-2 text-xs sm:text-sm font-bold leading-6 text-muted">
+                  <p className="mt-2 text-xs sm:text-sm font-bold leading-6 text-muted break-words">
                     {language === "id"
-                      ? "Berisi cerita singkat SUKI, materi Bagian 1 Ujian Berbicara, Tema Resmi Ujian Berbicara ECL yang diambil langsung dari situs resmi ECL, serta sebagian bocoran asli tema Bagian 2 dan Bagian 3 Ujian Berbicara ECL Deutsch B2."
-                      : "Enthält SUKI-Kurzgeschichten, B2-Sprechen Teil 1-Unterlagen, offizielle ECL-Themen direkt von der ECL-Website sowie geleakte Sprechen-Themen für Teil 2 und 3."}
+                      ? "Kumpulan lembar latihan resmi dan contoh soal struktur ujian ECL Deutsch B2 lengkap dengan petunjuk pengerjaan."
+                      : "Sammlung offizieller Übungsblätter und Beispielaufgaben der ECL Deutsch B2 Prüfung mit Bearbeitungshinweisen."}
                   </p>
                 </div>
                 <MagneticButton className="mt-5 sm:mt-6 w-full">
                   <motion.a
-                    href="https://docs.google.com/document/d/1KHzF7IriKkR2p4oFFRq_XQx3IXHL6k5Dky1wp5c8HOo/preview"
+                    href={
+                      docToggles.doc1
+                        ? "https://docs.google.com/document/d/1KHzF7IriKkR2p4oFFRq_XQx3IXHL6k5Dky1wp5c8HOo/edit?usp=sharing"
+                        : "/ecl-b2/unavailable?doc=1"
+                    }
+                    target={docToggles.doc1 ? "_blank" : "_self"}
+                    rel={docToggles.doc1 ? "noopener noreferrer" : undefined}
                     whileHover="hover"
                     whileTap="press"
                     variants={{
@@ -519,16 +549,7 @@ export function ECLMaterialSection() {
                     className="button-primary focus-ring w-full flex items-center justify-center gap-2 text-xs sm:text-sm py-2.5 sm:py-3 border-0"
                   >
                     <span>{language === "id" ? "Buka Dokumen" : "Dokument öffnen"}</span>
-                    <motion.span
-                      variants={{
-                        hover: { x: 3, y: -3 },
-                        press: { x: 1, y: -1 }
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      className="inline-flex items-center animate-pulse"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    </motion.span>
+                    <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                   </motion.a>
                 </MagneticButton>
               </motion.article>
@@ -536,19 +557,19 @@ export function ECLMaterialSection() {
               <motion.article
                 whileHover={{ y: -4 }}
                 whileTap={{ scale: 0.985 }}
-                className="premium-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-line flex flex-col justify-between cursor-pointer select-none"
+                className="premium-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-line flex flex-col justify-between select-none overflow-hidden"
               >
                 <div>
                   <motion.div
                     whileTap={{ scale: 0.88, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)" }}
-                    className="icon-orbit grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl sm:rounded-2xl border border-line bg-primary/10 text-primary"
+                    className="icon-orbit grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
                   >
                     <FileText className="h-5.5 w-5.5 sm:h-6 sm:w-6" />
                   </motion.div>
-                  <h4 className="mt-3.5 sm:mt-4 font-display text-lg sm:text-xl font-black">
+                  <h4 className="mt-3.5 sm:mt-4 font-display text-base sm:text-xl font-black leading-snug break-words">
                     {language === "id" ? "Dokumen 2 — Bocoran Membaca, Menulis & Mendengar B2" : "Dokument 2 — B2 Lesen, Schreiben & Hören Vorbereitung"}
                   </h4>
-                  <p className="mt-2 text-xs sm:text-sm font-bold leading-6 text-muted">
+                  <p className="mt-2 text-xs sm:text-sm font-bold leading-6 text-muted break-words">
                     {language === "id"
                       ? "Berisi semua kumpulan bocoran soal asli untuk sub-ujian Membaca, Menulis, dan Mendengar ECL Deutsch B2, serta sebagian bocoran asli tema Bagian 2 dan Bagian 3 Ujian Berbicara ECL Deutsch B2."
                       : "Enthält eine Sammlung originaler Übungsaufgaben für die B2-Prüfungsteile Lesen, Schreiben und Hören sowie geleakte Sprechen-Themen für Teil 2 und 3."}
@@ -556,7 +577,13 @@ export function ECLMaterialSection() {
                 </div>
                 <MagneticButton className="mt-5 sm:mt-6 w-full">
                   <motion.a
-                    href="https://docs.google.com/document/d/1h_Io7Tl451P8otFz5q_3nS7xyepxJ3FckjAvvW03U0U/preview"
+                    href={
+                      docToggles.doc2
+                        ? "https://docs.google.com/document/d/1h_Io7Tl451P8otFz5q_3nS7xyepxJ3FckjAvvW03U0U/edit?usp=sharing"
+                        : "/ecl-b2/unavailable?doc=2"
+                    }
+                    target={docToggles.doc2 ? "_blank" : "_self"}
+                    rel={docToggles.doc2 ? "noopener noreferrer" : undefined}
                     whileHover="hover"
                     whileTap="press"
                     variants={{
@@ -567,16 +594,48 @@ export function ECLMaterialSection() {
                     className="button-primary focus-ring w-full flex items-center justify-center gap-2 text-xs sm:text-sm py-2.5 sm:py-3 border-0"
                   >
                     <span>{language === "id" ? "Buka Dokumen" : "Dokument öffnen"}</span>
-                    <motion.span
-                      variants={{
-                        hover: { x: 3, y: -3 },
-                        press: { x: 1, y: -1 }
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      className="inline-flex items-center animate-pulse"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    </motion.span>
+                    <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                  </motion.a>
+                </MagneticButton>
+              </motion.article>
+
+              {/* Dokumen 3 — Full Width Memanjang di Bawah Dokumen 1 & 2 */}
+              <motion.article
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.985 }}
+                className="premium-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-line flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none md:col-span-2 overflow-hidden"
+              >
+                <div className="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0">
+                  <motion.div
+                    whileTap={{ scale: 0.88, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)" }}
+                    className="icon-orbit grid h-10 w-10 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
+                  >
+                    <FileText className="h-5.5 w-5.5 sm:h-6 sm:w-6" />
+                  </motion.div>
+                  <h4 className="font-display text-base sm:text-xl font-black leading-snug break-words min-w-0">
+                    {language === "id" ? "Dokumen 3 — Wahyu Ilahi ECL B2 Agustus 2026" : "Dokument 3 — Wahyu Ilahi ECL B2 August 2026"}
+                  </h4>
+                </div>
+                <MagneticButton className="w-full sm:w-auto shrink-0">
+                  <motion.a
+                    href={
+                      docToggles.doc3
+                        ? "https://docs.google.com/document/d/1JxCMWPL2n3fyJSYIZ3KVUFUbBdY8cdBc29Z6kO3YHLo/edit?usp=sharing"
+                        : "/ecl-b2/unavailable?doc=3"
+                    }
+                    target={docToggles.doc3 ? "_blank" : "_self"}
+                    rel={docToggles.doc3 ? "noopener noreferrer" : undefined}
+                    whileHover="hover"
+                    whileTap="press"
+                    variants={{
+                      hover: { scale: 1.02, y: -2 },
+                      press: { scale: 0.97 }
+                    }}
+                    transition={{ type: "spring", stiffness: 380, damping: 12 }}
+                    className="button-primary focus-ring w-full sm:w-auto px-6 flex items-center justify-center gap-2 text-xs sm:text-sm py-2.5 sm:py-3 border-0"
+                  >
+                    <span>{language === "id" ? "Buka Dokumen" : "Dokument öffnen"}</span>
+                    <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                   </motion.a>
                 </MagneticButton>
               </motion.article>

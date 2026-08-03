@@ -1,0 +1,82 @@
+{
+  "auth": {
+    "username": "Hajaturrachman10",
+    "passwordHash": "Xyzordie67@",
+    "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+    "lastPasswordChange": 1785340800000
+  },
+  "accounts": [
+    {
+      "id": "acc-1",
+      "username": "Hajaturrachman10",
+      "passwords": [
+        "Xyzordie67@"
+      ],
+      "role": "SUPER_ADMIN",
+      "createdAt": 1785485599887
+    }
+  ],
+  "strategies": {
+    "cv": {
+      "type": "STATIC",
+      "password": "cvhajat2026"
+    },
+    "vault": {
+      "type": "STATIC",
+      "password": "hajatprivat2026"
+    },
+    "ecl": {
+      "type": "YEAR_RANGE",
+      "base": "10juli",
+      "startYear": 2006,
+      "endYear": 2026
+    }
+  },
+  "toggles": {
+    "cv": {
+      "protected": true,
+      "updatedAt": 1785454531937
+    },
+    "vault": {
+      "protected": true,
+      "updatedAt": 1785454699919
+    },
+    "ecl": {
+      "protected": true,
+      "updatedAt": 1785454648862
+    },
+    "ecl_doc1": {
+      "protected": true,
+      "updatedAt": 1785745098187
+    },
+    "ecl_doc2": {
+      "protected": true,
+      "updatedAt": 1785745098187
+    },
+    "ecl_doc3": {
+      "protected": false,
+      "updatedAt": 1785745396835
+    }
+  },
+  "globalEpoch": 1785454699919,
+  "stats": {
+    "totalVisitors": 1420,
+    "cvUnlocks": 128,
+    "vaultUnlocks": 45,
+    "eclUnlocks": 89,
+    "contactSubmissions": 8
+  },
+  "lastLogin": {
+    "time": 1785448800773,
+    "ip": "127.0.0.1",
+    "browser": "Chrome / Next.js Admin Client",
+    "remember": true
+  },
+  "loginHistory": {
+    "failedCountToday": 0,
+    "successCountToday": 0,
+    "totalFailed": 37,
+    "totalSuccess": 8,
+    "lastResetDate": "2026-08-03"
+  }
+}

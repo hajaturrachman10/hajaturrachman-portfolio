@@ -37,7 +37,7 @@ export function PageRestoreOverlay() {
           >
             <div className="relative flex items-center justify-center">
               <div className="absolute h-16 w-16 rounded-full bg-primary/20 animate-ping blur-md" />
-              <div className="icon-orbit grid h-14 w-14 place-items-center rounded-3xl border border-primary/30 bg-primary/10 text-primary shadow-glow shadow-primary/20">
+              <div className="icon-orbit grid h-14 w-14 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary shadow-glow shadow-primary/20">
                 <Sparkles className="h-7 w-7 animate-pulse" />
               </div>
             </div>

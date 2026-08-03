@@ -104,7 +104,15 @@ export const contactService = {
           messages = [];
         }
       }
-      messages.unshift({ id: Date.now().toString(), ...dataPayload });
+      messages.unshift({
+        id: `msg-${Date.now()}`,
+        name: payload.name,
+        email: payload.email,
+        subject: `Pesan Kontak Baru dari ${payload.name}`,
+        message: payload.message,
+        timestamp: new Date().toISOString(),
+        status: "unread"
+      });
       fs.writeFileSync(filePath, JSON.stringify(messages, null, 2), "utf-8");
       savedToLocal = true;
     } catch (err) {

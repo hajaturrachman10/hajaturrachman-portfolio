@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { PasswordModal } from "@/components/modals/PasswordModal";
+import { subscribeCrossTabSync } from "@/lib/crossTabSync";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { useSiteData } from "@/data/site";
@@ -97,6 +98,9 @@ export function PrivateVaultSection() {
     }
   }
 
+  const [isAdminOverride, setIsAdminOverride] = useState(false);
+  const [adminTransition, setAdminTransition] = useState<{ active: boolean; isEnabling: boolean } | null>(null);
+
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -104,31 +108,40 @@ export function PrivateVaultSection() {
         if (response.ok) {
           const data = await response.json();
           if (data.vaultUnlocked) {
-            const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") === "true";
-            if (!remember) {
-              setIsLocking(true);
-              setCheckingAuth(false);
-              try {
-                await fetch("/api/auth/lock", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ type: "private-vault" }),
-                });
-              } catch (e) {
-                console.error(e);
-              }
-              await new Promise((resolve) => setTimeout(resolve, 1800));
-              setUnlocked(false);
-              setIsLocking(false);
-            } else {
-              setIsUnlocking(true);
-              setCheckingAuth(false);
+            if (data.overrides?.vault) {
+              setIsAdminOverride(true);
               await fetchVaultData();
-              await new Promise((resolve) => setTimeout(resolve, 1500));
               setUnlocked(true);
-              setIsUnlocking(false);
+              setCheckingAuth(false);
+            } else {
+              setIsAdminOverride(false);
+              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") === "true";
+              if (!remember) {
+                setIsLocking(true);
+                setCheckingAuth(false);
+                try {
+                  await fetch("/api/auth/lock", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ type: "private-vault" })
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
+                await new Promise((resolve) => setTimeout(resolve, 1800));
+                setUnlocked(false);
+                setIsLocking(false);
+              } else {
+                setIsUnlocking(true);
+                setCheckingAuth(false);
+                await fetchVaultData();
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+                setUnlocked(true);
+                setIsUnlocking(false);
+              }
             }
           } else {
+            setIsAdminOverride(false);
             setUnlocked(false);
             setCheckingAuth(false);
           }
@@ -139,6 +152,56 @@ export function PrivateVaultSection() {
       }
     }
     checkAuth();
+
+    const unsubscribe = subscribeCrossTabSync(async (msg) => {
+      if (msg.event === "TOGGLE_CHANGED") {
+        const feat = msg.data?.feature;
+        if (feat === "vault" || !feat) {
+          const isEnabling = !!msg.data?.protected;
+          setAdminTransition({ active: true, isEnabling });
+          await new Promise((r) => setTimeout(r, 1600));
+          try {
+            const res = await fetch("/api/auth/status", { cache: "no-store" });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.vaultUnlocked) {
+                setUnlocked(true);
+                setIsAdminOverride(!!data.overrides?.vault);
+                await fetchVaultData();
+              } else {
+                setUnlocked(false);
+                setIsAdminOverride(false);
+                setVaultData(null);
+                setModalOpen(false);
+              }
+            }
+          } catch {
+            // Handled
+          } finally {
+            setAdminTransition(null);
+          }
+        }
+      } else if (
+        msg.event === "SESSION_REVOKED" ||
+        msg.event === "CONFIG_RESTORED" ||
+        msg.event === "PUBLIC_SESSION_INVALID"
+      ) {
+        try {
+          const res = await fetch("/api/auth/status", { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            if (!data.vaultUnlocked) {
+              setUnlocked(false);
+              setModalOpen(false);
+            }
+          }
+        } catch {
+          // Handled
+        }
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   async function handleLockConfirm() {
@@ -166,7 +229,7 @@ export function PrivateVaultSection() {
 
   return (
     <>
-      <Reveal id="private" className="container-page section-space pt-0 overflow-hidden">
+      <Reveal id="private" className="container-page section-space overflow-hidden">
         <SectionHeader
           eyebrow={language === "id" ? "Ruang Personal" : "Persönlicher Bereich"}
           title={language === "id" ? "Ruang cerita untuk keluarga, sahabat, dan orang terdekat." : "Geschützter Bereich für Familie, Freunde und Angehörige."}
@@ -176,192 +239,118 @@ export function PrivateVaultSection() {
         />
 
         <AnimatePresence mode="wait">
-          {isLocking ? (
-            /* SECURING SESSION ANIMATED VIEW (UPGRADED & MOBILE-OPTIMIZED) */
-            <motion.div 
-              key="locking"
-              initial={{ opacity: 0, scale: 0.94, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: -20 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="premium-card rounded-3xl sm:rounded-4xl p-5 sm:p-10 flex flex-col items-center justify-center py-12 sm:py-16 gap-5 sm:gap-6 text-center border border-rose-500/30 bg-gradient-to-b from-rose-500/[0.04] via-surface to-surface shadow-[0_0_45px_-10px_rgba(244,63,94,0.18)] w-full relative overflow-hidden"
-            >
-              <div className="absolute h-36 w-36 sm:h-40 sm:w-40 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
-
-              <div className="relative h-16 w-16 sm:h-20 sm:w-20 flex items-center justify-center">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0.5 }}
-                  animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
-                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
-                  className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-rose-500/25"
-                />
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0.5 }}
-                  animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
-                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
-                  className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-rose-500/25"
-                />
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
-                  className="absolute -inset-1.5 sm:-inset-2 rounded-[22px] sm:rounded-[26px] border-2 border-dashed border-rose-500/40 z-10"
-                />
-                <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{ repeat: Infinity, duration: 1.0, ease: "linear" }}
-                  className="absolute -inset-3 sm:-inset-3.5 rounded-[26px] sm:rounded-[30px] border-2 border-t-rose-500 border-r-transparent border-b-transparent border-l-transparent z-10"
-                />
-                <motion.div 
-                  initial={{ rotate: 180, scale: 0.3 }}
-                  animate={{ rotate: 0, scale: 1 }}
-                  transition={{ type: "spring", stiffness: 220, damping: 14 }}
-                  className="icon-orbit relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-2xl sm:rounded-3xl border border-rose-500/30 bg-rose-500/15 text-rose-500 shadow-glow shadow-rose-500/10 z-20"
-                >
-                  <motion.span
-                    animate={{ scale: [1, 0.9, 1.12, 1] }}
-                    transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                    className="inline-flex"
-                  >
-                    <LockKeyhole className="h-7 w-7 sm:h-9 sm:w-9" />
-                  </motion.span>
-                </motion.div>
-              </div>
-
-              <div className="space-y-2 max-w-xs sm:max-w-sm w-full z-20 mt-1 sm:mt-2">
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 px-3 py-1 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.16em] text-rose-500"
-                >
-                  <RefreshCw className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin" />
-                  <span>ENKRIPSI SESI AKTIF</span>
-                </motion.div>
-
-                <h4 className="font-display text-xl sm:text-2xl font-black text-rose-500 tracking-tight">
-                  {language === "id" ? "Mengamankan Sesi..." : "Sitzung sichern..."}
-                </h4>
-                <p className="text-xs font-bold text-muted leading-5">
-                  {language === "id" ? "Memusnahkan token sesi dan mengunci kembali akses server." : "Token wird vernichtet und Zugang wieder gesperrt."}
-                </p>
-
-                <div className="w-full bg-rose-500/15 h-2 rounded-full mt-3.5 sm:mt-4 overflow-hidden border border-rose-500/20">
-                  <motion.div
-                    className="bg-rose-500 h-full rounded-full"
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 1.7, ease: "easeInOut" }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          ) : isUnlocking ? (
-            /* RESTORING SESSION ANIMATED VIEW (UPGRADED & MOBILE-OPTIMIZED) */
-            <motion.div 
-              key="unlocking"
-              initial={{ opacity: 0, scale: 0.94, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: -20 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="premium-card rounded-3xl sm:rounded-4xl p-5 sm:p-10 flex flex-col items-center justify-center py-12 sm:py-16 gap-5 sm:gap-6 text-center border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.04] via-surface to-surface shadow-[0_0_45px_-10px_rgba(16,185,129,0.18)] w-full relative overflow-hidden"
-            >
-              <div className="absolute h-36 w-36 sm:h-40 sm:w-40 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-
-              <div className="relative h-16 w-16 sm:h-20 sm:w-20 flex items-center justify-center">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0.5 }}
-                  animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
-                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
-                  className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-emerald-500/25"
-                />
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0.5 }}
-                  animate={{ scale: [1, 2.4], opacity: [0.7, 0] }}
-                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
-                  className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-emerald-500/25"
-                />
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
-                  className="absolute -inset-1.5 sm:-inset-2 rounded-[22px] sm:rounded-[26px] border-2 border-dashed border-emerald-500/40 z-10"
-                />
-                <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{ repeat: Infinity, duration: 1.0, ease: "linear" }}
-                  className="absolute -inset-3 sm:-inset-3.5 rounded-[26px] sm:rounded-[30px] border-2 border-t-emerald-500 border-r-transparent border-b-transparent border-l-transparent z-10"
-                />
-                <motion.div 
-                  initial={{ rotate: -180, scale: 0.3 }}
-                  animate={{ rotate: 0, scale: 1 }}
-                  transition={{ type: "spring", stiffness: 220, damping: 14 }}
-                  className="icon-orbit relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-2xl sm:rounded-3xl border border-emerald-500/30 bg-emerald-500/15 text-emerald-500 shadow-glow shadow-emerald-500/10 z-20"
-                >
-                  <motion.span
-                    animate={{ scale: [1, 0.9, 1.12, 1] }}
-                    transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                    className="inline-flex"
-                  >
-                    <ShieldCheck className="h-7 w-7 sm:h-9 sm:w-9" />
-                  </motion.span>
-                </motion.div>
-              </div>
-
-              <div className="space-y-2 max-w-xs sm:max-w-sm w-full z-20 mt-1 sm:mt-2">
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.16em] text-emerald-500"
-                >
-                  <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-pulse text-emerald-400" />
-                  <span>MEMULIHKAN OTENTIKASI SERVER</span>
-                </motion.div>
-
-                <h4 className="font-display text-xl sm:text-2xl font-black text-emerald-500 tracking-tight">
-                  {language === "id" ? "Memulihkan Sesi Aman..." : "Sitzung wird wiederhergestellt..."}
-                </h4>
-                <p className="text-xs font-bold text-muted leading-5">
-                  {language === "id" ? "Akses otomatis dipulihkan karena sesi diingat di browser ini." : "Zugang wird automatisch wiederhergestellt."}
-                </p>
-
-                <div className="w-full bg-emerald-500/15 h-2 rounded-full mt-3.5 sm:mt-4 overflow-hidden border border-emerald-500/20">
-                  <motion.div
-                    className="bg-emerald-500 h-full rounded-full"
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 1.4, ease: "easeInOut" }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          ) : checkingAuth ? (
-            /* CHECKING AUTH SKELETON (MOBILE OPTIMIZED) */
+          {adminTransition?.active ? (
+            /* ADMIN OVERRIDE TRANSITION ANIMATED OVERLAY */
             <motion.div
-              key="checking"
+              key="admin-transition"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 sm:p-8"
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[380px] sm:min-h-[420px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
             >
-              <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-                <div>
-                  <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl sm:rounded-3xl skeleton-shimmer" />
-                  <div className="mt-4 sm:mt-6 h-7 sm:h-8 w-40 sm:w-48 rounded skeleton-shimmer" />
-                  <div className="mt-3 sm:mt-4 space-y-2">
-                    <div className="h-3.5 sm:h-4 w-full rounded skeleton-shimmer" />
-                    <div className="h-3.5 sm:h-4 w-5/6 rounded skeleton-shimmer" />
-                  </div>
-                  <div className="mt-5 sm:mt-6 h-10 sm:h-11 w-36 sm:w-44 rounded-full skeleton-shimmer" />
+              <div className={cn(
+                "grid h-12 w-12 place-items-center rounded-2xl border shadow-glow",
+                adminTransition.isEnabling
+                  ? "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
+                  : "border-blue-500/30 bg-blue-500/10 text-blue-500 shadow-blue-500/20"
+              )}>
+                <RefreshCw className="h-6 w-6 animate-spin" />
+              </div>
+
+              <div>
+                <div className={cn(
+                  "inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 border",
+                  adminTransition.isEnabling
+                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                    : "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                )}>
+                  <span>PENEGASAN ADMINISTRATOR</span>
                 </div>
-                <div className="grid gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-1">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="rounded-2xl sm:rounded-4xl border border-line bg-surface/50 p-3.5 sm:p-5 space-y-2.5">
-                      <div className="h-5 w-5 rounded skeleton-shimmer" />
-                      <div className="h-4 w-24 sm:w-32 rounded skeleton-shimmer" />
-                      <div className="h-3 w-5/6 rounded skeleton-shimmer" />
-                    </div>
-                  ))}
+                <h4 className={cn(
+                  "font-display text-sm sm:text-base font-black",
+                  adminTransition.isEnabling ? "text-rose-500" : "text-blue-500"
+                )}>
+                  {adminTransition.isEnabling
+                    ? "🔒 Proteksi Dipulihkan oleh Administrator..."
+                    : "🌐 Akses Ditingkatkan oleh Administrator..."}
+                </h4>
+              </div>
+
+              <div className={cn(
+                "w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border",
+                adminTransition.isEnabling ? "bg-rose-500/15 border-rose-500/20" : "bg-blue-500/15 border-blue-500/20"
+              )}>
+                <motion.div
+                  className={cn("h-full rounded-full", adminTransition.isEnabling ? "bg-rose-500" : "bg-blue-500")}
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1.4, ease: "easeInOut" }}
+                />
+              </div>
+            </motion.div>
+          ) : isLocking ? (
+            /* SECURING SESSION ANIMATED VIEW (ADMIN STYLE OVERLAY) */
+            <motion.div
+              key="locking"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[380px] sm:min-h-[420px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
+            >
+              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
+                <RefreshCw className="h-6 w-6 animate-spin" />
+              </div>
+
+              <div>
+                <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                  <span>ENKRIPSI SESI</span>
                 </div>
+                <h4 className="font-display text-sm sm:text-base font-black text-rose-500">
+                  {language === "id" ? "Mengamankan Sesi..." : "Sitzung sichern..."}
+                </h4>
+              </div>
+
+              <div className="w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border bg-rose-500/15 border-rose-500/20">
+                <motion.div
+                  className="bg-rose-500 h-full rounded-full"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1.1, ease: "easeInOut" }}
+                />
+              </div>
+            </motion.div>
+          ) : isUnlocking ? (
+            /* RESTORING SESSION ANIMATED VIEW (ADMIN STYLE OVERLAY) */
+            <motion.div
+              key="unlocking"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[380px] sm:min-h-[420px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
+            >
+              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20">
+                <RefreshCw className="h-6 w-6 animate-spin" />
+              </div>
+
+              <div>
+                <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                  <span>OTENTIKASI</span>
+                </div>
+                <h4 className="font-display text-sm sm:text-base font-black text-emerald-500">
+                  {language === "id" ? "Memulihkan Sesi Aman..." : "Sitzung wird wiederhergestellt..."}
+                </h4>
+              </div>
+
+              <div className="w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border bg-emerald-500/15 border-emerald-500/20">
+                <motion.div
+                  className="bg-emerald-500 h-full rounded-full"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
+                />
               </div>
             </motion.div>
           ) : !unlocked ? (
@@ -376,30 +365,19 @@ export function PrivateVaultSection() {
             >
               <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
                 <div>
-                  <MagneticButton className="w-fit">
                     <motion.div
+                      onClick={() => setModalOpen(true)}
                       whileHover="hover"
                       whileTap="press"
                       variants={{
-                        hover: {
-                          scale: 1.08,
-                          rotate: 6,
-                          borderColor: "rgb(var(--color-primary) / 0.56)",
-                          boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)"
-                        },
-                        press: {
-                          scale: 0.88,
-                          rotate: 6,
-                          borderColor: "rgb(var(--color-primary) / 0.72)",
-                          boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)"
-                        }
+                        hover: { scale: 1.06, rotate: 6, boxShadow: "0 0 18px rgb(var(--color-primary) / 0.35)" },
+                        press: { scale: 0.94, rotate: 3, boxShadow: "0 0 12px rgb(var(--color-primary) / 0.5)" }
                       }}
                       transition={{ type: "spring", stiffness: 450, damping: 18 }}
                       className="icon-orbit grid h-14 w-14 sm:h-16 sm:w-16 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
                     >
                       <LockKeyhole className="h-7 w-7 sm:h-8 sm:w-8" />
                     </motion.div>
-                  </MagneticButton>
                   
                   <h3 className="mt-4 sm:mt-6 font-display text-2xl sm:text-3xl font-black">{privateVault.title}</h3>
                   <p className="mt-2.5 sm:mt-4 text-sm sm:text-base leading-7 sm:leading-8 text-muted">{privateVault.description}</p>
@@ -411,51 +389,36 @@ export function PrivateVaultSection() {
                       whileHover="hover"
                       whileTap="press"
                       variants={{
-                        hover: { scale: 1.03, y: -3 },
-                        press: { scale: 0.95 }
+                        hover: { scale: 1.02, y: -2 },
+                        press: { scale: 0.97 }
                       }}
                       transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                      className="button-primary shimmer-constant focus-ring w-full sm:w-auto border-0 flex items-center justify-center gap-2.5 cursor-pointer select-none py-3"
+                      className="button-primary shimmer-constant focus-ring w-full sm:w-auto border-0 flex items-center justify-center gap-2 cursor-pointer select-none py-3 px-6 text-sm font-black"
                     >
-                      <motion.span
-                        variants={{
-                          hover: { scale: 1.25, rotate: -10 },
-                          press: { scale: 0.85, rotate: 0 }
-                        }}
-                        transition={{ type: "spring", stiffness: 450, damping: 10 }}
-                        className="inline-flex items-center"
-                      >
-                        <LockKeyhole className="h-4 w-4 sm:h-5 sm:w-5" />
-                      </motion.span>
-                      <span className="text-sm font-black">{language === "id" ? "Masukkan Kata Sandi" : "Code Eingeben"}</span>
+                      <LockKeyhole className="h-4 w-4 shrink-0" />
+                      <span>{language === "id" ? "Buka Akses Private Vault" : "Code Eingeben"}</span>
                     </motion.button>
                   </MagneticButton>
                 </div>
 
-                {/* 2x2 Grid on Mobile for Section Cards */}
+                {/* 2x2 Grid on Mobile for Section Cards (Static cards without hover animation) */}
                 <div className="grid gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-1">
                   {privateVault.sections.map((section, idx) => {
                     const Icon = sectionIcons[section.id] || sectionIcons.family;
                     return (
-                      <motion.article
+                      <motion.div
                         key={section.id}
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.35, delay: idx * 0.08 }}
-                        whileHover={{ y: -4, scale: 1.015 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="rounded-2xl sm:rounded-4xl border border-line bg-surface/80 p-3.5 sm:p-5 cursor-pointer select-none transition-colors hover:border-primary/45 group"
+                        className="rounded-2xl sm:rounded-4xl border border-line bg-surface/80 p-3.5 sm:p-5 select-none"
                       >
-                        <motion.div
-                          whileHover={{ scale: 1.15, rotate: 8 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                          className="w-fit"
-                        >
-                          <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary transition-transform duration-300 group-hover:scale-110" />
-                        </motion.div>
+                        <div className="icon-orbit grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-2xl border border-line bg-primary/10 text-primary">
+                          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                        </div>
                         <h4 className="mt-2.5 sm:mt-4 font-display text-sm sm:text-lg font-black">{section.title}</h4>
                         <p className="mt-1 text-xs font-bold leading-5 text-muted line-clamp-2 sm:line-clamp-none">{section.summary}</p>
-                      </motion.article>
+                      </motion.div>
                     );
                   })}
                 </div>
@@ -486,7 +449,9 @@ export function PrivateVaultSection() {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className={cn(
                 "premium-card rounded-3xl sm:rounded-4xl p-4 sm:p-8 select-none transition-all duration-500 border-2",
-                rememberSession
+                isAdminOverride
+                  ? "border-blue-500/60 dark:border-blue-500/45 shadow-[0_0_55px_-5px_rgba(59,130,246,0.25)] bg-gradient-to-br from-blue-500/[0.05] via-surface to-blue-500/[0.015] dark:from-blue-500/[0.06] dark:via-slate-950"
+                  : rememberSession
                   ? "border-emerald-500/60 dark:border-emerald-500/45 shadow-[0_0_55px_-5px_rgba(16,185,129,0.25)] bg-gradient-to-br from-emerald-500/[0.05] via-surface to-emerald-500/[0.015] dark:from-emerald-500/[0.06] dark:via-slate-950"
                   : "border-rose-500/60 dark:border-rose-500/45 shadow-[0_0_55px_-5px_rgba(244,63,94,0.25)] bg-gradient-to-br from-rose-500/[0.05] via-surface to-rose-500/[0.015] dark:from-rose-500/[0.06] dark:via-slate-950"
               )}
@@ -497,85 +462,75 @@ export function PrivateVaultSection() {
                   <motion.p 
                     initial={{ opacity: 0, x: -15 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] sm:text-xs font-black uppercase tracking-[0.14em] text-primary"
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] sm:text-xs font-black uppercase tracking-[0.14em] ${
+                      isAdminOverride
+                        ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                        : "bg-primary/10 text-primary"
+                    }`}
                   >
                     <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-pulse" />
-                    <span>{language === "id" ? "Terotentikasi Server Aman" : "Vom Server verifiziert"}</span>
+                    <span>
+                      {isAdminOverride
+                        ? (language === "id" ? "🌐 Akses Terbuka (Administrator)" : "🌐 Offener Zugang (Administrator)")
+                        : (language === "id" ? "Terotentikasi Server Aman" : "Vom Server verifiziert")}
+                    </span>
                   </motion.p>
                   <h3 className="mt-2.5 sm:mt-4 font-display text-2xl sm:text-3xl font-black">
                     {language === "id" ? "Ruang Personal Hajaturrachman" : "Persönlicher Bereich von Hajat"}
                   </h3>
                 </div>
                 
-                <div className="flex flex-col gap-2.5 sm:items-end w-full sm:w-auto">
-                  <MagneticButton className="w-full sm:w-[220px]">
-                    <motion.button
-                      type="button"
-                      whileHover="hover"
-                      whileTap="press"
-                      variants={{
-                        hover: {
-                          scale: 1.03,
-                          y: -3,
-                          borderColor: "rgba(239, 68, 68, 0.5)",
-                          backgroundColor: "rgba(239, 68, 68, 0.12)",
-                          boxShadow: "0 8px 16px rgba(239, 68, 68, 0.15)"
-                        },
-                        press: {
-                          scale: 0.95,
-                          y: 1,
-                          borderColor: "rgb(239, 68, 68)",
-                          backgroundColor: "rgba(239, 68, 68, 0.25)"
-                        }
-                      }}
-                      transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                      onClick={() => setConfirmLock(true)}
-                      className="flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black transition-colors duration-300 focus-ring cursor-pointer select-none w-full sm:w-[220px]"
-                    >
-                      <motion.span
+                {!isAdminOverride ? (
+                  <div className="flex flex-col gap-2.5 sm:items-end w-full sm:w-auto">
+                    <MagneticButton className="w-full sm:w-[240px]">
+                      <motion.button
+                        type="button"
+                        whileHover="hover"
+                        whileTap="press"
                         variants={{
-                          hover: { rotate: 15, scale: 1.2 },
-                          press: { rotate: 0, scale: 0.85 }
+                          hover: { scale: 1.03, y: -2 },
+                          press: { scale: 0.95 }
                         }}
-                        transition={{ type: "spring", stiffness: 450, damping: 10 }}
-                        className="inline-flex items-center"
+                        transition={{ type: "spring", stiffness: 380, damping: 12 }}
+                        onClick={() => setConfirmLock(true)}
+                        className="flex items-center justify-center gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white hover:border-rose-600 active:bg-rose-700 shadow-sm hover:shadow-md hover:shadow-rose-600/20 px-5 py-3 text-xs sm:text-sm font-black transition-all duration-300 focus-ring cursor-pointer select-none w-full sm:w-[240px]"
                       >
-                        <LockKeyhole className="h-4 w-4" />
-                      </motion.span>
-                      <span>{language === "id" ? "Kunci Sesi" : "Sitzung sperren"}</span>
-                    </motion.button>
-                  </MagneticButton>
-                  
-                  {/* Remember Session Switch Bar */}
-                  <div className="flex items-center justify-between sm:justify-end gap-2.5 w-full sm:w-[220px]">
-                    <span className="text-[11px] sm:text-xs font-black text-muted leading-tight">
-                      {language === "id" ? "Ingat kata sandi & sesi login di browser ini" : "Sitzung & Passwort auf diesem Browser merken"}
-                    </span>
-                    <div
-                      className={cn(
-                        "relative inline-flex h-5 w-10 sm:h-6 sm:w-12 cursor-pointer rounded-full border-2 transition-all duration-300 ease-in-out select-none items-center touch-pan-x shrink-0",
-                        rememberSession
-                          ? "bg-emerald-500 border-emerald-500 ring-2 ring-emerald-400/30 shadow-[0_0_15px_rgba(16,185,129,0.45)]"
-                          : "bg-rose-500 border-rose-500 ring-2 ring-rose-400/30 shadow-[0_0_15px_rgba(244,63,94,0.45)]"
-                      )}
-                      onClick={() => {
-                        const nextVal = !rememberSession;
-                        setRememberSession(nextVal);
-                        localStorage.setItem("remember_session_private-vault", nextVal ? "true" : "false");
-                      }}
-                      aria-label={rememberSession ? "Ingat sesi aktif" : "Ingat sesi nonaktif"}
-                    >
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        initial={{ x: rememberSession ? (typeof window !== 'undefined' && window.innerWidth < 640 ? 20 : 24) : 0 }}
-                        animate={{ x: rememberSession ? (typeof window !== 'undefined' && window.innerWidth < 640 ? 20 : 24) : 0 }}
-                        transition={{ type: "spring", stiffness: 600, damping: 32 }}
-                        className="pointer-events-auto h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-white shadow ring-0 cursor-pointer"
-                      />
+                        <LockKeyhole className="h-4 w-4 shrink-0" />
+                        <span>{language === "id" ? "Kunci Sesi" : "Sperren"}</span>
+                      </motion.button>
+                    </MagneticButton>
+                    
+                    {/* Switch bar for Remember Session (Hidden during Admin Override) */}
+                    <div className="flex items-center justify-between gap-2.5 w-full sm:w-[240px]">
+                      <span className="text-[11px] sm:text-xs font-black text-muted leading-tight">
+                        {language === "id" ? "Ingat kata sandi & sesi akses di browser ini" : "Sitzung & Passwort auf diesem Browser merken"}
+                      </span>
+                      <div
+                        className={cn(
+                          "relative inline-flex h-5 w-10 sm:h-6 sm:w-12 cursor-pointer rounded-full border-2 transition-all duration-300 ease-in-out select-none items-center touch-pan-x shrink-0",
+                          rememberSession
+                            ? "bg-emerald-500 border-emerald-500 ring-2 ring-emerald-400/30 shadow-[0_0_15px_rgba(16,185,129,0.45)]"
+                            : "bg-rose-500 border-rose-500 ring-2 ring-rose-400/30 shadow-[0_0_15px_rgba(244,63,94,0.45)]"
+                        )}
+                        onClick={() => {
+                          const nextVal = !rememberSession;
+                          setRememberSession(nextVal);
+                          localStorage.setItem("remember_session_private-vault", nextVal ? "true" : "false");
+                        }}
+                        aria-label={rememberSession ? "Ingat sesi aktif" : "Ingat sesi nonaktif"}
+                      >
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          initial={{ x: rememberSession ? (typeof window !== 'undefined' && window.innerWidth < 640 ? 20 : 24) : 0 }}
+                          animate={{ x: rememberSession ? (typeof window !== 'undefined' && window.innerWidth < 640 ? 20 : 24) : 0 }}
+                          transition={{ type: "spring", stiffness: 600, damping: 32 }}
+                          className="pointer-events-auto h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-white shadow ring-0 cursor-pointer"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : null}
               </div>
 
               {/* Animated Category Tabs: 2x2 Grid on Mobile, Flex on Desktop */}
@@ -602,16 +557,7 @@ export function PrivateVaultSection() {
                             : "border-line bg-surface/80 text-muted hover:border-primary/60 hover:text-text"
                         )}
                       >
-                        <motion.span
-                          variants={{
-                            hover: { scale: 1.25, rotate: 10 },
-                            press: { scale: 0.85, rotate: -5 }
-                          }}
-                          transition={{ type: "spring", stiffness: 450, damping: 10 }}
-                          className="inline-flex items-center shrink-0"
-                        >
-                          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                        </motion.span>
+                        <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                         <span className="truncate">{section.title}</span>
                       </motion.button>
                     </MagneticButton>
@@ -645,7 +591,7 @@ export function PrivateVaultSection() {
                       <motion.div 
                         whileHover={{ scale: 1.1, rotate: 8 }}
                         transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                        className="icon-orbit grid h-11 w-11 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl sm:rounded-3xl border border-line bg-primary/10 text-primary"
+                        className="icon-orbit grid h-11 w-11 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
                       >
                         {(() => {
                           const Icon = sectionIcons[active.id] || sectionIcons.family;

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Compass, Link, ArrowLeft } from "lucide-react";
+import { Compass, ArrowLeft, ExternalLink } from "lucide-react";
 
 import { useLanguage } from "@/components/providers/LanguageContext";
 import { MagneticButton } from "@/components/ui/MagneticButton";
@@ -64,7 +64,6 @@ export function LocationConfirmModal({
           aria-modal="true"
         >
           <motion.div
-            layout
             initial={{ opacity: 0, y: 35, scale: 0.93 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.90 }}
@@ -73,39 +72,37 @@ export function LocationConfirmModal({
               stiffness: 350,
               damping: 22
             }}
-            className="premium-card w-full max-w-md rounded-3xl sm:rounded-4xl p-5 sm:p-7 shadow-2xl border border-line bg-surface"
+            className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden"
           >
             <div className="flex flex-col items-center text-center gap-4">
-              <MagneticButton>
-                <motion.div
-                  whileHover="hover"
-                  whileTap="press"
-                  variants={{
-                    hover: {
-                      scale: 1.08,
-                      rotate: 6,
-                      borderColor: "rgb(var(--color-primary) / 0.56)",
-                      boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)",
-                      transition: { type: "spring", stiffness: 450, damping: 18 }
-                    },
-                    press: {
-                      scale: 0.88,
-                      rotate: 6,
-                      borderColor: "rgb(var(--color-primary) / 0.72)",
-                      boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)",
-                      transition: { type: "spring", stiffness: 450, damping: 18 }
-                    }
-                  }}
-                  className="icon-orbit grid h-12 w-12 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
-                >
-                  <Compass className="h-6 w-6" />
-                </motion.div>
-              </MagneticButton>
+              <motion.div
+                whileHover="hover"
+                whileTap="press"
+                variants={{
+                  hover: {
+                    scale: 1.06,
+                    rotate: 6,
+                    borderColor: "rgb(var(--color-primary) / 0.56)",
+                    boxShadow: "0 0 18px rgb(var(--color-primary) / 0.35)",
+                    transition: { type: "spring", stiffness: 450, damping: 18 }
+                  },
+                  press: {
+                    scale: 0.94,
+                    rotate: 3,
+                    borderColor: "rgb(var(--color-primary) / 0.72)",
+                    boxShadow: "0 0 12px rgb(var(--color-primary) / 0.5)",
+                    transition: { type: "spring", stiffness: 450, damping: 18 }
+                  }
+                }}
+                className="icon-orbit grid h-14 w-14 sm:h-16 sm:w-16 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
+              >
+                <Compass className="h-7 w-7" />
+              </motion.div>
               <div className="w-full">
-                <h3 className="font-display text-xl font-black">
+                <h3 className="font-display text-2xl font-black">
                   {language === "id" ? "Konfirmasi Pengalihan" : "Weiterleitung bestätigen"}
                 </h3>
-                <p className="mt-3 text-sm font-bold leading-6 text-muted text-center">
+                <p className="mt-2 text-sm font-bold leading-6 text-muted text-center">
                   {language === "id" ? (
                     <>
                       Anda akan dialihkan ke Google Maps untuk melihat lokasi <strong>{targetName}</strong>. Apakah Anda bersedia membuka tautan eksternal berikut?
@@ -121,47 +118,30 @@ export function LocationConfirmModal({
                 </div>
               </div>
             </div>
- 
+
             <div className="mt-6 flex flex-col gap-3 w-full">
-              {/* Setujui button: solid primary/green anchor link */}
+              {/* Setujui button */}
               <MagneticButton className="w-full">
                 <motion.a
                   href={targetUrl}
                   onClick={onConfirm}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileHover="hover"
                   whileTap="press"
                   variants={{
-                    hover: {
-                      scale: 1.03,
-                      y: -3,
-                      filter: "brightness(1.08)",
-                      boxShadow: "0 10px 20px rgb(var(--color-primary) / 0.3)"
-                    },
-                    press: {
-                      scale: 0.95,
-                      y: 1,
-                      filter: "brightness(0.92)",
-                      boxShadow: "0 4px 6px rgb(var(--color-primary) / 0.1)"
-                    }
+                    hover: { scale: 1.03, y: -3 },
+                    press: { scale: 0.95 }
                   }}
                   transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                  className="button-primary shimmer-constant focus-ring flex items-center justify-center gap-2 py-3.5 text-sm border-0 w-full"
+                  className="button-primary shimmer-constant focus-ring mt-2 w-full flex items-center justify-center gap-2 border-0 select-none"
                 >
-                  <motion.span
-                    variants={{
-                      hover: { x: 4, rotate: 15 },
-                      press: { x: 1, rotate: 0 }
-                    }}
-                    transition={{ type: "spring", stiffness: 450, damping: 10 }}
-                    className="inline-flex items-center"
-                  >
-                    <Link className="h-4 w-4" />
-                  </motion.span>
-                  {language === "id" ? "Setujui" : "Zustimmen"}
+                  <ExternalLink className="h-4 w-4 shrink-0" />
+                  <span>{language === "id" ? "Buka Google Maps" : "Google Maps öffnen"}</span>
                 </motion.a>
               </MagneticButton>
-              
-              {/* Kembali button: bordered primary outline */}
+
+              {/* Batal button */}
               <MagneticButton className="w-full">
                 <motion.button
                   type="button"
@@ -169,35 +149,14 @@ export function LocationConfirmModal({
                   whileHover="hover"
                   whileTap="press"
                   variants={{
-                    hover: {
-                      scale: 1.03,
-                      y: -3,
-                      borderColor: "rgba(var(--color-primary), 0.5)",
-                      backgroundColor: "rgba(var(--color-primary), 0.08)",
-                      boxShadow: "0 8px 16px rgba(var(--color-primary), 0.15)"
-                    },
-                    press: {
-                      scale: 0.95,
-                      y: 1,
-                      borderColor: "rgb(var(--color-primary))",
-                      backgroundColor: "rgba(var(--color-primary), 0.25)",
-                      boxShadow: "0 2px 4px rgba(var(--color-primary), 0.05)"
-                    }
+                    hover: { scale: 1.03, y: -3 },
+                    press: { scale: 0.95 }
                   }}
                   transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                  className="button-secondary focus-ring w-full flex items-center justify-center gap-2.5 py-3.5 text-sm font-black transition-all duration-300 cursor-pointer select-none shadow-sm border border-line bg-surface text-primary"
+                  className="button-secondary-negative focus-ring w-full mt-1 flex items-center justify-center gap-2 cursor-pointer select-none"
                 >
-                  <motion.span
-                    variants={{
-                      hover: { x: -4 },
-                      press: { x: -1 }
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                    className="inline-flex items-center"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </motion.span>
-                  {language === "id" ? "Kembali" : "Zurück"}
+                  <ArrowLeft className="h-4 w-4 shrink-0" />
+                  <span>{language === "id" ? "Batal" : "Abbrechen"}</span>
                 </motion.button>
               </MagneticButton>
             </div>

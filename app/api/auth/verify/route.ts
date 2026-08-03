@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!type || !password || typeof password !== "string" || password.length > 128) {
+    if (!type || !password || typeof password !== "string" || !password.trim() || password.length > 128) {
       return NextResponse.json(
         { success: false, error: "Kata sandi dan tipe tidak valid." },
         { status: 400 }

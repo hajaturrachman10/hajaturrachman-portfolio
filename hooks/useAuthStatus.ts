@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { subscribeCrossTabSync } from "@/lib/crossTabSync";
 
 export type AuthStatusState = {
   cvUnlocked: boolean;
   vaultUnlocked: boolean;
   eclUnlocked: boolean;
+  overrides: {
+    cv: boolean;
+    vault: boolean;
+    ecl: boolean;
+  };
   loading: boolean;
 };
 
@@ -14,6 +20,11 @@ export function useAuthStatus() {
     cvUnlocked: false,
     vaultUnlocked: false,
     eclUnlocked: false,
+    overrides: {
+      cv: false,
+      vault: false,
+      ecl: false
+    },
     loading: true
   });
 
@@ -26,6 +37,11 @@ export function useAuthStatus() {
           cvUnlocked: Boolean(data.cvUnlocked),
           vaultUnlocked: Boolean(data.vaultUnlocked),
           eclUnlocked: Boolean(data.eclUnlocked),
+          overrides: {
+            cv: Boolean(data.overrides?.cv),
+            vault: Boolean(data.overrides?.vault),
+            ecl: Boolean(data.overrides?.ecl)
+          },
           loading: false
         });
       } else {
@@ -38,6 +54,22 @@ export function useAuthStatus() {
 
   useEffect(() => {
     fetchStatus();
+
+    // Subscribe to real-time cross-tab synchronization events
+    const unsubscribe = subscribeCrossTabSync((msg) => {
+      if (
+        msg.event === "TOGGLE_CHANGED" ||
+        msg.event === "SESSION_REVOKED" ||
+        msg.event === "CONFIG_RESTORED" ||
+        msg.event === "PUBLIC_SESSION_INVALID" ||
+        msg.event === "RESOURCE_LOCKED" ||
+        msg.event === "RESOURCE_UNLOCKED"
+      ) {
+        fetchStatus();
+      }
+    });
+
+    return () => unsubscribe();
   }, [fetchStatus]);
 
   return {

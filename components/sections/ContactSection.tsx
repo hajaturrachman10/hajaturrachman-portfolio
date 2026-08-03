@@ -51,6 +51,11 @@ export function ContactSection() {
         setStatus(language === "id" ? "Pesan Anda berhasil dikirim secara aman!" : "Ihre Nachricht wurde erfolgreich gesendet!");
         setIsSuccess(true);
         form.reset();
+
+        // Dispatch real-time event so Admin Dashboard Messages tab updates instantly
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("contact_message_submitted"));
+        }
       } else {
         setStatus(data.error || (language === "id" ? "Gagal mengirim pesan. Silakan coba lagi." : "Senden fehlgeschlagen. Bitte erneut versuchen."));
         setIsSuccess(false);
@@ -208,17 +213,8 @@ export function ContactSection() {
                   </>
                 ) : (
                   <>
-                    {language === "id" ? "Kirim Pesan" : "Nachricht senden"}
-                    <motion.span
-                      variants={{
-                        hover: { x: 5, rotate: -15 },
-                        press: { x: 5, rotate: -15 }
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      className="inline-flex items-center"
-                    >
-                      <Send className="h-4 w-4" />
-                    </motion.span>
+                    <span>{language === "id" ? "Kirim Pesan" : "Nachricht senden"}</span>
+                    <Send className="h-4 w-4 shrink-0" />
                   </>
                 )}
               </motion.button>

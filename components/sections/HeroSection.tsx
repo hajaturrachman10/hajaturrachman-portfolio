@@ -203,7 +203,7 @@ export function HeroSection() {
               className="premium-card rounded-3xl p-4 text-center cursor-pointer select-none"
             >
               <div
-                className="icon-orbit mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl border border-line bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-105 group-hover:rotate-6"
+                className="icon-orbit mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
               >
                 <stat.icon className="h-5 w-5 animate-pulse" />
               </div>

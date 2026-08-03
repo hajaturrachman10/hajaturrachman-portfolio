@@ -32,7 +32,7 @@ export function GallerySection() {
 
   return (
     <>
-      <Reveal id="gallery" className="container-page section-space pt-0 overflow-hidden">
+      <Reveal id="gallery" className="container-page section-space overflow-hidden">
         <SectionHeader
           eyebrow={language === "id" ? "Galeri" : "Galerie"}
           title={language === "id" ? "Ruang visual untuk cerita yang terus bertambah." : "Visueller Raum für wachsende Lebensabschnitte."}
@@ -74,7 +74,13 @@ export function GallerySection() {
               <div className="p-6">
                 <div className="flex gap-4">
                   <motion.div
-                    whileTap={{ scale: 0.88, rotate: 6, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)" }}
+                    whileHover="hover"
+                    whileTap="press"
+                    variants={{
+                      hover: { scale: 1.06, rotate: 6, boxShadow: "0 0 18px rgb(var(--color-primary) / 0.35)" },
+                      press: { scale: 0.94, rotate: 3, boxShadow: "0 0 12px rgb(var(--color-primary) / 0.5)" }
+                    }}
+                    transition={{ type: "spring", stiffness: 450, damping: 18 }}
                     className="icon-orbit grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
                   >
                     <Camera className="h-6 w-6" />
@@ -97,16 +103,7 @@ export function GallerySection() {
                           className="button-primary focus-ring px-4 py-2 text-xs flex items-center justify-center gap-2 cursor-pointer select-none border-0"
                         >
                           <span>{language === "id" ? "Buka Galeri" : "Galerie öffnen"}</span>
-                          <motion.span
-                            variants={{
-                              hover: { x: 3 },
-                              press: { x: 1 }
-                            }}
-                            transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                            className="inline-flex items-center"
-                          >
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </motion.span>
+                          <ArrowRight className="h-3.5 w-3.5 shrink-0" />
                         </motion.button>
                       </MagneticButton>
                     </div>
@@ -123,8 +120,16 @@ export function GallerySection() {
 }
 
 function GalleryModal({ item, onClose }: { item: GalleryItem | null; onClose: () => void }) {
-  const [activeIndex, setActiveIndex] = useState(0);
   const { language } = useLanguage();
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (!item) return;
+    lockScroll();
+    return () => {
+      unlockScroll();
+    };
+  }, [item]);
   
   // Reset active thumbnail index when item changes
   useEffect(() => {
@@ -179,16 +184,7 @@ function GalleryModal({ item, onClose }: { item: GalleryItem | null; onClose: ()
                 transition={{ type: "spring", stiffness: 450, damping: 18 }}
                 className="rounded-full bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white px-4 py-2 text-xs font-black transition-colors duration-300 flex items-center gap-1.5 cursor-pointer select-none shadow-md shadow-rose-600/10 border-0"
               >
-                <motion.span
-                  variants={{
-                    hover: { rotate: 90, scale: 1.1 },
-                    press: { rotate: 90, scale: 0.9 }
-                  }}
-                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                  className="inline-flex items-center"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </motion.span>
+                <X className="h-3.5 w-3.5" />
                 <span>{language === "id" ? "Tutup" : "Schließen"}</span>
               </motion.button>
             </MagneticButton>

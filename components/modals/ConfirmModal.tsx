@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { LockKeyhole, ArrowLeft } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
+import { cn } from "@/lib/utils";
 
 type ConfirmModalProps = {
   open: boolean;
@@ -12,6 +13,9 @@ type ConfirmModalProps = {
   description: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  iconClassName?: string;
+  confirmButtonClassName?: string;
   onConfirm: () => void;
   onCancel: () => void;
 };
@@ -20,8 +24,11 @@ export function ConfirmModal({
   open,
   title,
   description,
-  confirmLabel = "Ya, kunci",
+  confirmLabel = "Ya, Kunci Sesi",
   cancelLabel = "Batal",
+  icon: Icon = LockKeyhole,
+  iconClassName = "border-line bg-primary/10 text-primary",
+  confirmButtonClassName = "button-primary",
   onConfirm,
   onCancel
 }: ConfirmModalProps) {
@@ -43,11 +50,11 @@ export function ConfirmModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.28, ease: "easeOut" }}
+          onClick={onCancel}
           role="dialog"
           aria-modal="true"
         >
           <motion.div
-            layout
             initial={{ opacity: 0, y: 35, scale: 0.93 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.90 }}
@@ -56,37 +63,35 @@ export function ConfirmModal({
               stiffness: 350,
               damping: 22
             }}
-            className="premium-card w-full max-w-md rounded-3xl sm:rounded-4xl p-5 sm:p-7 shadow-2xl border border-line bg-surface"
+            onClick={(e) => e.stopPropagation()}
+            className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden"
           >
             <div className="flex flex-col items-center text-center gap-4">
-              <MagneticButton>
-                <motion.div
-                  whileHover="hover"
-                  whileTap="press"
-                  variants={{
-                    hover: {
-                      scale: 1.08,
-                      rotate: 6,
-                      borderColor: "rgb(var(--color-primary) / 0.56)",
-                      boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)",
-                      transition: { type: "spring", stiffness: 450, damping: 18 }
-                    },
-                    press: {
-                      scale: 0.88,
-                      rotate: 6,
-                      borderColor: "rgb(var(--color-primary) / 0.72)",
-                      boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)",
-                      transition: { type: "spring", stiffness: 450, damping: 18 }
-                    }
-                  }}
-                  className="icon-orbit grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
-                >
-                  <LockKeyhole className="h-6 w-6" />
-                </motion.div>
-              </MagneticButton>
+              <motion.div
+                whileHover="hover"
+                whileTap="press"
+                variants={{
+                  hover: {
+                    scale: 1.06,
+                    rotate: 6,
+                    transition: { type: "spring", stiffness: 450, damping: 18 }
+                  },
+                  press: {
+                    scale: 0.94,
+                    rotate: 3,
+                    transition: { type: "spring", stiffness: 450, damping: 18 }
+                  }
+                }}
+                className={cn(
+                  "icon-orbit grid h-14 w-14 sm:h-16 sm:w-16 shrink-0 place-items-center rounded-2xl border cursor-pointer select-none",
+                  iconClassName
+                )}
+              >
+                <Icon className="h-7 w-7" />
+              </motion.div>
               <div className="w-full">
-                <h3 className="font-display text-xl font-black">{title}</h3>
-                <p className="mt-3 text-sm font-bold leading-6 text-muted">
+                <h3 className="font-display text-xl sm:text-2xl font-black">{title}</h3>
+                <p className="mt-2 text-xs sm:text-sm font-bold leading-6 text-muted">
                   {description}
                 </p>
               </div>
@@ -100,32 +105,16 @@ export function ConfirmModal({
                   whileHover="hover"
                   whileTap="press"
                   variants={{
-                    hover: {
-                      scale: 1.03,
-                      y: -3,
-                      backgroundColor: "#e11d48", // Rose 600 hover background
-                      boxShadow: "0 10px 20px rgba(225, 29, 72, 0.3)"
-                    },
-                    press: {
-                      scale: 0.95,
-                      y: 1,
-                      backgroundColor: "#be123c", // Rose 700 active background
-                      boxShadow: "0 4px 6px rgba(225, 29, 72, 0.1)"
-                    }
+                    hover: { scale: 1.02, y: -2 },
+                    press: { scale: 0.97 }
                   }}
                   transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                  className="rounded-2xl bg-rose-600 text-white font-black px-5 py-3.5 text-sm w-full cursor-pointer select-none shadow-md shadow-rose-600/20 border-0 flex items-center justify-center gap-2"
+                  className={cn(
+                    "focus-ring w-full py-3 text-sm font-black flex items-center justify-center gap-2 border-0 cursor-pointer select-none rounded-2xl",
+                    confirmButtonClassName
+                  )}
                 >
-                  <motion.span
-                    variants={{
-                      hover: { scale: 1.25, rotate: -10 },
-                      press: { scale: 0.85, rotate: 0 }
-                    }}
-                    transition={{ type: "spring", stiffness: 450, damping: 10 }}
-                    className="inline-flex items-center"
-                  >
-                    <LockKeyhole className="h-4 w-4" />
-                  </motion.span>
+                  <Icon className="h-4 w-4 shrink-0" />
                   <span>{confirmLabel}</span>
                 </motion.button>
               </MagneticButton>
@@ -137,34 +126,13 @@ export function ConfirmModal({
                   whileHover="hover"
                   whileTap="press"
                   variants={{
-                    hover: {
-                      scale: 1.03,
-                      y: -3,
-                      borderColor: "rgba(var(--color-primary), 0.5)",
-                      backgroundColor: "rgba(var(--color-primary), 0.08)",
-                      boxShadow: "0 8px 16px rgba(var(--color-primary), 0.15)"
-                    },
-                    press: {
-                      scale: 0.95,
-                      y: 1,
-                      borderColor: "rgb(var(--color-primary))",
-                      backgroundColor: "rgba(var(--color-primary), 0.25)",
-                      boxShadow: "0 2px 4px rgba(var(--color-primary), 0.05)"
-                    }
+                    hover: { scale: 1.02, y: -2 },
+                    press: { scale: 0.97 }
                   }}
                   transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                  className="flex items-center justify-center gap-2.5 rounded-2xl border border-line bg-surface text-primary px-5 py-3.5 text-sm font-black transition-all duration-300 cursor-pointer select-none shadow-sm w-full"
+                  className="button-secondary-negative focus-ring w-full py-3 text-sm font-black flex items-center justify-center gap-2 cursor-pointer select-none"
                 >
-                  <motion.span
-                    variants={{
-                      hover: { x: -4 },
-                      press: { x: -1 }
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                    className="inline-flex items-center"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </motion.span>
+                  <ArrowLeft className="h-4 w-4 shrink-0" />
                   <span>{cancelLabel}</span>
                 </motion.button>
               </MagneticButton>

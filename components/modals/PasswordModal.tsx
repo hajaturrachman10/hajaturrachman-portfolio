@@ -8,6 +8,7 @@ import {
   Eye,
   EyeOff,
   Instagram,
+  Lock,
   LockKeyhole,
   MessageCircle,
   ShieldAlert,
@@ -56,6 +57,7 @@ export function PasswordModal({
   const [resetTrigger, setResetTrigger] = useState(false);
   const [shakeTrigger, setShakeTrigger] = useState(0);
   const [isShakeError, setIsShakeError] = useState(false);
+  const [isEmptyWarning, setIsEmptyWarning] = useState(false);
   const [lastTap, setLastTap] = useState(0);
   
   const inputRef = useRef<HTMLInputElement>(null);
@@ -80,25 +82,18 @@ export function PasswordModal({
   // Load attempts from localStorage and reset form state when modal opens
   useEffect(() => {
     if (open) {
-      setError("");
       setPassword("");
-      setShowPassword(false);
+      setError("");
+      setIsShakeError(false);
+      setSuccess(false);
+      const savedAttempts = localStorage.getItem(`attempts_${type}`);
+      setAttempts(savedAttempts ? parseInt(savedAttempts, 10) : 0);
 
       const remainingSec = getRemainingLockoutSeconds(type);
-      if (remainingSec > 0) {
-        setAttempts(5);
-        setBlockCountdown(remainingSec);
-      } else {
-        const stored = localStorage.getItem(`attempts_${type}`);
-        const initialAttempts = stored ? parseInt(stored, 10) : 0;
-        if (initialAttempts >= 5) {
-          setLockoutUntilTimestamp(type, 600);
-          setAttempts(5);
-          setBlockCountdown(600);
-        } else {
-          setAttempts(initialAttempts);
-          setBlockCountdown(null);
-        }
+      setBlockCountdown(remainingSec > 0 ? remainingSec : null);
+
+      if (remainingSec <= 0) {
+        localStorage.removeItem(`lockout_until_${type}`);
       }
     }
   }, [open, type]);
@@ -156,6 +151,7 @@ export function PasswordModal({
 
     setPassword(val);
     if (error) setError(""); // Clear error state on typing so input outline returns to normal
+    if (isEmptyWarning) setIsEmptyWarning(false);
     if (isShakeError) setIsShakeError(false);
 
     requestAnimationFrame(() => {
@@ -201,32 +197,23 @@ export function PasswordModal({
       setResetTrigger(true);
       setTimeout(() => setResetTrigger(false), 900);
 
-      if (isBlocked) {
-        // Tapped Shield Icon 3 times (Blocked view): Full client & server reset
-        localStorage.removeItem(`attempts_${type}`);
-        localStorage.removeItem(`lockout_until_${type}`);
-        setAttempts(0);
-        setBlockCountdown(null);
-        setError("");
-        setIsShakeError(false);
-        setPassword("");
+      // Full client & server reset on 3 taps
+      localStorage.removeItem(`attempts_${type}`);
+      localStorage.removeItem(`lockout_until_${type}`);
+      setAttempts(0);
+      setBlockCountdown(null);
+      setError("");
+      setIsShakeError(false);
+      setPassword("");
 
-        // Reset server IP rate limit map
-        try {
-          await fetch("/api/auth/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "reset", type })
-          });
-        } catch {}
-      } else {
-        // Tapped Lock Icon 3 times (Normal view): Only resets client failed attempt count
-        localStorage.removeItem(`attempts_${type}`);
-        setAttempts(0);
-        setError("");
-        setIsShakeError(false);
-        setPassword("");
-      }
+      // Reset server IP rate limit map
+      try {
+        await fetch("/api/auth/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "reset", type })
+        });
+      } catch {}
 
       tapCountRef.current = 0;
     } else {
@@ -249,6 +236,20 @@ export function PasswordModal({
       return;
     }
 
+    if (!password || !password.trim()) {
+      setIsEmptyWarning(true);
+      setError(language === "id" ? "Kata sandi wajib diisi." : "Bitte Passwort eingeben.");
+      setIsShakeError(true);
+      shakeControls.start({
+        x: [0, -14, 14, -10, 10, -6, 6, -3, 3, 0],
+        rotate: [0, -3, 3, -2, 2, -1, 1, 0],
+        scale: [1, 0.96, 1.02, 0.98, 1],
+        transition: { duration: 0.52, ease: [0.36, 0.07, 0.19, 0.97] }
+      });
+      return;
+    }
+
+    setIsEmptyWarning(false);
     setError("");
     setLoading(true);
 
@@ -320,13 +321,6 @@ export function PasswordModal({
               scale: [1, 0.96, 1.02, 0.98, 1],
               transition: { duration: 0.52, ease: [0.36, 0.07, 0.19, 0.97] }
             });
-            window.setTimeout(() => {
-              if (inputRef.current) {
-                inputRef.current.focus();
-                const len = inputRef.current.value.length;
-                inputRef.current.setSelectionRange(len, len);
-              }
-            }, 50);
           }
         }
         setLoading(false);
@@ -364,7 +358,6 @@ export function PasswordModal({
           aria-modal="true"
         >
           <motion.div
-            layout
             initial={{ opacity: 0, y: 35, scale: 0.93 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.90 }}
@@ -412,24 +405,23 @@ export function PasswordModal({
                 /* MAIN FORM & BLOCKED STATE VIEW */
                 <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="flex flex-col items-center text-center gap-4">
-                    <MagneticButton>
-                      <motion.div
+                    <motion.div
                         onClick={handleLockTap}
                         whileHover="hover"
                         whileTap="press"
                         variants={{
                           hover: {
-                            scale: 1.08,
+                            scale: 1.06,
                             rotate: 6,
                             borderColor: "rgb(var(--color-primary) / 0.56)",
-                            boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)",
+                            boxShadow: "0 0 18px rgb(var(--color-primary) / 0.35)",
                             transition: { type: "spring", stiffness: 450, damping: 18 }
                           },
                           press: {
-                            scale: 0.88,
-                            rotate: 6,
+                            scale: 0.94,
+                            rotate: 3,
                             borderColor: "rgb(var(--color-primary) / 0.72)",
-                            boxShadow: "0 0 15px rgb(var(--color-primary) / 0.6)",
+                            boxShadow: "0 0 12px rgb(var(--color-primary) / 0.5)",
                             transition: { type: "spring", stiffness: 450, damping: 18 }
                           }
                         }}
@@ -460,11 +452,10 @@ export function PasswordModal({
                         }
                         transition={resetTrigger ? { duration: 0.9, ease: "easeInOut" } : { duration: 0.3 }}
                         title={language === "id" ? "Ketuk 3 kali untuk atur ulang darurat (Khusus Hajat)" : "Dreimal tippen für Notfall-Zusatz (Nur Hajat)"}
-                        className="icon-orbit grid h-14 w-14 place-items-center rounded-3xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
+                        className="icon-orbit grid h-14 w-14 sm:h-16 sm:w-16 place-items-center rounded-2xl border border-line bg-primary/10 text-primary cursor-pointer select-none"
                       >
                         {isBlocked ? <ShieldAlert className="h-7 w-7 animate-pulse text-rose-500" /> : <LockKeyhole className="h-7 w-7" />}
                       </motion.div>
-                    </MagneticButton>
 
                     <div className="w-full">
                       <AnimatePresence mode="wait">
@@ -560,7 +551,7 @@ export function PasswordModal({
                                 }
                               }}
                               transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                              className="flex items-center justify-center gap-2.5 rounded-2xl bg-emerald-600 text-white px-5 py-3.5 text-sm font-black cursor-pointer select-none shadow-md shadow-emerald-600/20 border-0 w-full"
+                              className="flex items-center justify-center gap-2.5 rounded-full bg-emerald-600 text-white px-5 py-3.5 text-sm font-black cursor-pointer select-none shadow-md shadow-emerald-600/20 border-0 w-full"
                             >
                               <motion.span
                                 variants={{
@@ -598,7 +589,7 @@ export function PasswordModal({
                                 }
                               }}
                               transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                              className="flex items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 text-white px-5 py-3.5 text-sm font-black cursor-pointer select-none shadow-md shadow-pink-600/20 border-0 w-full"
+                              className="flex items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 text-white px-5 py-3.5 text-sm font-black cursor-pointer select-none shadow-md shadow-pink-600/20 border-0 w-full"
                             >
                               <motion.span
                                 variants={{
@@ -637,7 +628,7 @@ export function PasswordModal({
                                 }
                               }}
                               transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                              className="flex items-center justify-center gap-2.5 rounded-2xl border border-rose-500/25 bg-surface text-rose-500 px-5 py-3.5 text-sm font-black transition-all duration-300 cursor-pointer select-none shadow-sm w-full"
+                              className="button-secondary-negative focus-ring w-full mt-3 flex items-center justify-center gap-2 cursor-pointer select-none"
                             >
                               <motion.span
                                 variants={{
@@ -647,7 +638,7 @@ export function PasswordModal({
                                 transition={{ type: "spring", stiffness: 400, damping: 12 }}
                                 className="inline-flex items-center"
                               >
-                                <ArrowLeft className="h-4 w-4" />
+                                <ArrowLeft className="h-4 w-4 !transform-none" />
                               </motion.span>
                               <span>{language === "id" ? "Kembali" : "Zurück"}</span>
                             </motion.button>
@@ -657,6 +648,7 @@ export function PasswordModal({
                     ) : (
                       /* ACTIVE PASSWORD INPUT FORM VIEW */
                       <motion.div
+                        layout
                         key="password-form"
                         initial={{ opacity: 0, y: 15, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -664,104 +656,121 @@ export function PasswordModal({
                         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                         className="mt-6"
                       >
-                        <motion.div animate={shakeControls}>
-                          <label className="grid gap-2 text-left">
-                            <span className="text-sm font-black">{language === "id" ? "Kata Sandi" : "Passwort"}</span>
-                            <div className="relative">
-                              <input
-                                type="text"
-                                style={{
-                                  WebkitTextSecurity: showPassword ? "none" : "disc"
-                                } as React.CSSProperties}
-                                autoComplete="off"
-                                data-lpignore="true"
-                                data-1p-ignore="true"
-                                data-form-type="other"
-                                name="secure_vault_pin"
-                                id="secure_vault_pin"
-                                autoCapitalize="off"
-                                autoCorrect="off"
-                                spellCheck="false"
-                                className={cn(
-                                  "input pr-12 text-left transition-all duration-300",
-                                  (isShakeError || Boolean(error)) && "!border-rose-500 ring-4 ring-rose-500/25 shadow-glow shadow-rose-500/20 text-rose-500 dark:text-rose-400 bg-rose-500/5"
-                                )}
-                                placeholder={language === "id" ? "Masukkan kata sandi" : "Passwort eingeben"}
-                                value={password}
-                                onChange={handlePasswordChange}
-                                onFocus={(e) => {
-                                  const target = e.target;
-                                  requestAnimationFrame(() => {
+                          <motion.div animate={shakeControls} className="flex flex-col gap-4">
+                            <label className="grid gap-2 text-left">
+                              <span className="text-sm font-black">{language === "id" ? "Kata Sandi" : "Passwort"}</span>
+                              <div className="relative">
+                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted pointer-events-none" />
+                                <input
+                                  type="text"
+                                  style={{
+                                    WebkitTextSecurity: showPassword ? "none" : "disc"
+                                  } as React.CSSProperties}
+                                  autoComplete="off"
+                                  data-lpignore="true"
+                                  data-1p-ignore="true"
+                                  data-form-type="other"
+                                  name="secure_vault_pin"
+                                  id="secure_vault_pin"
+                                  autoCapitalize="off"
+                                  autoCorrect="off"
+                                  spellCheck="false"
+                                  className={cn(
+                                    "input pl-11 pr-12 text-left transition-all duration-300 w-full",
+                                    (isShakeError || Boolean(error)) &&
+                                      (isEmptyWarning
+                                        ? "!border-amber-500 ring-4 ring-amber-500/25 shadow-glow shadow-amber-500/20 text-amber-500 dark:text-amber-400 bg-amber-500/5"
+                                        : "!border-rose-500 ring-4 ring-rose-500/25 shadow-glow shadow-rose-500/20 text-rose-500 dark:text-rose-400 bg-rose-500/5")
+                                  )}
+                                  placeholder={language === "id" ? "Masukkan kata sandi" : "Passwort eingeben"}
+                                  value={password}
+                                  onChange={handlePasswordChange}
+                                  onFocus={(e) => {
+                                    if (error) setError("");
+                                    if (isEmptyWarning) setIsEmptyWarning(false);
+                                    if (isShakeError) setIsShakeError(false);
+                                    const target = e.target;
+                                    requestAnimationFrame(() => {
+                                      if (target.value.length > 0 && target.selectionStart === 0 && target.selectionEnd === 0) {
+                                        target.setSelectionRange(target.value.length, target.value.length);
+                                      }
+                                    });
+                                  }}
+                                  onClick={(e) => {
+                                    const target = e.currentTarget;
                                     if (target.value.length > 0 && target.selectionStart === 0 && target.selectionEnd === 0) {
                                       target.setSelectionRange(target.value.length, target.value.length);
                                     }
-                                  });
-                                }}
-                                onClick={(e) => {
-                                  const target = e.currentTarget;
-                                  if (target.value.length > 0 && target.selectionStart === 0 && target.selectionEnd === 0) {
-                                    target.setSelectionRange(target.value.length, target.value.length);
-                                  }
-                                }}
-                                onKeyDown={(event) => {
-                                  if (event.key === "Enter") {
-                                    event.preventDefault();
-                                    handleSubmit();
-                                  }
-                                }}
-                                disabled={loading}
-                                ref={inputRef}
-                              />
-                              <button
-                                type="button"
-                                onMouseDown={(e) => {
-                                  // Prevent input from losing focus and closing keyboard
-                                  e.preventDefault();
-                                }}
-                                onClick={handleEyeToggle}
-                                disabled={loading}
-                                className="focus-ring absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted transition hover:bg-primary/10 hover:text-text disabled:opacity-50"
-                                aria-label={showPassword ? (language === "id" ? "Sembunyikan kata sandi" : "Passwort ausblenden") : (language === "id" ? "Lihat kata sandi" : "Passwort anzeigen")}
-                              >
-                                <AnimatePresence mode="wait" initial={false}>
-                                  <motion.span
-                                    key={showPassword ? "eye-off" : "eye"}
-                                    initial={{ opacity: 0, scale: 0.8, rotate: -25 }}
-                                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                                    exit={{ opacity: 0, scale: 0.8, rotate: 25 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="inline-flex items-center justify-center"
-                                  >
-                                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                                  </motion.span>
-                                </AnimatePresence>
-                              </button>
-                            </div>
-                          </label>
+                                  }}
+                                  onKeyDown={(event) => {
+                                    if (event.key === "Enter") {
+                                      event.preventDefault();
+                                      handleSubmit();
+                                    }
+                                  }}
+                                  disabled={loading}
+                                  ref={inputRef}
+                                />
+                                <button
+                                  type="button"
+                                  onMouseDown={(e) => {
+                                    // Prevent input from losing focus and closing keyboard
+                                    e.preventDefault();
+                                  }}
+                                  onClick={handleEyeToggle}
+                                  disabled={loading}
+                                  className="focus-ring absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted transition hover:bg-primary/10 hover:text-text disabled:opacity-50"
+                                  aria-label={showPassword ? (language === "id" ? "Sembunyikan kata sandi" : "Passwort ausblenden") : (language === "id" ? "Lihat kata sandi" : "Passwort anzeigen")}
+                                >
+                                  <AnimatePresence mode="wait" initial={false}>
+                                    <motion.span
+                                      key={showPassword ? "eye-off" : "eye"}
+                                      initial={{ opacity: 0, scale: 0.8, rotate: -25 }}
+                                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                      exit={{ opacity: 0, scale: 0.8, rotate: 25 }}
+                                      transition={{ duration: 0.15 }}
+                                      className="inline-flex items-center justify-center"
+                                    >
+                                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                    </motion.span>
+                                  </AnimatePresence>
+                                </button>
+                              </div>
+                            </label>
 
-                          <AnimatePresence>
-                            {error ? (
-                              <motion.div
-                                key="error-banner"
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ type: "spring", stiffness: 450, damping: 30 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="mt-3.5 flex items-center justify-center gap-2 rounded-2xl bg-rose-500/10 border border-rose-500/25 p-3 text-xs sm:text-sm font-black text-rose-500 shadow-glow shadow-rose-500/5 text-center">
-                                  <motion.span
-                                    animate={{ rotate: [0, -12, 12, -8, 8, 0], scale: [1, 1.25, 1] }}
-                                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                                    className="inline-flex shrink-0"
-                                  >
-                                    <AlertCircle className="h-4.5 w-4.5 text-rose-500" />
-                                  </motion.span>
-                                  <span>{error}</span>
-                                </div>
-                              </motion.div>
-                            ) : null}
-                          </AnimatePresence>
+                            <AnimatePresence>
+                              {error ? (
+                                <motion.div
+                                  key="error-banner"
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="pt-1.5 pb-1 px-0.5">
+                                    <div
+                                      className={cn(
+                                        "flex items-center justify-center gap-2 rounded-2xl p-3 text-xs sm:text-sm font-black text-center shadow-glow shadow-5/5",
+                                        isEmptyWarning
+                                          ? "bg-amber-500/10 border border-amber-500/25 text-amber-500 dark:text-amber-400 shadow-amber-500/5"
+                                          : "bg-rose-500/10 border border-rose-500/25 text-rose-500 shadow-rose-500/5"
+                                      )}
+                                    >
+                                      <motion.span
+                                        animate={{ rotate: [0, -12, 12, -8, 8, 0], scale: [1, 1.25, 1] }}
+                                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                                        className="inline-flex shrink-0"
+                                      >
+                                        <AlertCircle className={cn("h-4.5 w-4.5", isEmptyWarning ? "text-amber-500 dark:text-amber-400" : "text-rose-500")} />
+                                      </motion.span>
+                                      <span>{error}</span>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              ) : null}
+                            </AnimatePresence>
+                          </motion.div>
 
                           <MagneticButton className="w-full">
                             <motion.button
@@ -787,16 +796,7 @@ export function PasswordModal({
                                 </>
                               ) : (
                                 <>
-                                  <motion.span
-                                    variants={{
-                                      hover: { scale: 1.25, rotate: -10 },
-                                      press: { scale: 0.85, rotate: 0 }
-                                    }}
-                                    transition={{ type: "spring", stiffness: 450, damping: 10 }}
-                                    className="inline-flex items-center mr-1.5"
-                                  >
-                                    <UnlockKeyhole className="h-4 w-4" />
-                                  </motion.span>
+                                  <UnlockKeyhole className="h-4 w-4 shrink-0" />
                                   <span>{language === "id" ? "Buka Akses" : "Freischalten"}</span>
                                 </>
                               )}
@@ -817,16 +817,7 @@ export function PasswordModal({
                               transition={{ type: "spring", stiffness: 380, damping: 12 }}
                               className="button-secondary-negative focus-ring w-full mt-3 flex items-center justify-center gap-2 cursor-pointer select-none"
                             >
-                              <motion.span
-                                variants={{
-                                  hover: { x: -4 },
-                                  press: { x: -1 }
-                                }}
-                                transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                                className="inline-flex items-center"
-                              >
-                                <ArrowLeft className="h-4 w-4 !transform-none" />
-                              </motion.span>
+                              <ArrowLeft className="h-4 w-4 shrink-0" />
                               <span>{language === "id" ? "Kembali" : "Zurück"}</span>
                             </motion.button>
                           </MagneticButton>
@@ -844,12 +835,11 @@ export function PasswordModal({
                             </a>
                           </p>
                         </motion.div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
           </motion.div>
         </motion.div>
       ) : null}
