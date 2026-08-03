@@ -7,6 +7,21 @@ const DEV_STORAGE_PATH = path.join(process.cwd(), "data", "adminState.json");
 const TMP_STORAGE_PATH = path.join(os.tmpdir(), "hajat_adminState.json");
 
 let inMemoryState: AdminState | null = (globalThis as any).__adminStateCache || null;
+let lastFileMtimeMs: number = (globalThis as any).__adminStateMtime || 0;
+
+function getFileMtime(): number {
+  try {
+    if (fs.existsSync(TMP_STORAGE_PATH)) {
+      return fs.statSync(TMP_STORAGE_PATH).mtimeMs;
+    }
+    if (fs.existsSync(DEV_STORAGE_PATH)) {
+      return fs.statSync(DEV_STORAGE_PATH).mtimeMs;
+    }
+  } catch {
+    // Ignore
+  }
+  return 0;
+}
 
 const DEFAULT_STATE: AdminState = {
   auth: {
@@ -62,7 +77,8 @@ const DEFAULT_STATE: AdminState = {
 
 export const adminRepository = {
   read(): AdminState {
-    if (inMemoryState) {
+    const currentMtime = getFileMtime();
+    if (inMemoryState && currentMtime > 0 && currentMtime <= lastFileMtimeMs) {
       return inMemoryState;
     }
 
@@ -70,9 +86,12 @@ export const adminRepository = {
       let raw = "";
       if (fs.existsSync(TMP_STORAGE_PATH)) {
         raw = fs.readFileSync(TMP_STORAGE_PATH, "utf-8");
+        lastFileMtimeMs = fs.statSync(TMP_STORAGE_PATH).mtimeMs;
       } else if (fs.existsSync(DEV_STORAGE_PATH)) {
         raw = fs.readFileSync(DEV_STORAGE_PATH, "utf-8");
+        lastFileMtimeMs = fs.statSync(DEV_STORAGE_PATH).mtimeMs;
       }
+      (globalThis as any).__adminStateMtime = lastFileMtimeMs;
 
       if (!raw) {
         inMemoryState = DEFAULT_STATE;
@@ -136,6 +155,8 @@ export const adminRepository = {
         fs.mkdirSync(dir, { recursive: true });
       }
       fs.writeFileSync(DEV_STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
+      lastFileMtimeMs = getFileMtime();
+      (globalThis as any).__adminStateMtime = lastFileMtimeMs;
       return;
     } catch {
       // Dev directory read-only on Vercel Serverless
@@ -147,6 +168,8 @@ export const adminRepository = {
         fs.mkdirSync(tmpDir, { recursive: true });
       }
       fs.writeFileSync(TMP_STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
+      lastFileMtimeMs = getFileMtime();
+      (globalThis as any).__adminStateMtime = lastFileMtimeMs;
     } catch (err) {
       console.error("Gagal menyimpan adminState ke serverless tmp:", err);
     }

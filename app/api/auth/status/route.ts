@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { authService } from "@/services/authService";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   const cvToken = cookies().get("cv_unlocked")?.value;
@@ -11,5 +12,11 @@ export async function GET() {
 
   const status = authService.getAuthStatus(cvToken, vaultToken, eclToken);
 
-  return NextResponse.json(status);
+  return NextResponse.json(status, {
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0"
+    }
+  });
 }

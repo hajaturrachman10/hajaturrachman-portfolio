@@ -104,41 +104,39 @@ export function PrivateVaultSection() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const response = await fetch("/api/auth/status");
+        const response = await fetch("/api/auth/status", { cache: "no-store" });
         if (response.ok) {
           const data = await response.json();
-          if (data.vaultUnlocked) {
-            if (data.overrides?.vault) {
-              setIsAdminOverride(true);
-              await fetchVaultData();
-              setUnlocked(true);
+          if (data.overrides?.vault) {
+            setIsAdminOverride(true);
+            await fetchVaultData();
+            setUnlocked(true);
+            setCheckingAuth(false);
+          } else if (data.vaultUnlocked) {
+            setIsAdminOverride(false);
+            const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") === "true";
+            if (!remember) {
+              setIsLocking(true);
               setCheckingAuth(false);
-            } else {
-              setIsAdminOverride(false);
-              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") === "true";
-              if (!remember) {
-                setIsLocking(true);
-                setCheckingAuth(false);
-                try {
-                  await fetch("/api/auth/lock", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ type: "private-vault" })
-                  });
-                } catch (e) {
-                  console.error(e);
-                }
-                await new Promise((resolve) => setTimeout(resolve, 1800));
-                setUnlocked(false);
-                setIsLocking(false);
-              } else {
-                setIsUnlocking(true);
-                setCheckingAuth(false);
-                await fetchVaultData();
-                await new Promise((resolve) => setTimeout(resolve, 1500));
-                setUnlocked(true);
-                setIsUnlocking(false);
+              try {
+                await fetch("/api/auth/lock", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ type: "private-vault" })
+                });
+              } catch (e) {
+                console.error(e);
               }
+              await new Promise((resolve) => setTimeout(resolve, 1800));
+              setUnlocked(false);
+              setIsLocking(false);
+            } else {
+              setIsUnlocking(true);
+              setCheckingAuth(false);
+              await fetchVaultData();
+              await new Promise((resolve) => setTimeout(resolve, 1500));
+              setUnlocked(true);
+              setIsUnlocking(false);
             }
           } else {
             setIsAdminOverride(false);

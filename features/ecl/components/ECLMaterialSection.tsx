@@ -42,42 +42,40 @@ export function ECLMaterialSection() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const response = await fetch("/api/auth/status");
+        const response = await fetch("/api/auth/status", { cache: "no-store" });
         if (response.ok) {
           const data = await response.json();
           if (data.docToggles) {
             setDocToggles(data.docToggles);
           }
-          if (data.eclUnlocked) {
-            if (data.overrides?.ecl) {
-              setIsAdminOverride(true);
-              setUnlocked(true);
+          if (data.overrides?.ecl) {
+            setIsAdminOverride(true);
+            setUnlocked(true);
+            setCheckingAuth(false);
+          } else if (data.eclUnlocked) {
+            setIsAdminOverride(false);
+            const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
+            if (!remember) {
+              setIsLocking(true);
               setCheckingAuth(false);
-            } else {
-              setIsAdminOverride(false);
-              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
-              if (!remember) {
-                setIsLocking(true);
-                setCheckingAuth(false);
-                try {
-                  await fetch("/api/auth/lock", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ type: "ecl-material" })
-                  });
-                } catch (e) {
-                  console.error(e);
-                }
-                await new Promise((resolve) => setTimeout(resolve, 1800));
-                setUnlocked(false);
-                setIsLocking(false);
-              } else {
-                setIsUnlocking(true);
-                setCheckingAuth(false);
-                await new Promise((resolve) => setTimeout(resolve, 1500));
-                setUnlocked(true);
-                setIsUnlocking(false);
+              try {
+                await fetch("/api/auth/lock", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ type: "ecl-material" })
+                });
+              } catch (e) {
+                console.error(e);
               }
+              await new Promise((resolve) => setTimeout(resolve, 1800));
+              setUnlocked(false);
+              setIsLocking(false);
+            } else {
+              setIsUnlocking(true);
+              setCheckingAuth(false);
+              await new Promise((resolve) => setTimeout(resolve, 1500));
+              setUnlocked(true);
+              setIsUnlocking(false);
             }
           } else {
             setIsAdminOverride(false);

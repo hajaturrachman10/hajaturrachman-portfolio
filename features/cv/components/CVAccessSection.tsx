@@ -40,40 +40,38 @@ export function CVAccessSection() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const response = await fetch("/api/auth/status");
+        const response = await fetch("/api/auth/status", { cache: "no-store" });
         if (response.ok) {
           const data = await response.json();
-          if (data.cvUnlocked) {
-            if (data.overrides?.cv) {
-              // Admin Override Active: Instant transition, no restore session animation!
-              setIsAdminOverride(true);
-              setUnlocked(true);
+          if (data.overrides?.cv) {
+            // Admin Override Active: Instant transition, no restore session animation!
+            setIsAdminOverride(true);
+            setUnlocked(true);
+            setCheckingAuth(false);
+          } else if (data.cvUnlocked) {
+            setIsAdminOverride(false);
+            const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") === "true";
+            if (!remember) {
+              setIsLocking(true);
               setCheckingAuth(false);
-            } else {
-              setIsAdminOverride(false);
-              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") === "true";
-              if (!remember) {
-                setIsLocking(true);
-                setCheckingAuth(false);
-                try {
-                  await fetch("/api/auth/lock", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ type: "cv" })
-                  });
-                } catch (e) {
-                  console.error(e);
-                }
-                await new Promise((resolve) => setTimeout(resolve, 1800));
-                setUnlocked(false);
-                setIsLocking(false);
-              } else {
-                setIsUnlocking(true);
-                setCheckingAuth(false);
-                await new Promise((resolve) => setTimeout(resolve, 1500));
-                setUnlocked(true);
-                setIsUnlocking(false);
+              try {
+                await fetch("/api/auth/lock", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ type: "cv" })
+                });
+              } catch (e) {
+                console.error(e);
               }
+              await new Promise((resolve) => setTimeout(resolve, 1800));
+              setUnlocked(false);
+              setIsLocking(false);
+            } else {
+              setIsUnlocking(true);
+              setCheckingAuth(false);
+              await new Promise((resolve) => setTimeout(resolve, 1500));
+              setUnlocked(true);
+              setIsUnlocking(false);
             }
           } else {
             setIsAdminOverride(false);
