@@ -40,6 +40,30 @@ export function ECLMaterialSection() {
   });
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const raw = localStorage.getItem("hajat_toggles_state");
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.ecl_doc1 !== undefined) {
+            setDocToggles({
+              doc1: Boolean(parsed.ecl_doc1),
+              doc2: Boolean(parsed.ecl_doc2),
+              doc3: Boolean(parsed.ecl_doc3)
+            });
+          }
+          if (parsed.ecl !== undefined && !parsed.ecl) {
+            setIsAdminOverride(true);
+            setUnlocked(true);
+          }
+        } catch {
+          // Ignore
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     async function checkAuth() {
       try {
         const response = await fetch("/api/auth/status", { cache: "no-store" });
@@ -92,47 +116,31 @@ export function ECLMaterialSection() {
 
     const unsubscribe = subscribeCrossTabSync(async (msg) => {
       if (msg.event === "TOGGLE_CHANGED") {
-        const feat = msg.data?.feature;
-        if (feat === "ecl" || feat?.startsWith("ecl_doc") || !feat) {
-          if (feat?.startsWith("ecl_doc")) {
-            try {
-              const res = await fetch("/api/auth/status", { cache: "no-store" });
-              if (res.ok) {
-                const data = await res.json();
-                if (data.docToggles) {
-                  setDocToggles(data.docToggles);
-                }
-              }
-            } catch {
-              // Handled
-            }
-          } else {
-            const isEnabling = !!msg.data?.protected;
-            setAdminTransition({ active: true, isEnabling });
-            await new Promise((r) => setTimeout(r, 1600));
-            try {
-              const res = await fetch("/api/auth/status", { cache: "no-store" });
-              if (res.ok) {
-                const data = await res.json();
-                if (data.docToggles) {
-                  setDocToggles(data.docToggles);
-                }
-                if (data.eclUnlocked) {
-                  setUnlocked(true);
-                  setIsAdminOverride(!!data.overrides?.ecl);
-                } else {
-                  setUnlocked(false);
-                  setIsAdminOverride(false);
-                  setModalOpen(false);
-                }
-              }
-            } catch {
-              // Handled
-            } finally {
-              setAdminTransition(null);
+        const togglesMap = msg.data?.togglesMap || msg.payload?.togglesMap;
+        if (togglesMap) {
+          try {
+            localStorage.setItem("hajat_toggles_state", JSON.stringify(togglesMap));
+            document.cookie = `hajat_toggles_state=${encodeURIComponent(JSON.stringify(togglesMap))}; path=/; max-age=31536000; SameSite=Lax`;
+          } catch {
+            // Ignore
+          }
+          if (togglesMap.ecl_doc1 !== undefined) {
+            setDocToggles({
+              doc1: Boolean(togglesMap.ecl_doc1),
+              doc2: Boolean(togglesMap.ecl_doc2),
+              doc3: Boolean(togglesMap.ecl_doc3)
+            });
+          }
+          if (togglesMap.ecl !== undefined) {
+            if (!togglesMap.ecl) {
+              setIsAdminOverride(true);
+              setUnlocked(true);
+            } else {
+              setIsAdminOverride(false);
             }
           }
         }
+        checkAuth();
       } else if (
         msg.event === "SESSION_REVOKED" ||
         msg.event === "CONFIG_RESTORED" ||

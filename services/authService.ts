@@ -65,7 +65,7 @@ export const authService = {
     return generateSessionToken(type);
   },
 
-  getAuthStatus(cvToken?: string, vaultToken?: string, eclToken?: string) {
+  getAuthStatus(cvToken?: string, vaultToken?: string, eclToken?: string, togglesCookie?: string) {
     let adminState;
     try {
       adminState = adminRepository.read();
@@ -73,19 +73,52 @@ export const authService = {
       adminState = null;
     }
 
+    let cookieToggles: Record<string, boolean> | null = null;
+    if (togglesCookie) {
+      try {
+        cookieToggles = JSON.parse(togglesCookie);
+      } catch {
+        cookieToggles = null;
+      }
+    }
+
+    const isCvProtected = cookieToggles && cookieToggles.cv !== undefined
+      ? cookieToggles.cv
+      : (adminState ? (adminState.toggles?.cv?.protected ?? true) : true);
+
+    const isVaultProtected = cookieToggles && cookieToggles.vault !== undefined
+      ? cookieToggles.vault
+      : (adminState ? (adminState.toggles?.vault?.protected ?? true) : true);
+
+    const isEclProtected = cookieToggles && cookieToggles.ecl !== undefined
+      ? cookieToggles.ecl
+      : (adminState ? (adminState.toggles?.ecl?.protected ?? true) : true);
+
+    const isDoc1Protected = cookieToggles && cookieToggles.ecl_doc1 !== undefined
+      ? cookieToggles.ecl_doc1
+      : (adminState ? (adminState.toggles?.ecl_doc1?.protected ?? true) : true);
+
+    const isDoc2Protected = cookieToggles && cookieToggles.ecl_doc2 !== undefined
+      ? cookieToggles.ecl_doc2
+      : (adminState ? (adminState.toggles?.ecl_doc2?.protected ?? true) : true);
+
+    const isDoc3Protected = cookieToggles && cookieToggles.ecl_doc3 !== undefined
+      ? cookieToggles.ecl_doc3
+      : (adminState ? (adminState.toggles?.ecl_doc3?.protected ?? true) : true);
+
     return {
       cvUnlocked: verifySessionToken(cvToken, "cv"),
       vaultUnlocked: verifySessionToken(vaultToken, "private-vault"),
       eclUnlocked: verifySessionToken(eclToken, "ecl-material"),
       overrides: {
-        cv: adminState ? !adminState.toggles?.cv?.protected : false,
-        vault: adminState ? !adminState.toggles?.vault?.protected : false,
-        ecl: adminState ? !adminState.toggles?.ecl?.protected : false
+        cv: !isCvProtected,
+        vault: !isVaultProtected,
+        ecl: !isEclProtected
       },
       docToggles: {
-        doc1: adminState ? (adminState.toggles?.ecl_doc1?.protected ?? true) : true,
-        doc2: adminState ? (adminState.toggles?.ecl_doc2?.protected ?? true) : true,
-        doc3: adminState ? (adminState.toggles?.ecl_doc3?.protected ?? true) : true
+        doc1: isDoc1Protected,
+        doc2: isDoc2Protected,
+        doc3: isDoc3Protected
       }
     };
   }

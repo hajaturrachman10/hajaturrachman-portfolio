@@ -44,10 +44,28 @@ export async function PATCH(request: Request) {
       );
     }
 
-    return NextResponse.json({
+    const allToggles = adminToggleService.getAllFeatureStates();
+    const togglesMap: Record<string, boolean> = {};
+    if (allToggles.success && allToggles.data) {
+      Object.keys(allToggles.data).forEach((key) => {
+        togglesMap[key] = allToggles.data[key as keyof typeof allToggles.data].protected;
+      });
+    }
+
+    const response = NextResponse.json({
       success: true,
-      data: toggleResult.data
+      data: toggleResult.data,
+      togglesMap
     });
+
+    response.cookies.set("hajat_toggles_state", JSON.stringify(togglesMap), {
+      path: "/",
+      httpOnly: false,
+      sameSite: "lax",
+      maxAge: 31536000
+    });
+
+    return response;
   } catch {
     return NextResponse.json(
       { success: false, error: "Format payload request tidak valid.", code: "BAD_REQUEST" },

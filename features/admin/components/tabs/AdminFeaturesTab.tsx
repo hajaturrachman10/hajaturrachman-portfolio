@@ -76,8 +76,17 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
         // 2. Instantly update local state under overlay so card swaps state IMMEDIATELY
         setLocalOverrides((prev) => ({ ...prev, [feature]: !currentStatus }));
 
+        if (data.togglesMap) {
+          try {
+            localStorage.setItem("hajat_toggles_state", JSON.stringify(data.togglesMap));
+            document.cookie = `hajat_toggles_state=${encodeURIComponent(JSON.stringify(data.togglesMap))}; path=/; max-age=31536000; SameSite=Lax`;
+          } catch {
+            // Ignore
+          }
+        }
+
         // 3. Broadcast event & trigger server refresh
-        broadcastCrossTabEvent("TOGGLE_CHANGED", { feature, protected: !currentStatus });
+        broadcastCrossTabEvent("TOGGLE_CHANGED", { feature, protected: !currentStatus, togglesMap: data.togglesMap });
         onRefresh();
 
         // 4. Comfortable grace delay (1100ms) so progress bar reaches 100% before overlay fades out
