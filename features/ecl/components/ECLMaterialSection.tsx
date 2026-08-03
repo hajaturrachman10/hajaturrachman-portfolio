@@ -48,16 +48,21 @@ export function ECLMaterialSection() {
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
-          if (parsed.ecl_doc1 !== undefined) {
+          const toggles = parsed.toggles || parsed;
+          if (toggles.ecl_doc1 !== undefined) {
             setDocToggles({
-              doc1: Boolean(parsed.ecl_doc1),
-              doc2: Boolean(parsed.ecl_doc2),
-              doc3: Boolean(parsed.ecl_doc3)
+              doc1: Boolean(toggles.ecl_doc1.protected !== undefined ? toggles.ecl_doc1.protected : toggles.ecl_doc1),
+              doc2: Boolean(toggles.ecl_doc2.protected !== undefined ? toggles.ecl_doc2.protected : toggles.ecl_doc2),
+              doc3: Boolean(toggles.ecl_doc3.protected !== undefined ? toggles.ecl_doc3.protected : toggles.ecl_doc3)
             });
           }
-          if (parsed.ecl !== undefined && !parsed.ecl) {
-            setIsAdminOverride(true);
-            setUnlocked(true);
+          const eclToggle = toggles.ecl;
+          if (eclToggle !== undefined) {
+            const isEclProtected = eclToggle.protected !== undefined ? eclToggle.protected : eclToggle;
+            if (!isEclProtected) {
+              setIsAdminOverride(true);
+              setUnlocked(true);
+            }
           }
         } catch {
           // Ignore
@@ -72,6 +77,9 @@ export function ECLMaterialSection() {
         const response = await fetch("/api/auth/status", { cache: "no-store" });
         if (response.ok) {
           const data = await response.json();
+          if (data.toggles) {
+            syncLocalToggles(data.toggles, data.globalEpoch);
+          }
           if (data.docToggles) {
             setDocToggles(data.docToggles);
           }
@@ -764,4 +772,54 @@ export function ECLMaterialSection() {
       />
     </>
   );
+}
+
+function syncLocalToggles(serverToggles: any, serverEpoch: number) {
+  if (typeof window === "undefined" || !serverToggles) return;
+  
+  const raw = localStorage.getItem("hajat_toggles_state");
+  let localData: any = null;
+  if (raw) {
+    try {
+      localData = JSON.parse(raw);
+    } catch {
+      localData = null;
+    }
+  }
+
+  if (localData && !localData.toggles) {
+    localData = {
+      toggles: Object.keys(localData).reduce((acc, key) => {
+        acc[key] = { protected: localData[key], updatedAt: 0 };
+        return acc;
+      }, {} as any),
+      globalEpoch: 0
+    };
+  }
+
+  const merged = {
+    toggles: { ...serverToggles },
+    globalEpoch: Math.max(serverEpoch || 0, localData?.globalEpoch || 0)
+  };
+
+  if (localData?.toggles) {
+    Object.keys(localData.toggles).forEach((key) => {
+      const serverVal = serverToggles[key];
+      const localVal = localData.toggles[key];
+      if (serverVal && localVal) {
+        const serverTime = Number(serverVal.updatedAt) || 0;
+        const localTime = Number(localVal.updatedAt) || 0;
+        
+        if (localTime > serverTime) {
+          merged.toggles[key] = {
+            protected: localVal.protected,
+            updatedAt: localTime
+          };
+        }
+      }
+    });
+  }
+
+  localStorage.setItem("hajat_toggles_state", JSON.stringify(merged));
+  document.cookie = `hajat_toggles_state=${encodeURIComponent(JSON.stringify(merged))}; path=/; max-age=31536000; SameSite=Lax`;
 }

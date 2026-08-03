@@ -193,6 +193,7 @@ export function checkContactRateLimit(ip: string): boolean {
     return true;
   }
 
-  contactRateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+  const resetTime = now + windowMs;
+  contactRateLimitMap.set(ip, { count: 1, resetTime });
   return true;
 }

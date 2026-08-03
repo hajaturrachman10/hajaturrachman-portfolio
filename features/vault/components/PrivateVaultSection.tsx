@@ -107,9 +107,14 @@ export function PrivateVaultSection() {
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
-          if (parsed.vault !== undefined && !parsed.vault) {
-            setIsAdminOverride(true);
-            setUnlocked(true);
+          const toggles = parsed.toggles || parsed;
+          const vaultToggle = toggles.vault;
+          if (vaultToggle !== undefined) {
+            const isVaultProtected = vaultToggle.protected !== undefined ? vaultToggle.protected : vaultToggle;
+            if (!isVaultProtected) {
+              setIsAdminOverride(true);
+              setUnlocked(true);
+            }
           }
         } catch {
           // Ignore
@@ -124,6 +129,9 @@ export function PrivateVaultSection() {
         const response = await fetch("/api/auth/status", { cache: "no-store" });
         if (response.ok) {
           const data = await response.json();
+          if (data.toggles) {
+            syncLocalToggles(data.toggles, data.globalEpoch);
+          }
           if (data.overrides?.vault) {
             setIsAdminOverride(true);
             await fetchVaultData();
@@ -747,4 +755,54 @@ export function PrivateVaultSection() {
       />
     </>
   );
+}
+
+function syncLocalToggles(serverToggles: any, serverEpoch: number) {
+  if (typeof window === "undefined" || !serverToggles) return;
+  
+  const raw = localStorage.getItem("hajat_toggles_state");
+  let localData: any = null;
+  if (raw) {
+    try {
+      localData = JSON.parse(raw);
+    } catch {
+      localData = null;
+    }
+  }
+
+  if (localData && !localData.toggles) {
+    localData = {
+      toggles: Object.keys(localData).reduce((acc, key) => {
+        acc[key] = { protected: localData[key], updatedAt: 0 };
+        return acc;
+      }, {} as any),
+      globalEpoch: 0
+    };
+  }
+
+  const merged = {
+    toggles: { ...serverToggles },
+    globalEpoch: Math.max(serverEpoch || 0, localData?.globalEpoch || 0)
+  };
+
+  if (localData?.toggles) {
+    Object.keys(localData.toggles).forEach((key) => {
+      const serverVal = serverToggles[key];
+      const localVal = localData.toggles[key];
+      if (serverVal && localVal) {
+        const serverTime = Number(serverVal.updatedAt) || 0;
+        const localTime = Number(localVal.updatedAt) || 0;
+        
+        if (localTime > serverTime) {
+          merged.toggles[key] = {
+            protected: localVal.protected,
+            updatedAt: localTime
+          };
+        }
+      }
+    });
+  }
+
+  localStorage.setItem("hajat_toggles_state", JSON.stringify(merged));
+  document.cookie = `hajat_toggles_state=${encodeURIComponent(JSON.stringify(merged))}; path=/; max-age=31536000; SameSite=Lax`;
 }

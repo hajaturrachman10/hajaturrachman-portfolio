@@ -119,7 +119,9 @@ export const authService = {
         doc1: isDoc1Protected,
         doc2: isDoc2Protected,
         doc3: isDoc3Protected
-      }
+      },
+      toggles: adminState ? adminState.toggles : null,
+      globalEpoch: adminState ? adminState.globalEpoch : null
     };
   }
 };

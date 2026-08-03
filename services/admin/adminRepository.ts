@@ -52,7 +52,7 @@ const DEFAULT_STATE: AdminState = {
     ecl_doc2: { protected: true, updatedAt: Date.now() },
     ecl_doc3: { protected: true, updatedAt: Date.now() }
   },
-  globalEpoch: Date.now(),
+  globalEpoch: 1785752077882, // Static base timestamp to prevent container boot flip-flops
   stats: {
     totalVisitors: 0,
     cvUnlocks: 0,
@@ -100,55 +100,63 @@ export const adminRepository = {
         return DEFAULT_STATE;
       }
 
-      const parsed = JSON.parse(raw) as Partial<AdminState>;
-      const todayStr = new Date().toISOString().slice(0, 10);
+      const parsed = JSON.parse(raw);
       const loginHistory = {
         ...DEFAULT_STATE.loginHistory,
-        ...(parsed.loginHistory || {})
+        ...parsed.loginHistory
       };
-
-      if (loginHistory.lastResetDate !== todayStr) {
-        loginHistory.failedCountToday = 0;
-        loginHistory.successCountToday = 0;
-        loginHistory.lastResetDate = todayStr;
-      }
-
-      const defaultAccounts = [
-        {
-          id: "acc-1",
-          username: parsed.auth?.username || "Hajaturrachman10",
-          passwords: [parsed.auth?.passwordHash || "Xyzordie67@"],
-          role: "SUPER_ADMIN" as const,
-          createdAt: Date.now()
-        }
-      ];
-
+      
       const fullState: AdminState = {
-        ...DEFAULT_STATE,
-        ...parsed,
         auth: { ...DEFAULT_STATE.auth, ...parsed.auth },
         accounts: parsed.accounts && parsed.accounts.length > 0 ? parsed.accounts : defaultAccounts,
         strategies: { ...DEFAULT_STATE.strategies, ...parsed.strategies },
         toggles: { ...DEFAULT_STATE.toggles, ...parsed.toggles },
         stats: { ...DEFAULT_STATE.stats, ...parsed.stats },
         lastLogin: (parsed.lastLogin ? { ...DEFAULT_STATE.lastLogin, ...parsed.lastLogin } : DEFAULT_STATE.lastLogin)!,
-        loginHistory: loginHistory as LoginHistoryStats
+        loginHistory: loginHistory as LoginHistoryStats,
+        globalEpoch: Number(parsed.globalEpoch) || DEFAULT_STATE.globalEpoch
       };
 
       try {
         const { cookies } = require("next/headers");
         const togglesCookie = cookies().get("hajat_toggles_state")?.value;
         if (togglesCookie) {
-          const cookieMap = JSON.parse(decodeURIComponent(togglesCookie));
-          Object.keys(cookieMap).forEach((key) => {
-            const k = key as keyof typeof fullState.toggles;
-            if (fullState.toggles[k]) {
-              fullState.toggles[k] = {
-                ...fullState.toggles[k],
-                protected: Boolean(cookieMap[key])
-              };
+          const cookieData = JSON.parse(decodeURIComponent(togglesCookie));
+          
+          if (cookieData && typeof cookieData === "object") {
+            if (cookieData.toggles && typeof cookieData.toggles === "object") {
+              // New nested format: { toggles: { cv: { protected, updatedAt } }, globalEpoch: 123 }
+              Object.keys(cookieData.toggles).forEach((key) => {
+                const k = key as keyof typeof fullState.toggles;
+                if (fullState.toggles[k] && cookieData.toggles[k]) {
+                  const cookieTime = Number(cookieData.toggles[k].updatedAt) || 0;
+                  const dbTime = Number(fullState.toggles[k].updatedAt) || 0;
+                  if (cookieTime > dbTime) {
+                    fullState.toggles[k] = {
+                      protected: Boolean(cookieData.toggles[k].protected),
+                      updatedAt: cookieTime
+                    };
+                  }
+                }
+              });
+
+              const cookieEpoch = Number(cookieData.globalEpoch) || 0;
+              if (cookieEpoch > fullState.globalEpoch) {
+                fullState.globalEpoch = cookieEpoch;
+              }
+            } else {
+              // Legacy flat format: { cv: true, ... }
+              Object.keys(cookieData).forEach((key) => {
+                const k = key as keyof typeof fullState.toggles;
+                if (fullState.toggles[k]) {
+                  fullState.toggles[k] = {
+                    ...fullState.toggles[k],
+                    protected: Boolean(cookieData[key])
+                  };
+                }
+              });
             }
-          });
+          }
         }
       } catch {
         // Ignore if outside request context
@@ -206,3 +214,5 @@ export const adminRepository = {
     return DEFAULT_STATE;
   }
 };
+
+const defaultAccounts = DEFAULT_STATE.accounts;

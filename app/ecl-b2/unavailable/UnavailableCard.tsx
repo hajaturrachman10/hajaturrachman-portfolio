@@ -65,6 +65,12 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
         const res = await fetch("/api/auth/status", { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
+          
+          // Sync client-side toggles if available in response
+          if (data.toggles) {
+            syncLocalToggles(data.toggles, data.globalEpoch);
+          }
+
           const docKey = `doc${docId}` as "doc1" | "doc2" | "doc3";
           if (data.docToggles?.[docKey] === true) {
             handleRedirect();
@@ -100,89 +106,125 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
         centered
       />
 
-      {/* Central Card Harmonized 1:1 with Portfolio Design System */}
-      <Reveal className="max-w-2xl w-full mt-4 sm:mt-6">
-        <motion.article
-          initial={{ opacity: 0, y: 15, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 border border-line bg-surface flex flex-col items-center justify-center text-center gap-6 relative overflow-hidden shadow-card select-none"
-        >
-          {/* Glowing Orbit Icon */}
-          <div className="relative">
-            <div className="absolute inset-0 rounded-3xl bg-rose-500/20 blur-xl animate-pulse" />
-            <motion.div
-              whileHover={{ scale: 1.06, rotate: 6 }}
-              whileTap={{ scale: 0.94, rotate: 3 }}
-              transition={{ type: "spring", stiffness: 450, damping: 18 }}
-              className="icon-orbit grid h-16 w-16 place-items-center rounded-3xl border border-rose-500/40 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20 relative z-10"
-            >
-              <FileX className="h-8 w-8" />
-            </motion.div>
-          </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 border border-line bg-surface flex flex-col items-center justify-center text-center gap-6 relative overflow-hidden shadow-card select-none"
+      >
+        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-rose-500/10 blur-3xl" />
+        <div className="absolute -left-20 -bottom-20 h-56 w-56 rounded-full bg-rose-500/10 blur-3xl" />
 
-          <div className="flex flex-col items-center w-full">
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-500 border border-rose-500/20 mb-3 inline-block shadow-xs">
-              {language === "id" ? "STATUS: NONAKTIF SEMENTARA" : "STATUS: VORÜBERGEHEND DEAKTIVIERT"}
-            </span>
-            <h2 className="font-display text-xl sm:text-2xl font-black text-primary">
-              {language === "id" ? "Dokumen Tidak Dapat Diakses" : "Dokument zurzeit nicht verfügbar"}
-            </h2>
-            
-            {/* Document box with explicit width container to prevent border leak/overflow */}
-            <div className="mt-3 px-4 py-2.5 rounded-xl bg-surface/80 border border-line flex items-center justify-center gap-2 max-w-xs sm:max-w-md w-[88%] sm:w-auto mx-auto shadow-sm">
-              <FileText className="h-4.5 w-4.5 text-primary shrink-0" />
-              <span className="text-xs font-black text-primary truncate max-w-[180px] sm:max-w-none">
-                {docName}
-              </span>
-            </div>
+        <div className="relative">
+          <div className="icon-orbit grid h-16 w-16 place-items-center rounded-3xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
+            <FileX className="h-7 w-7" />
           </div>
+          <span className="absolute -bottom-1 -right-1 flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+          </span>
+        </div>
 
-          <p className="text-xs sm:text-sm font-bold leading-relaxed text-muted max-w-lg">
+        <div>
+          <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider mb-2 bg-rose-500/10 text-rose-500 border border-rose-500/20">
+            <span>STATUS: {language === "id" ? "NONAKTIF SEMENTARA" : "VORÜBERGEHEND DEAKTIVIERT"}</span>
+          </div>
+          <h2 className="font-display text-lg sm:text-xl font-black text-rose-500">{docName}</h2>
+        </div>
+
+        {/* Warning card matching exact system alert */}
+        <div className="flex gap-3 text-left p-4.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 max-w-md w-full relative z-10 shadow-glow shadow-rose-500/5">
+          <AlertTriangle className="h-5 w-5 shrink-0" />
+          <div className="text-xs font-bold leading-5">
             {language === "id"
-              ? "Mohon maaf, dokumen ini sedang dinonaktifkan sementara oleh Administrator untuk pembaruan materi, revisi berkas, atau pemeliharaan sistem."
-              : "Entschuldigung, dieses Dokument wurde vom Administrator vorübergehend für Aktualisierungen, Überarbeitungen oder Wartungsarbeiten deaktiviert."}
-          </p>
-
-          <div className="p-4 rounded-2xl bg-amber-500/[0.04] border border-amber-500/20 text-left text-xs font-bold text-muted flex items-start gap-3 max-w-lg w-full">
-            <AlertTriangle className="h-4.5 w-4.5 text-amber-500 shrink-0 mt-0.5" />
-            <span>
-              {language === "id"
-                ? "Silakan periksa kembali secara berkala atau hubungi Hajat via WhatsApp jika Anda memerlukan akses dokumen secara mendesak."
-                : "Bitte überprüfen Sie die Seite später erneut oder kontaktieren Sie Hajat per WhatsApp, falls Sie dringenden Zugriff benötigen."}
-            </span>
+              ? "Dokumen ini saat ini ditangguhkan oleh administrator. Kami akan mengalihkan Anda secara otomatis begitu akses dipulihkan."
+              : "Dieses Dokument ist vorübergehend deaktiviert. Sie werden automatisch weitergeleitet, sobald der Zugriff wiederhergestellt ist."}
           </div>
+        </div>
 
-          <div className="flex flex-col sm:flex-row gap-3.5 w-full max-w-lg mt-2">
-            <MagneticButton className="flex-1">
-              <button
-                type="button"
-                onClick={() => router.push("/ecl-b2")}
-                className="button-secondary focus-ring w-full py-3.5 text-xs font-black flex items-center justify-center gap-2 rounded-2xl cursor-pointer"
-              >
-                <ArrowLeft className="h-4 w-4 shrink-0" />
-                <span>{language === "id" ? "Kembali ke ECL B2" : "Zurück zu ECL B2"}</span>
-              </button>
-            </MagneticButton>
+        {/* Action Button */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto relative z-10">
+          <MagneticButton className="w-full sm:w-auto">
+            <button
+              onClick={() => router.push("/ecl-b2")}
+              className="flex items-center justify-center gap-2 rounded-2xl border border-line bg-surface hover:bg-slate-100 hover:text-primary transition-all duration-300 px-5 py-3 text-xs font-black w-full sm:w-auto"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>{language === "id" ? "Kembali ke Materi" : "Zurück zur Übersicht"}</span>
+            </button>
+          </MagneticButton>
 
-            <MagneticButton className="flex-1">
-              <a
-                href={`https://wa.me/6285158518090?text=${encodeURIComponent(
-                  language === "id"
-                    ? `Halo Hajat, saya ingin menanyakan status akses ${docName} yang saat ini sedang nonaktif.`
-                    : `Hallo Hajat, ich möchte nach dem Status von ${docName} fragen.`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="button-primary focus-ring flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white px-5 py-3.5 text-xs font-black transition-colors duration-300 cursor-pointer select-none shadow-md shadow-emerald-600/10 w-full border-0"
-              >
-                <MessageCircle className="h-4 w-4 shrink-0" />
-                <span>{language === "id" ? "Tanya Hajat" : "Hajat Fragen"}</span>
-              </a>
-            </MagneticButton>
-          </div>
-        </motion.article>
-      </Reveal>
+          <MagneticButton className="w-full sm:w-auto">
+            <motion.a
+              href={`https://wa.me/6285158518090?text=${encodeURIComponent(
+                language === "id"
+                  ? `Halo Hajat, saya ingin menanyakan akses dokumen: ${docNames.id}`
+                  : `Hallo Hajat, ich möchte nach dem Zugriff auf das Dokument fragen: ${docNames.de}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 text-white px-5 py-3 text-xs font-black shadow-md shadow-emerald-600/20 border-0 w-full sm:w-auto"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>{language === "id" ? "Hubungi via WhatsApp" : "Hajat kontaktieren"}</span>
+            </motion.a>
+          </MagneticButton>
+        </div>
+      </motion.div>
     </div>
   );
+}
+
+// Client-side helper function to perform Conflict-Free Last-Write-Wins synchronization of admin toggles
+function syncLocalToggles(serverToggles: any, serverEpoch: number) {
+  if (typeof window === "undefined" || !serverToggles) return;
+  
+  const raw = localStorage.getItem("hajat_toggles_state");
+  let localData: any = null;
+  if (raw) {
+    try {
+      localData = JSON.parse(raw);
+    } catch {
+      localData = null;
+    }
+  }
+
+  // Restructure legacy flat format if necessary
+  if (localData && !localData.toggles) {
+    localData = {
+      toggles: Object.keys(localData).reduce((acc, key) => {
+        acc[key] = { protected: localData[key], updatedAt: 0 };
+        return acc;
+      }, {} as any),
+      globalEpoch: 0
+    };
+  }
+
+  const merged = {
+    toggles: { ...serverToggles },
+    globalEpoch: Math.max(serverEpoch || 0, localData?.globalEpoch || 0)
+  };
+
+  if (localData?.toggles) {
+    Object.keys(localData.toggles).forEach((key) => {
+      const serverVal = serverToggles[key];
+      const localVal = localData.toggles[key];
+      if (serverVal && localVal) {
+        const serverTime = Number(serverVal.updatedAt) || 0;
+        const localTime = Number(localVal.updatedAt) || 0;
+        
+        if (localTime > serverTime) {
+          merged.toggles[key] = {
+            protected: localVal.protected,
+            updatedAt: localTime
+          };
+        }
+      }
+    });
+  }
+
+  localStorage.setItem("hajat_toggles_state", JSON.stringify(merged));
+  document.cookie = `hajat_toggles_state=${encodeURIComponent(JSON.stringify(merged))}; path=/; max-age=31536000; SameSite=Lax`;
 }
