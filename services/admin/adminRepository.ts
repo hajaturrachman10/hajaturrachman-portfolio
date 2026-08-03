@@ -1,8 +1,12 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { AdminState, LoginHistoryStats, LastLoginMetadata } from "./adminTypes";
 
-const STORAGE_PATH = path.join(process.cwd(), "data", "adminState.json");
+const DEV_STORAGE_PATH = path.join(process.cwd(), "data", "adminState.json");
+const TMP_STORAGE_PATH = path.join(os.tmpdir(), "hajat_adminState.json");
+
+let inMemoryState: AdminState | null = (globalThis as any).__adminStateCache || null;
 
 const DEFAULT_STATE: AdminState = {
   auth: {
@@ -58,21 +62,32 @@ const DEFAULT_STATE: AdminState = {
 
 export const adminRepository = {
   read(): AdminState {
+    if (inMemoryState) {
+      return inMemoryState;
+    }
+
     try {
-      if (!fs.existsSync(STORAGE_PATH)) {
+      let raw = "";
+      if (fs.existsSync(TMP_STORAGE_PATH)) {
+        raw = fs.readFileSync(TMP_STORAGE_PATH, "utf-8");
+      } else if (fs.existsSync(DEV_STORAGE_PATH)) {
+        raw = fs.readFileSync(DEV_STORAGE_PATH, "utf-8");
+      }
+
+      if (!raw) {
+        inMemoryState = DEFAULT_STATE;
+        (globalThis as any).__adminStateCache = DEFAULT_STATE;
         this.write(DEFAULT_STATE);
         return DEFAULT_STATE;
       }
-      const raw = fs.readFileSync(STORAGE_PATH, "utf-8");
-      const parsed = JSON.parse(raw) as Partial<AdminState>;
 
+      const parsed = JSON.parse(raw) as Partial<AdminState>;
       const todayStr = new Date().toISOString().slice(0, 10);
       const loginHistory = {
         ...DEFAULT_STATE.loginHistory,
         ...(parsed.loginHistory || {})
       };
 
-      // Reset daily counts if new day
       if (loginHistory.lastResetDate !== todayStr) {
         loginHistory.failedCountToday = 0;
         loginHistory.successCountToday = 0;
@@ -89,7 +104,7 @@ export const adminRepository = {
         }
       ];
 
-      return {
+      const fullState: AdminState = {
         ...DEFAULT_STATE,
         ...parsed,
         auth: { ...DEFAULT_STATE.auth, ...parsed.auth },
@@ -100,20 +115,40 @@ export const adminRepository = {
         lastLogin: (parsed.lastLogin ? { ...DEFAULT_STATE.lastLogin, ...parsed.lastLogin } : DEFAULT_STATE.lastLogin)!,
         loginHistory: loginHistory as LoginHistoryStats
       };
+
+      inMemoryState = fullState;
+      (globalThis as any).__adminStateCache = fullState;
+      return fullState;
     } catch {
+      inMemoryState = DEFAULT_STATE;
+      (globalThis as any).__adminStateCache = DEFAULT_STATE;
       return DEFAULT_STATE;
     }
   },
 
   write(state: AdminState): void {
+    inMemoryState = state;
+    (globalThis as any).__adminStateCache = state;
+
     try {
-      const dir = path.dirname(STORAGE_PATH);
+      const dir = path.dirname(DEV_STORAGE_PATH);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
+      fs.writeFileSync(DEV_STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
+      return;
+    } catch {
+      // Dev directory read-only on Vercel Serverless
+    }
+
+    try {
+      const tmpDir = path.dirname(TMP_STORAGE_PATH);
+      if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      }
+      fs.writeFileSync(TMP_STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
     } catch (err) {
-      console.error("Gagal menyimpan adminState.json:", err);
+      console.error("Gagal menyimpan adminState ke serverless tmp:", err);
     }
   },
 
