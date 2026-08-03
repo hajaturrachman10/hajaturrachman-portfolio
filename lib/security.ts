@@ -101,7 +101,9 @@ export function getClientIp(request: Request): string {
 }
 
 /**
- * Rate limit check for Password Authentication (Max 5 failed attempts per 15 minutes)
+ * Rate limit check for Auth attempts (Max 5 attempts per 10 minutes per IP)
+ * Lockout status persists for 10 minutes (600 seconds)
+ * IP block also acts as fallback mechanism for brute force attacks (Max 15 attempts per 15 minutes)
  */
 export function checkAuthRateLimit(ip: string): { allowed: boolean; remainingSeconds: number } {
   const now = Date.now();
@@ -178,15 +180,19 @@ export function checkContactRateLimit(ip: string): boolean {
 
   const record = contactRateLimitMap.get(ip);
 
-  if (!record || now > record.resetTime) {
-    contactRateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+  if (record) {
+    if (now > record.resetTime) {
+      contactRateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+      return true;
+    }
+    if (record.count >= maxSubmissions) {
+      return false;
+    }
+    record.count += 1;
+    contactRateLimitMap.set(ip, record);
     return true;
   }
 
-  if (record.count >= maxSubmissions) {
-    return false;
-  }
-
-  record.count += 1;
+  contactRateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
   return true;
 }

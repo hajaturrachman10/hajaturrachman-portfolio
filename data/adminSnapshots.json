@@ -1,10 +1,10 @@
 [
   {
-    "version": 74,
-    "createdAt": 1785745396823,
+    "version": 126,
+    "createdAt": 1785752814883,
     "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle ECL_DOC3 ke UNPROTECTED",
-    "configHash": "fba702c715c76004dbd7ddb773b47fec5d3d85d37c41154889bc0f1b34faa01a",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "4ed79389dabc289e85d2ceaa9bbbd3780f78904114c0eb2f684a6fc69318e780",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -50,111 +50,22 @@
         },
         "ecl": {
           "protected": true,
-          "updatedAt": 1785454648862
+          "updatedAt": 1785752589834
         },
         "ecl_doc1": {
-          "protected": true,
-          "updatedAt": 1785745098187
+          "protected": false,
+          "updatedAt": 1785752799838
         },
         "ecl_doc2": {
           "protected": true,
-          "updatedAt": 1785745098187
-        },
-        "ecl_doc3": {
-          "protected": true,
-          "updatedAt": 1785745378856
-        }
-      },
-      "globalEpoch": 1785454699919,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 8
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 0,
-        "successCountToday": 0,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-08-03"
-      }
-    }
-  },
-  {
-    "version": 73,
-    "createdAt": 1785745378847,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle ECL_DOC3 ke PROTECTED",
-    "configHash": "827dbc288fee2c72692813c55c2b3a13c07f712067ee79f479a8f865cb1bb42a",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "accounts": [
-        {
-          "id": "acc-1",
-          "username": "Hajaturrachman10",
-          "passwords": [
-            "Xyzordie67@"
-          ],
-          "role": "SUPER_ADMIN",
-          "createdAt": 1785485599887
-        }
-      ],
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785454531937
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785454699919
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785454648862
-        },
-        "ecl_doc1": {
-          "protected": true,
-          "updatedAt": 1785745098187
-        },
-        "ecl_doc2": {
-          "protected": true,
-          "updatedAt": 1785745098187
+          "updatedAt": 1785752722914
         },
         "ecl_doc3": {
           "protected": false,
-          "updatedAt": 1785745119459
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785454699919,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
@@ -178,11 +89,11 @@
     }
   },
   {
-    "version": 72,
-    "createdAt": 1785745119456,
+    "version": 125,
+    "createdAt": 1785752799837,
     "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle ECL_DOC3 ke UNPROTECTED",
-    "configHash": "9d4faab1681f1e400659a59fb52ba16ebddd066d3c937a1fcaee6327e0bab3b3",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "261018b27485360225756980e3805b194b3f023f929e42b8053b2b98035e3449",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -228,22 +139,22 @@
         },
         "ecl": {
           "protected": true,
-          "updatedAt": 1785454648862
+          "updatedAt": 1785752589834
         },
         "ecl_doc1": {
-          "protected": true,
-          "updatedAt": 1785745098187
+          "protected": false,
+          "updatedAt": 1785752799838
         },
         "ecl_doc2": {
           "protected": true,
-          "updatedAt": 1785745098187
+          "updatedAt": 1785752722914
         },
         "ecl_doc3": {
-          "protected": true,
-          "updatedAt": 1785745098187
+          "protected": false,
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785454699919,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
@@ -267,11 +178,11 @@
     }
   },
   {
-    "version": 71,
-    "createdAt": 1785454699912,
+    "version": 124,
+    "createdAt": 1785752722913,
     "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke PROTECTED",
-    "configHash": "8250e82056d2187a5498a44ae2c43090b7e7060fdbeb10d87bbc3adebce4ce5f",
+    "message": "Perubahan Toggle ECL_DOC2 ke PROTECTED",
+    "configHash": "73ea9d480ffda680b433bdaf74f0ffa81908af4ce38633a281bb2913f922836f",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -279,6 +190,17 @@
         "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
         "lastPasswordChange": 1785340800000
       },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
       "strategies": {
         "cv": {
           "type": "STATIC",
@@ -301,21 +223,33 @@
           "updatedAt": 1785454531937
         },
         "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
           "protected": false,
-          "updatedAt": 1785454684872
+          "updatedAt": 1785752799838
         },
-        "ecl": {
+        "ecl_doc2": {
           "protected": true,
-          "updatedAt": 1785454648862
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785454648862,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
         "vaultUnlocks": 45,
         "eclUnlocks": 89,
-        "contactSubmissions": 12
+        "contactSubmissions": 8
       },
       "lastLogin": {
         "time": 1785448800773,
@@ -324,20 +258,20 @@
         "remember": true
       },
       "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
+        "failedCountToday": 0,
+        "successCountToday": 0,
         "totalFailed": 37,
         "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
+        "lastResetDate": "2026-08-03"
       }
     }
   },
   {
-    "version": 70,
-    "createdAt": 1785454684869,
+    "version": 123,
+    "createdAt": 1785752712881,
     "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke UNPROTECTED",
-    "configHash": "7b0dfc285e2fcc6ab633a4496ac51428190f8706b9a2cabe293207f5c3a7ce6d",
+    "message": "Perubahan Toggle ECL_DOC2 ke UNPROTECTED",
+    "configHash": "43334aba658fd764fbd3400ee6dc0b06867d757d8022f623bb88e8959e0ab5e9",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -345,6 +279,17 @@
         "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
         "lastPasswordChange": 1785340800000
       },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
       "strategies": {
         "cv": {
           "type": "STATIC",
@@ -368,20 +313,32 @@
         },
         "vault": {
           "protected": true,
-          "updatedAt": 1785450558864
+          "updatedAt": 1785454699919
         },
         "ecl": {
           "protected": true,
-          "updatedAt": 1785454648862
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785454648862,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
         "vaultUnlocks": 45,
         "eclUnlocks": 89,
-        "contactSubmissions": 12
+        "contactSubmissions": 8
       },
       "lastLogin": {
         "time": 1785448800773,
@@ -390,20 +347,554 @@
         "remember": true
       },
       "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
+        "failedCountToday": 0,
+        "successCountToday": 0,
         "totalFailed": 37,
         "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
+        "lastResetDate": "2026-08-03"
       }
     }
   },
   {
-    "version": 69,
-    "createdAt": 1785454648856,
+    "version": 122,
+    "createdAt": 1785752694832,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC2 ke PROTECTED",
+    "configHash": "5e953f0036b691932f83811fcebdbdbf6f67af25df6120fd2227bfb7d35411d9",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 121,
+    "createdAt": 1785752678850,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC2 ke UNPROTECTED",
+    "configHash": "3757147718d030f55ce542d2c52d51553726c19baf0ba416aab32970419ff072",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 120,
+    "createdAt": 1785752657819,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC2 ke PROTECTED",
+    "configHash": "331edc47b687996d11b93fdfebca1f0e7f213e0dee97c04a123a9eb22bc7a42a",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 119,
+    "createdAt": 1785752648834,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC2 ke UNPROTECTED",
+    "configHash": "88e579a986d956ac16eae60eb4b019c8ef16ee9961a2f82293878bf4d9bacee1",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 118,
+    "createdAt": 1785752625824,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "503ba87cbab4abdcf6194709e2ae08b8462acf6f62d825557e68c950b124246b",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 117,
+    "createdAt": 1785752597808,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "a9f1f892981bf617224e34294db204f97529d5b2cbb7b2648c3107aa94a34cae",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 116,
+    "createdAt": 1785752589832,
     "createdBy": "Hajaturrachman10",
     "message": "Perubahan Toggle ECL ke PROTECTED",
-    "configHash": "1aa28c7ed18cd58827745796bb67a4e370e438a7ab099a31e9e164f0b850629e",
+    "configHash": "bcef8fbec7fcaad4a072ff1d211d144fd2f6c59d13d2df2cda014be0427e7ace",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -411,6 +902,17 @@
         "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
         "lastPasswordChange": 1785340800000
       },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
       "strategies": {
         "cv": {
           "type": "STATIC",
@@ -434,20 +936,32 @@
         },
         "vault": {
           "protected": true,
-          "updatedAt": 1785450558864
+          "updatedAt": 1785454699919
         },
         "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
           "protected": false,
-          "updatedAt": 1785454547849
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785454531937,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
         "vaultUnlocks": 45,
         "eclUnlocks": 89,
-        "contactSubmissions": 12
+        "contactSubmissions": 8
       },
       "lastLogin": {
         "time": 1785448800773,
@@ -456,20 +970,20 @@
         "remember": true
       },
       "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
+        "failedCountToday": 0,
+        "successCountToday": 0,
         "totalFailed": 37,
         "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
+        "lastResetDate": "2026-08-03"
       }
     }
   },
   {
-    "version": 68,
-    "createdAt": 1785454547841,
+    "version": 115,
+    "createdAt": 1785752507101,
     "createdBy": "Hajaturrachman10",
     "message": "Perubahan Toggle ECL ke UNPROTECTED",
-    "configHash": "11861c181eb653bdef85495a7595367e278c24c6820ec22ec6f844eb6780d016",
+    "configHash": "bedb287324809b7441f5368c1668589ba04eecc9a447c5933cbbcc6997c04524",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -477,6 +991,17 @@
         "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
         "lastPasswordChange": 1785340800000
       },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
       "strategies": {
         "cv": {
           "type": "STATIC",
@@ -500,218 +1025,32 @@
         },
         "vault": {
           "protected": true,
-          "updatedAt": 1785450558864
+          "updatedAt": 1785454699919
         },
         "ecl": {
           "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785454531937,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 67,
-    "createdAt": 1785454531924,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "8dd0d084744cecf925f1e448c3a968100902a2360e9b3417adb7bdd2d07f34c6",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
+          "updatedAt": 1785752589834
         },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
+        "ecl_doc1": {
           "protected": false,
-          "updatedAt": 1785454226164
+          "updatedAt": 1785752799838
         },
-        "vault": {
+        "ecl_doc2": {
           "protected": true,
-          "updatedAt": 1785450558864
+          "updatedAt": 1785752722914
         },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785453639143,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 66,
-    "createdAt": 1785454226160,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "5dd48c051c1f4d92ca2a66b9e9ea8b463e49a71514e96bcd42aa9aa28db0f0f7",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785453639143
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785450558864
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785453639143,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 65,
-    "createdAt": 1785453639140,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "1357a60408a2f73aa21d2efa001d82bf5361ad20bbe3ce373b133ca19d4555e2",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
+        "ecl_doc3": {
           "protected": false,
-          "updatedAt": 1785453513611
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785450558864
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785450565139,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
         "vaultUnlocks": 45,
         "eclUnlocks": 89,
-        "contactSubmissions": 12
+        "contactSubmissions": 8
       },
       "lastLogin": {
         "time": 1785448800773,
@@ -720,1670 +1059,20 @@
         "remember": true
       },
       "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
+        "failedCountToday": 0,
+        "successCountToday": 0,
         "totalFailed": 37,
         "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
+        "lastResetDate": "2026-08-03"
       }
     }
   },
   {
-    "version": 64,
-    "createdAt": 1785453513606,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "b493de4c4312e57c18938c4f47effb9c3b6bb39dd086ed2612c3c3fae39c4c3f",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450565139
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785450558864
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450565139,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 63,
-    "createdAt": 1785450565136,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "8d7478387e0aca913f319a2071a990bea382f41a375b2a90eb199bc1cf8cdf59",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450562087
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785450558864
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450558864,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 62,
-    "createdAt": 1785450562083,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "8af9ea6ab94f374a55dd3c4d11d26c47877018854bb35bd5798c5d2e5a97488c",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450555824
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785450558864
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450558864,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 61,
-    "createdAt": 1785450558857,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke PROTECTED",
-    "configHash": "c0ccc8ab9fa6b2d4fe8800953c1b9c578aa2b6f21fab8808c5f285b6493e8c7c",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450555824
-        },
-        "vault": {
-          "protected": false,
-          "updatedAt": 1785450553248
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450555824,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 60,
-    "createdAt": 1785450555820,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "ee2993b1e182348090f5e160f7acfc25eaf422bddcc6472c3a9f67e3cc8078a4",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450550368
-        },
-        "vault": {
-          "protected": false,
-          "updatedAt": 1785450553248
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450473900,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 59,
-    "createdAt": 1785450553239,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke UNPROTECTED",
-    "configHash": "bfe3dce15868164a2e47180cf1f78c9fafe924b28eda96aafa3ff4c1bb61cfbf",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450550368
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450473900,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 58,
-    "createdAt": 1785450550355,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "cc21b422d19e34b1e198e8da2b2a79534267d1c8505c9af757aee8009b5948d2",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450473900
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450473900,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 57,
-    "createdAt": 1785450473894,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "0bcc2c34297a4608ee29efc4c37cc8be4ff568e48ec85f7ce10cce98462a00a0",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450453468
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450339491,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 56,
-    "createdAt": 1785450453461,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "886e9fbfb731688a2695db13a5713b50e9754d682b877d68910ad95e07f50c6c",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450339491
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450339491,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 55,
-    "createdAt": 1785450339488,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "491ebd06bdd9bebd7124da9918b631e39aaca337d2d012898c094b74c92f3172",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450252408
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450224778,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 54,
-    "createdAt": 1785450252405,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "0d44e250a5e835f5b2f5080568646387bf37347d8445cfc06ab8df89e54f4d4b",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450224778
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450224778,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 53,
-    "createdAt": 1785450224775,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "60c812d2bcc3d25845e00f6aa3034e52929066789fe5f707c8cce538fbf1c498",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450149564
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450091317,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 52,
-    "createdAt": 1785450149559,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "28d60c76f849e10b540277c48d3b0691f83e737331989d20e64c640ac4dcbfd3",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450093178
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450091317,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 51,
-    "createdAt": 1785450093174,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "93c5b301ee5f5d3908398ef64c664a8d2f739076f29990e36f4a480f1ee2c7da",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450091317
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450091317,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 50,
-    "createdAt": 1785450091313,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "d285d741e90edbbdbeb3f48a9146b2715e489bc458d5973688adcaa446ccbed4",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450089461
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450087081,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 49,
-    "createdAt": 1785450089449,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "1855e476b99d77d1d910cad51d6011bf0e7f95d04ef3db30b1ac95adc3d63564",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450087081
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450087081,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 48,
-    "createdAt": 1785450087078,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "3b5b7f2de2f1bdc9311462172942ed75ac359b80431b4c703179205cabc437b1",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450085117
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450079645,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 47,
-    "createdAt": 1785450085115,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "0d2577dc246cc68615035b11453ed9e55f323fe3203a62a81c1d777f49a73110",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450082233
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450079645,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 46,
-    "createdAt": 1785450082214,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "8bbbba690b4da0a03ba639d51c4b5c2ad20af1b96f73e93f2dfb8277ebdd1706",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450079645
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450079645,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 45,
-    "createdAt": 1785450079634,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "8ec449ef6aeee650faaf650ba3a4f3b0b419b4261fb7a6a799fc39deb128d5e6",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450076813
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450074532,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 44,
-    "createdAt": 1785450076811,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "02037d23163380d00ac8d37481fcca8f646c9a5561b31e2f3eaafcf9fb8c8d7a",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450074532
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450074532,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 43,
-    "createdAt": 1785450074528,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "d555d9d0f64b6fdfb20fdcf179b0a5347d6f7b958dc11a4267911be2cda02f11",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450072744
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450070845,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 42,
-    "createdAt": 1785450072738,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "48c97382e38dad41679e750c1217a4b7b77241cf0a87d4703f43ab6ffdeb34e1",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785450070845
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450070845,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 41,
-    "createdAt": 1785450070842,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "f9dab33e367ad55ead68883b80a87a2aa63427196b6eb48860f7ca0f93d1687a",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": false,
-          "updatedAt": 1785450068426
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450062871,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 40,
-    "createdAt": 1785450068417,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "884b4a488b9cc488432bb4eaf251e1cf11162de70e16e4f9bdb3b5b6782eb1c5",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449875152
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449920984
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785450062871
-        }
-      },
-      "globalEpoch": 1785450062871,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 39,
-    "createdAt": 1785450062865,
+    "version": 114,
+    "createdAt": 1785752495841,
     "createdBy": "Hajaturrachman10",
     "message": "Perubahan Toggle ECL ke PROTECTED",
-    "configHash": "432267956dc85f8144e4c3ee648c5b968ece899f32c0e5f775ca525e518233a5",
+    "configHash": "ff094e00732b160b77fd0b8b21f08e0bcfe2ad59a0e50e66fb1c28bc18e91e7d",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -2391,6 +1080,17 @@
         "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
         "lastPasswordChange": 1785340800000
       },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
       "strategies": {
         "cv": {
           "type": "STATIC",
@@ -2410,24 +1110,36 @@
       "toggles": {
         "cv": {
           "protected": true,
-          "updatedAt": 1785449875152
+          "updatedAt": 1785454531937
         },
         "vault": {
           "protected": true,
-          "updatedAt": 1785449920984
+          "updatedAt": 1785454699919
         },
         "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
           "protected": false,
-          "updatedAt": 1785449895019
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785449920984,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
         "vaultUnlocks": 45,
         "eclUnlocks": 89,
-        "contactSubmissions": 12
+        "contactSubmissions": 8
       },
       "lastLogin": {
         "time": 1785448800773,
@@ -2436,350 +1148,20 @@
         "remember": true
       },
       "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
+        "failedCountToday": 0,
+        "successCountToday": 0,
         "totalFailed": 37,
         "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
+        "lastResetDate": "2026-08-03"
       }
     }
   },
   {
-    "version": 38,
-    "createdAt": 1785449920981,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke PROTECTED",
-    "configHash": "3e22067250d77150e206dacf944644b75260a14131e2b562c57b642a72c32dc2",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449875152
-        },
-        "vault": {
-          "protected": false,
-          "updatedAt": 1785449914953
-        },
-        "ecl": {
-          "protected": false,
-          "updatedAt": 1785449895019
-        }
-      },
-      "globalEpoch": 1785449906516,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 37,
-    "createdAt": 1785449914951,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke UNPROTECTED",
-    "configHash": "92c67ff8b5302872ef10d83ce04940a0727b30dc8965fb095314cf6a177cdf57",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449875152
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449906516
-        },
-        "ecl": {
-          "protected": false,
-          "updatedAt": 1785449895019
-        }
-      },
-      "globalEpoch": 1785449906516,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 36,
-    "createdAt": 1785449906514,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke PROTECTED",
-    "configHash": "e58bb5e9be26d2d3f860335a345e3a038399ea5473d576bdf60265096b46af3d",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449875152
-        },
-        "vault": {
-          "protected": false,
-          "updatedAt": 1785449904103
-        },
-        "ecl": {
-          "protected": false,
-          "updatedAt": 1785449895019
-        }
-      },
-      "globalEpoch": 1785449902216,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 35,
-    "createdAt": 1785449904101,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke UNPROTECTED",
-    "configHash": "d885a77f6bda6e11560bf5ed5cfeebdcdafd698363d6df908d886595420b6972",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449875152
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449902216
-        },
-        "ecl": {
-          "protected": false,
-          "updatedAt": 1785449895019
-        }
-      },
-      "globalEpoch": 1785449902216,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 34,
-    "createdAt": 1785449902215,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke PROTECTED",
-    "configHash": "216d0786b144dfe57123f0254283d97c659cae047383097d8e4d7fb758b9ba2b",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449875152
-        },
-        "vault": {
-          "protected": false,
-          "updatedAt": 1785449888966
-        },
-        "ecl": {
-          "protected": false,
-          "updatedAt": 1785449895019
-        }
-      },
-      "globalEpoch": 1785449885938,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 33,
-    "createdAt": 1785449895016,
+    "version": 113,
+    "createdAt": 1785752486826,
     "createdBy": "Hajaturrachman10",
     "message": "Perubahan Toggle ECL ke UNPROTECTED",
-    "configHash": "d2ad28106cb58e6f82497c662309b55a478ce3cad700813c9dbe283b763a6bde",
+    "configHash": "d055e014ef26bff6f19c3b1702f94c601775a1d35e260f196f357b7ff6389a9c",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -2787,6 +1169,17 @@
         "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
         "lastPasswordChange": 1785340800000
       },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
       "strategies": {
         "cv": {
           "type": "STATIC",
@@ -2806,156 +1199,36 @@
       "toggles": {
         "cv": {
           "protected": true,
-          "updatedAt": 1785449875152
+          "updatedAt": 1785454531937
         },
         "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
           "protected": false,
-          "updatedAt": 1785449888966
+          "updatedAt": 1785752799838
         },
-        "ecl": {
+        "ecl_doc2": {
           "protected": true,
-          "updatedAt": 1785441491905
-        }
-      },
-      "globalEpoch": 1785449885938,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 32,
-    "createdAt": 1785449888964,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke UNPROTECTED",
-    "configHash": "505fd2be1cc79002cd393429a2d79793562bce3a3b012e39a28716fc25bb271b",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
+          "updatedAt": 1785752722914
         },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449875152
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785449885938
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785441491905
-        }
-      },
-      "globalEpoch": 1785449885938,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 31,
-    "createdAt": 1785449885927,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke PROTECTED",
-    "configHash": "99863c949dcf511c9c823b7e88b2ee4c83d80600aabef5dd9e9f59775c49cd24",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449875152
-        },
-        "vault": {
+        "ecl_doc3": {
           "protected": false,
-          "updatedAt": 1785449880664
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785441491905
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785449875152,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
         "vaultUnlocks": 45,
         "eclUnlocks": 89,
-        "contactSubmissions": 12
+        "contactSubmissions": 8
       },
       "lastLogin": {
         "time": 1785448800773,
@@ -2964,20 +1237,20 @@
         "remember": true
       },
       "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
+        "failedCountToday": 0,
+        "successCountToday": 0,
         "totalFailed": 37,
         "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
+        "lastResetDate": "2026-08-03"
       }
     }
   },
   {
-    "version": 30,
-    "createdAt": 1785449880659,
+    "version": 112,
+    "createdAt": 1785752077881,
     "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle VAULT ke UNPROTECTED",
-    "configHash": "11e68a23ae8a21a23f3d69d1d9ae35929642077dcba7633c04e83b5b27be13f0",
+    "message": "Perubahan Toggle ECL ke PROTECTED",
+    "configHash": "2eed2bd96c98cf0fe6864fe2361d719f26e9e1c12bde776ba89ac576ec79cc6c",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -2985,6 +1258,17 @@
         "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
         "lastPasswordChange": 1785340800000
       },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
       "strategies": {
         "cv": {
           "type": "STATIC",
@@ -3004,222 +1288,36 @@
       "toggles": {
         "cv": {
           "protected": true,
-          "updatedAt": 1785449875152
+          "updatedAt": 1785454531937
         },
         "vault": {
           "protected": true,
-          "updatedAt": 1785448650228
+          "updatedAt": 1785454699919
         },
         "ecl": {
           "protected": true,
-          "updatedAt": 1785441491905
-        }
-      },
-      "globalEpoch": 1785449875152,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 29,
-    "createdAt": 1785449875149,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "3e869ed2c604e3392d1b0335baecd9cfeb4fba11f06b823286a089cb48ef76e5",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
+          "updatedAt": 1785752589834
         },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
+        "ecl_doc1": {
           "protected": false,
-          "updatedAt": 1785449867922
+          "updatedAt": 1785752799838
         },
-        "vault": {
+        "ecl_doc2": {
           "protected": true,
-          "updatedAt": 1785448650228
+          "updatedAt": 1785752722914
         },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785441491905
-        }
-      },
-      "globalEpoch": 1785449863462,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 28,
-    "createdAt": 1785449867918,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "907da23ee327c356ae11a890b12360c03c3500b69b694c14779aba7569b4dcd9",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
-          "protected": true,
-          "updatedAt": 1785449863462
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785448650228
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785441491905
-        }
-      },
-      "globalEpoch": 1785449863462,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 27,
-    "createdAt": 1785449863452,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "1e95699ed0220fa63c73a8987447096d755b470296680ea80939cf8591647d08",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
-        },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
+        "ecl_doc3": {
           "protected": false,
-          "updatedAt": 1785449721800
-        },
-        "vault": {
-          "protected": true,
-          "updatedAt": 1785448650228
-        },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785441491905
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785449641283,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
         "vaultUnlocks": 45,
         "eclUnlocks": 89,
-        "contactSubmissions": 12
+        "contactSubmissions": 8
       },
       "lastLogin": {
         "time": 1785448800773,
@@ -3228,20 +1326,20 @@
         "remember": true
       },
       "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
+        "failedCountToday": 0,
+        "successCountToday": 0,
         "totalFailed": 37,
         "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
+        "lastResetDate": "2026-08-03"
       }
     }
   },
   {
-    "version": 26,
-    "createdAt": 1785449721780,
+    "version": 111,
+    "createdAt": 1785752071281,
     "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke UNPROTECTED",
-    "configHash": "718edbfbbc03d4d4eaf7f4e9b490db6d8e750cbe8f0baad78f5c124c6f78b421",
+    "message": "Perubahan Toggle ECL ke UNPROTECTED",
+    "configHash": "3377883be5031dfefc43d0753a09e908962bdd24c32863fc6c814bc06e72dadd",
     "state": {
       "auth": {
         "username": "Hajaturrachman10",
@@ -3249,6 +1347,17 @@
         "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
         "lastPasswordChange": 1785340800000
       },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
       "strategies": {
         "cv": {
           "type": "STATIC",
@@ -3268,90 +1377,36 @@
       "toggles": {
         "cv": {
           "protected": true,
-          "updatedAt": 1785449641283
+          "updatedAt": 1785454531937
         },
         "vault": {
           "protected": true,
-          "updatedAt": 1785448650228
+          "updatedAt": 1785454699919
         },
         "ecl": {
           "protected": true,
-          "updatedAt": 1785441491905
-        }
-      },
-      "globalEpoch": 1785449641283,
-      "stats": {
-        "totalVisitors": 1420,
-        "cvUnlocks": 128,
-        "vaultUnlocks": 45,
-        "eclUnlocks": 89,
-        "contactSubmissions": 12
-      },
-      "lastLogin": {
-        "time": 1785448800773,
-        "ip": "127.0.0.1",
-        "browser": "Chrome / Next.js Admin Client",
-        "remember": true
-      },
-      "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
-        "totalFailed": 37,
-        "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
-      }
-    }
-  },
-  {
-    "version": 25,
-    "createdAt": 1785449641208,
-    "createdBy": "Hajaturrachman10",
-    "message": "Perubahan Toggle CV ke PROTECTED",
-    "configHash": "0298ffc416980d86d01b053626ac84b5a2280b5d7c7c509cbbe158a7e72d0777",
-    "state": {
-      "auth": {
-        "username": "Hajaturrachman10",
-        "passwordHash": "Xyzordie67@",
-        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
-        "lastPasswordChange": 1785340800000
-      },
-      "strategies": {
-        "cv": {
-          "type": "STATIC",
-          "password": "cvhajat2026"
+          "updatedAt": 1785752589834
         },
-        "vault": {
-          "type": "STATIC",
-          "password": "hajatprivat2026"
-        },
-        "ecl": {
-          "type": "YEAR_RANGE",
-          "base": "10juli",
-          "startYear": 2006,
-          "endYear": 2026
-        }
-      },
-      "toggles": {
-        "cv": {
+        "ecl_doc1": {
           "protected": false,
-          "updatedAt": 1785449637949
+          "updatedAt": 1785752799838
         },
-        "vault": {
+        "ecl_doc2": {
           "protected": true,
-          "updatedAt": 1785448650228
+          "updatedAt": 1785752722914
         },
-        "ecl": {
-          "protected": true,
-          "updatedAt": 1785441491905
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
         }
       },
-      "globalEpoch": 1785449632490,
+      "globalEpoch": 1785752077882,
       "stats": {
         "totalVisitors": 1420,
         "cvUnlocks": 128,
         "vaultUnlocks": 45,
         "eclUnlocks": 89,
-        "contactSubmissions": 12
+        "contactSubmissions": 8
       },
       "lastLogin": {
         "time": 1785448800773,
@@ -3360,11 +1415,3037 @@
         "remember": true
       },
       "loginHistory": {
-        "failedCountToday": 37,
-        "successCountToday": 8,
+        "failedCountToday": 0,
+        "successCountToday": 0,
         "totalFailed": 37,
         "totalSuccess": 8,
-        "lastResetDate": "2026-07-30"
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 110,
+    "createdAt": 1785752047801,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke PROTECTED",
+    "configHash": "5fcaf07714eae8b450e05921e4ca290547698afbad26e64d82bdeea84cc7c117",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 109,
+    "createdAt": 1785752039889,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke UNPROTECTED",
+    "configHash": "77d3126c991493d030b2debfc42180698edb15b4fad73e1fd4aacaa3458b2b94",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 108,
+    "createdAt": 1785752022216,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke PROTECTED",
+    "configHash": "e711d920675803ca24d1d35eb987d19a5ca5fe93465110be7c686593663b6d2c",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 107,
+    "createdAt": 1785751865814,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke UNPROTECTED",
+    "configHash": "e87e435f4422ab0b847202199e8ec09daba33b6b60eafbfe2586395cc4c16e01",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 106,
+    "createdAt": 1785751784846,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke PROTECTED",
+    "configHash": "0d829fe28b98961903e537666cbe3bb8e1c1ede04e164c5223ba97073f3cba43",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 105,
+    "createdAt": 1785751760904,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke UNPROTECTED",
+    "configHash": "e325a93d31ac0d296b023922abfedc7e9fa3cde4225d8be547aabea05aeb69ee",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 104,
+    "createdAt": 1785751749808,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "df24aacd11e0fdb0b43c0f9ea380d7f8ef9911b453427198aa0ba20a66bd7ee1",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 103,
+    "createdAt": 1785751740909,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "6fc9d32f18d653b6f4f5e6785f82f74fa2a88663bc1c1e338ea75089e3280fac",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 102,
+    "createdAt": 1785751588846,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "5119607807959ee97247ec8a99082fae63e216c46ea25c101e1a84cc44e8fd74",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 101,
+    "createdAt": 1785751580829,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "91adaed705485bd91e36a7a2bfa71c1e318bd2adb9c971cde368d3164437014f",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 100,
+    "createdAt": 1785751510815,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "898c9f082b5dbbcbad1dd0df381226e91e9d71968ae4dd4c4b16654fbd37c44d",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 99,
+    "createdAt": 1785751501264,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "5932264630f726a68c7c0c4dbb282a81c568bb4b04a3b8b3f9f1a6e7161264cb",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 98,
+    "createdAt": 1785751219805,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "1ebebec84657d94578726ba0b4d96f3e67df17fa214288d9900e232e12e93582",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 97,
+    "createdAt": 1785751158809,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "72d0287bdb9ae6b188182a5c339f4a87d225248b848021b52089a61023583cea",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 96,
+    "createdAt": 1785751136820,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke PROTECTED",
+    "configHash": "322f7047bccbd9b61238fe1c352c8bc737e64b3401be325b1df9e785b3ceb8f7",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 95,
+    "createdAt": 1785750968849,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke UNPROTECTED",
+    "configHash": "2aa0fc01090c5610cb3c729c2af05c612cd84d69f28ebdf5ae84aef401f77f5c",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 94,
+    "createdAt": 1785750828303,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke PROTECTED",
+    "configHash": "7af37b72706dfe6cd0f5f23469f117ba3b45aac60624a0ad921358c6226144bf",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 93,
+    "createdAt": 1785750820903,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke UNPROTECTED",
+    "configHash": "61cc903cdc9bb39a80bceab8a842a0dbb9ea5d5153dde99f50bfa1ecc2510074",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 92,
+    "createdAt": 1785750799913,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke PROTECTED",
+    "configHash": "94a158829479318a4ab2cb57fbd90d254f7b4542827788204af8048ff6667f0e",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 91,
+    "createdAt": 1785750789797,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke UNPROTECTED",
+    "configHash": "4ddc28877192684d166690ea018a4baad4e62ba1843386b62c165bc77b21a6b3",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 90,
+    "createdAt": 1785750757832,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke PROTECTED",
+    "configHash": "202f8e3e33c8888c2e13af648ea60b15d4453c62621dfd6cf8dfabb5fa56e893",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 89,
+    "createdAt": 1785750748806,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL ke UNPROTECTED",
+    "configHash": "9bbf492d76ed5a6e6c51bd30bc06718c968ad0f4cb96ce847f09700b950f3274",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 88,
+    "createdAt": 1785750737185,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "719897ba4f5f95cbcc459df07948f63106417ea4b6c0494a2ea71e92978ec734",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 87,
+    "createdAt": 1785750724820,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "442f471bf0899f8a699e5b196dfb75df6f84d1908165adf6ad005e02ae1d425d",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 86,
+    "createdAt": 1785750714842,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "3efe10e26a3fe862b20f125dda4c5723445382159a58759bba9a79bf3ab6cc89",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 85,
+    "createdAt": 1785750679909,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "a9df4b931a87fef970cbefb165c3def18d77d19fcf7740484bc1ea41985a01fd",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 84,
+    "createdAt": 1785750669831,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "f22b2850c7b681a05de7770e826e1ff8216204c40dd3ccaab944fc9190176964",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 83,
+    "createdAt": 1785750657834,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "b11bdf86c26f5f86340f94642f6e585a573f12681f2ea0a20695ce64212256ee",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 82,
+    "createdAt": 1785750448811,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "e520cfa327b71f5dd7f8b17f0d241a4365c0e56f22ba026f3d02874c0227e667",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 81,
+    "createdAt": 1785750400814,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "2aeff06f9bc9ce5471d76af010b96ac57ba7d33be8b51b40b2bac72c82327045",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 80,
+    "createdAt": 1785750385828,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "4c4fb337f6ec5c6b70b4a23e8be4bab40e87fd6f7731a95e83752ba844ef081c",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 79,
+    "createdAt": 1785750354827,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "24a2dfe82f6eb7c920b9b88d2ecad526f53ea73f10bcd52d4da2bcaf866e474c",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 78,
+    "createdAt": 1785750344872,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke PROTECTED",
+    "configHash": "a0e27b47b532cfe7989894742c1ea925feb610944ba541d27cc194cb55df5da7",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
+      }
+    }
+  },
+  {
+    "version": 77,
+    "createdAt": 1785750334967,
+    "createdBy": "Hajaturrachman10",
+    "message": "Perubahan Toggle ECL_DOC1 ke UNPROTECTED",
+    "configHash": "5aa8cd280ececefd449b530d96068cfbd02a3eb1c5d5592021b6dd8cf7dcd1bd",
+    "state": {
+      "auth": {
+        "username": "Hajaturrachman10",
+        "passwordHash": "Xyzordie67@",
+        "sessionSecret": "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+        "lastPasswordChange": 1785340800000
+      },
+      "accounts": [
+        {
+          "id": "acc-1",
+          "username": "Hajaturrachman10",
+          "passwords": [
+            "Xyzordie67@"
+          ],
+          "role": "SUPER_ADMIN",
+          "createdAt": 1785485599887
+        }
+      ],
+      "strategies": {
+        "cv": {
+          "type": "STATIC",
+          "password": "cvhajat2026"
+        },
+        "vault": {
+          "type": "STATIC",
+          "password": "hajatprivat2026"
+        },
+        "ecl": {
+          "type": "YEAR_RANGE",
+          "base": "10juli",
+          "startYear": 2006,
+          "endYear": 2026
+        }
+      },
+      "toggles": {
+        "cv": {
+          "protected": true,
+          "updatedAt": 1785454531937
+        },
+        "vault": {
+          "protected": true,
+          "updatedAt": 1785454699919
+        },
+        "ecl": {
+          "protected": true,
+          "updatedAt": 1785752589834
+        },
+        "ecl_doc1": {
+          "protected": false,
+          "updatedAt": 1785752799838
+        },
+        "ecl_doc2": {
+          "protected": true,
+          "updatedAt": 1785752722914
+        },
+        "ecl_doc3": {
+          "protected": false,
+          "updatedAt": 1785745396835
+        }
+      },
+      "globalEpoch": 1785752077882,
+      "stats": {
+        "totalVisitors": 1420,
+        "cvUnlocks": 128,
+        "vaultUnlocks": 45,
+        "eclUnlocks": 89,
+        "contactSubmissions": 8
+      },
+      "lastLogin": {
+        "time": 1785448800773,
+        "ip": "127.0.0.1",
+        "browser": "Chrome / Next.js Admin Client",
+        "remember": true
+      },
+      "loginHistory": {
+        "failedCountToday": 0,
+        "successCountToday": 0,
+        "totalFailed": 37,
+        "totalSuccess": 8,
+        "lastResetDate": "2026-08-03"
       }
     }
   }

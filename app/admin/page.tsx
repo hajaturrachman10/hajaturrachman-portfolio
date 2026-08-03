@@ -42,6 +42,14 @@ export default function AdminPage() {
     checkSession();
   }, [checkSession]);
 
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.title = authenticated 
+        ? "Admin Control Center | Hajaturrachman" 
+        : "Admin Login | Hajaturrachman";
+    }
+  }, [authenticated]);
+
   const handleLogout = async () => {
     try {
       await fetch("/api/admin/auth/logout", { method: "POST" });

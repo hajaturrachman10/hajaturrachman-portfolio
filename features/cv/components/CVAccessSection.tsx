@@ -55,7 +55,7 @@ export function CVAccessSection() {
   }, []);
 
   useEffect(() => {
-    async function checkAuth() {
+    async function checkAuth(isInitial = false) {
       try {
         const response = await fetch("/api/auth/status", { cache: "no-store" });
         if (response.ok) {
@@ -69,26 +69,36 @@ export function CVAccessSection() {
             setIsAdminOverride(false);
             const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") === "true";
             if (!remember) {
-              setIsLocking(true);
-              setCheckingAuth(false);
-              try {
-                await fetch("/api/auth/lock", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ type: "cv" })
-                });
-              } catch (e) {
-                console.error(e);
+              if (isInitial) {
+                setIsLocking(true);
+                setCheckingAuth(false);
+                try {
+                  await fetch("/api/auth/lock", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ type: "cv" })
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
+                await new Promise((resolve) => setTimeout(resolve, 1800));
+                setUnlocked(false);
+                setIsLocking(false);
+              } else {
+                setUnlocked(false);
+                setCheckingAuth(false);
               }
-              await new Promise((resolve) => setTimeout(resolve, 1800));
-              setUnlocked(false);
-              setIsLocking(false);
             } else {
-              setIsUnlocking(true);
-              setCheckingAuth(false);
-              await new Promise((resolve) => setTimeout(resolve, 1500));
-              setUnlocked(true);
-              setIsUnlocking(false);
+              if (isInitial) {
+                setIsUnlocking(true);
+                setCheckingAuth(false);
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+                setUnlocked(true);
+                setIsUnlocking(false);
+              } else {
+                setUnlocked(true);
+                setCheckingAuth(false);
+              }
             }
           } else {
             setIsAdminOverride(false);
@@ -101,33 +111,38 @@ export function CVAccessSection() {
         setCheckingAuth(false);
       }
     }
-    checkAuth();
+    checkAuth(true);
 
     const unsubscribe = subscribeCrossTabSync(async (msg) => {
       if (msg.event === "TOGGLE_CHANGED") {
-        const feat = msg.data?.feature;
-        if (feat === "cv" || !feat) {
-          const isEnabling = !!msg.data?.protected;
+        const feat = msg.data?.feature || msg.payload?.feature;
+        if (feat === "cv") {
+          const isEnabling = msg.data?.protected !== undefined ? !!msg.data.protected : !!msg.payload?.protected;
           setAdminTransition({ active: true, isEnabling });
-          await new Promise((r) => setTimeout(r, 1600));
-          try {
-            const res = await fetch("/api/auth/status", { cache: "no-store" });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.cvUnlocked) {
-                setUnlocked(true);
-                setIsAdminOverride(!!data.overrides?.cv);
-              } else {
-                setUnlocked(false);
-                setIsAdminOverride(false);
-                setViewerOpen(false);
-              }
-            }
-          } catch {
-            // Handled
-          } finally {
-            setAdminTransition(null);
+          await new Promise((r) => setTimeout(r, 1200));
+
+          const res = await fetch("/api/auth/status", { cache: "no-store" });
+          let hasSession = false;
+          let override = false;
+          if (res.ok) {
+            const data = await res.json();
+            override = !!data.overrides?.cv;
+            hasSession = !!data.cvUnlocked;
           }
+
+          if (override) {
+            setIsAdminOverride(true);
+            setUnlocked(true);
+          } else if (hasSession) {
+            setIsAdminOverride(false);
+            setUnlocked(true); // Persist unlocked session!
+          } else {
+            setIsAdminOverride(false);
+            setUnlocked(false);
+            setViewerOpen(false);
+          }
+          setAdminTransition(null);
+          checkAuth(false);
         }
       } else if (
         msg.event === "SESSION_REVOKED" ||
@@ -148,8 +163,17 @@ export function CVAccessSection() {
         }
       }
     });
+    // Add cross-device polling interval (every 4 seconds) to support multi-device real-time sync
+    const interval = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        checkAuth(false);
+      }
+    }, 4000);
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   // Lock body scroll when CV PDF viewer is opened
@@ -244,8 +268,8 @@ export function CVAccessSection() {
                 adminTransition.isEnabling ? "text-rose-500" : "text-blue-500"
               )}>
                 {adminTransition.isEnabling
-                  ? "🔒 Proteksi Dipulihkan oleh Administrator..."
-                  : "🌐 Akses Ditingkatkan oleh Administrator..."}
+                  ? "Proteksi Dipulihkan oleh Administrator..."
+                  : "Akses Ditingkatkan oleh Administrator..."}
               </h4>
             </div>
 
@@ -363,7 +387,7 @@ export function CVAccessSection() {
                       isAdminOverride ? "text-blue-500" : "text-primary"
                     }`}>
                       {isAdminOverride
-                        ? (language === "id" ? "🌐 Akses Terbuka (Administrator)" : "🌐 Offener Zugang (Administrator)")
+                        ? (language === "id" ? "Akses Terbuka (Administrator)" : "Offener Zugang (Administrator)")
                         : (language === "id" ? "Akses Terproteksi" : "Geschützter Lebenslauf")}
                     </p>
                   </div>

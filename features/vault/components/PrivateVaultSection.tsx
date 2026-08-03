@@ -119,7 +119,7 @@ export function PrivateVaultSection() {
   }, []);
 
   useEffect(() => {
-    async function checkAuth() {
+    async function checkAuth(isInitial = false) {
       try {
         const response = await fetch("/api/auth/status", { cache: "no-store" });
         if (response.ok) {
@@ -133,27 +133,38 @@ export function PrivateVaultSection() {
             setIsAdminOverride(false);
             const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") === "true";
             if (!remember) {
-              setIsLocking(true);
-              setCheckingAuth(false);
-              try {
-                await fetch("/api/auth/lock", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ type: "private-vault" })
-                });
-              } catch (e) {
-                console.error(e);
+              if (isInitial) {
+                setIsLocking(true);
+                setCheckingAuth(false);
+                try {
+                  await fetch("/api/auth/lock", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ type: "private-vault" })
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
+                await new Promise((resolve) => setTimeout(resolve, 1800));
+                setUnlocked(false);
+                setIsLocking(false);
+              } else {
+                setUnlocked(false);
+                setCheckingAuth(false);
               }
-              await new Promise((resolve) => setTimeout(resolve, 1800));
-              setUnlocked(false);
-              setIsLocking(false);
             } else {
-              setIsUnlocking(true);
-              setCheckingAuth(false);
-              await fetchVaultData();
-              await new Promise((resolve) => setTimeout(resolve, 1500));
-              setUnlocked(true);
-              setIsUnlocking(false);
+              if (isInitial) {
+                setIsUnlocking(true);
+                setCheckingAuth(false);
+                await fetchVaultData();
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+                setUnlocked(true);
+                setIsUnlocking(false);
+              } else {
+                setUnlocked(true);
+                setCheckingAuth(false);
+                await fetchVaultData();
+              }
             }
           } else {
             setIsAdminOverride(false);
@@ -166,35 +177,41 @@ export function PrivateVaultSection() {
         setCheckingAuth(false);
       }
     }
-    checkAuth();
+    checkAuth(true);
 
     const unsubscribe = subscribeCrossTabSync(async (msg) => {
       if (msg.event === "TOGGLE_CHANGED") {
-        const feat = msg.data?.feature;
-        if (feat === "vault" || !feat) {
-          const isEnabling = !!msg.data?.protected;
+        const feat = msg.data?.feature || msg.payload?.feature;
+        if (feat === "vault") {
+          const isEnabling = msg.data?.protected !== undefined ? !!msg.data.protected : !!msg.payload?.protected;
           setAdminTransition({ active: true, isEnabling });
-          await new Promise((r) => setTimeout(r, 1600));
-          try {
-            const res = await fetch("/api/auth/status", { cache: "no-store" });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.vaultUnlocked) {
-                setUnlocked(true);
-                setIsAdminOverride(!!data.overrides?.vault);
-                await fetchVaultData();
-              } else {
-                setUnlocked(false);
-                setIsAdminOverride(false);
-                setVaultData(null);
-                setModalOpen(false);
-              }
-            }
-          } catch {
-            // Handled
-          } finally {
-            setAdminTransition(null);
+          await new Promise((r) => setTimeout(r, 1200));
+
+          const res = await fetch("/api/auth/status", { cache: "no-store" });
+          let hasSession = false;
+          let override = false;
+          if (res.ok) {
+            const data = await res.json();
+            override = !!data.overrides?.vault;
+            hasSession = !!data.vaultUnlocked;
           }
+
+          if (override) {
+            setIsAdminOverride(true);
+            await fetchVaultData();
+            setUnlocked(true);
+          } else if (hasSession) {
+            setIsAdminOverride(false);
+            await fetchVaultData();
+            setUnlocked(true); // Persist unlocked session!
+          } else {
+            setIsAdminOverride(false);
+            setUnlocked(false);
+            setVaultData(null);
+            setModalOpen(false);
+          }
+          setAdminTransition(null);
+          checkAuth(false);
         }
       } else if (
         msg.event === "SESSION_REVOKED" ||
@@ -215,8 +232,17 @@ export function PrivateVaultSection() {
         }
       }
     });
+    // Add cross-device polling interval (every 4 seconds) to support multi-device real-time sync
+    const interval = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        checkAuth(false);
+      }
+    }, 4000);
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   async function handleLockConfirm() {
@@ -287,8 +313,8 @@ export function PrivateVaultSection() {
                   adminTransition.isEnabling ? "text-rose-500" : "text-blue-500"
                 )}>
                   {adminTransition.isEnabling
-                    ? "🔒 Proteksi Dipulihkan oleh Administrator..."
-                    : "🌐 Akses Ditingkatkan oleh Administrator..."}
+                    ? "Proteksi Dipulihkan oleh Administrator..."
+                    : "Akses Ditingkatkan oleh Administrator..."}
                 </h4>
               </div>
 
@@ -486,7 +512,7 @@ export function PrivateVaultSection() {
                     <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-pulse" />
                     <span>
                       {isAdminOverride
-                        ? (language === "id" ? "🌐 Akses Terbuka (Administrator)" : "🌐 Offener Zugang (Administrator)")
+                        ? (language === "id" ? "Akses Terbuka (Administrator)" : "Offener Zugang (Administrator)")
                         : (language === "id" ? "Terotentikasi Server Aman" : "Vom Server verifiziert")}
                     </span>
                   </motion.p>

@@ -27,12 +27,14 @@ import { MagneticButton } from "@/components/ui/MagneticButton";
 import { Reveal } from "@/components/ui/Reveal";
 import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/LanguageContext";
 
 type AdminLoginViewProps = {
   onLoginSuccess: () => void;
 };
 
 export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
+  const { language } = useLanguage();
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

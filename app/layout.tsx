@@ -5,7 +5,8 @@ import { siteConfig } from "@/data/site";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageTransition } from "@/components/layout/PageTransition";
-
+import { ScrollRestoration } from "@/components/providers/ScrollRestoration";
+import { PageRestoreOverlay } from "@/components/providers/PageRestoreOverlay";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://hajat.vercel.app"),
@@ -22,6 +23,10 @@ export const metadata: Metadata = {
   keywords: [
     "Hajaturrachman",
     "Hajat",
+    "Hajat ECL",
+    "Hajat ECL B2",
+    "Hajaturrachman ECL B2",
+    "Hajaturrachman Portofolio",
     "Portofolio",
     "Ausbildung",
     "Perawat",
@@ -70,9 +75,6 @@ export const viewport: Viewport = {
   ]
 };
 
-import { ScrollRestoration } from "@/components/providers/ScrollRestoration";
-import { PageRestoreOverlay } from "@/components/providers/PageRestoreOverlay";
-
 export default function RootLayout({
   children
 }: Readonly<{
@@ -81,7 +83,6 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className="antialiased">
-        {/* JSON-LD Structured Data Schema for Google Search snippet optimization */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -97,20 +98,19 @@ export default function RootLayout({
                 "address": {
                   "@type": "PostalAddress",
                   "addressLocality": "Jakarta Timur",
-                  "addressCountry": "ID"
-                },
-                "description": "Website portofolio pribadi Hajaturrachman: perjalanan, karya, Ausbildung Jerman, dan mimpi berkeliling dunia.",
-                "image": "https://hajat.vercel.app/assets/profile.jpg",
-                "sameAs": [
-                  "https://instagram.com/saya.hajat"
-                ]
+                  "addressCountry": "ID",
+                  "image": "https://hajat.vercel.app/assets/profile.jpg",
+                  "sameAs": [
+                    "https://instagram.com/saya.hajat"
+                  ]
+                }
               }
             })
           }}
         />
         <Providers>
-          <PageRestoreOverlay />
           <ScrollRestoration />
+          <PageRestoreOverlay />
           <Navbar />
           <PageTransition>{children}</PageTransition>
           <Footer />

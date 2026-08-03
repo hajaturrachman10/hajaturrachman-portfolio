@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, RefreshCw, Sparkles, ToggleLeft, ToggleRight } from "lucide-react";
+import { ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, RefreshCw, Sparkles, ToggleLeft, ToggleRight, FileText } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { FeatureType, FeatureToggleState } from "@/services/admin/adminTypes";
 import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
@@ -115,8 +115,157 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
     }
   };
 
+  const mainFeatures = featuresList.filter((f) => !f.isDoc);
+  const docFeatures = featuresList.filter((f) => f.isDoc);
+
+  const renderCard = (item: typeof featuresList[0]) => {
+    const isProtected = localOverrides[item.type] !== undefined
+      ? localOverrides[item.type]!
+      : toggles ? toggles[item.type]?.protected ?? true : true;
+    const isLoading = loadingFeature === item.type;
+
+    return (
+      <motion.div
+        key={item.type}
+        whileHover={{ y: -2 }}
+        className="premium-card relative p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-line bg-surface flex flex-col justify-between gap-4 sm:gap-6 shadow-sm overflow-hidden"
+      >
+        {/* In-Card Transition Animation Overlay (Non-fullscreen) */}
+        <AnimatePresence>
+          {isLoading ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 z-20 bg-surface/95 backdrop-blur-md p-4 sm:p-6 flex flex-col items-center justify-center text-center gap-2.5 sm:gap-3"
+            >
+              <div
+                className={`grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl sm:rounded-2xl border ${
+                  transitioningAction === "enabling"
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20"
+                    : "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20"
+                }`}
+              >
+                <RefreshCw className="h-5 w-5 sm:h-6 sm:w-6 animate-spin" />
+              </div>
+
+              <div>
+                <div
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[8px] sm:text-[9px] font-black uppercase tracking-wider mb-1 ${
+                    transitioningAction === "enabling"
+                      ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                      : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                  }`}
+                >
+                  <span>SINKRONISASI</span>
+                </div>
+                <h4
+                  className={`font-display text-xs sm:text-sm font-black ${
+                    transitioningAction === "enabling" ? "text-emerald-500" : "text-rose-500"
+                  }`}
+                >
+                  {item.isDoc
+                    ? (transitioningAction === "enabling" ? "Mengaktifkan Dokumen..." : "Menonaktifkan Dokumen...")
+                    : (transitioningAction === "enabling" ? "Menerapkan Proteksi..." : "Menyinkronkan Status...")}
+                </h4>
+              </div>
+
+              <div
+                className={`w-full max-w-[140px] sm:max-w-[160px] h-1.5 rounded-full overflow-hidden border ${
+                  transitioningAction === "enabling"
+                    ? "bg-emerald-500/15 border-emerald-500/20"
+                    : "bg-rose-500/15 border-rose-500/20"
+                }`}
+              >
+                <motion.div
+                  className={
+                    transitioningAction === "enabling"
+                      ? "bg-emerald-500 h-full rounded-full"
+                      : "bg-rose-500 h-full rounded-full"
+                  }
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+
+        <div className="flex flex-col gap-2.5 sm:gap-3">
+          <div className="flex items-center justify-between">
+            <motion.div
+              whileHover={{ scale: 1.06, rotate: 6 }}
+              whileTap={{ scale: 0.94, rotate: 3 }}
+              transition={{ type: "spring", stiffness: 450, damping: 18 }}
+              className={`icon-orbit grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl sm:rounded-2xl border ${
+                isProtected
+                  ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-500"
+                  : "border-rose-500/25 bg-rose-500/10 text-rose-500"
+              } cursor-pointer select-none`}
+            >
+              {isProtected ? <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" /> : <ShieldAlert className="h-5 w-5 sm:h-6 sm:w-6" />}
+            </motion.div>
+
+            <span
+              className={`px-2.5 py-0.5 sm:px-3.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${
+                isProtected
+                  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                  : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+              }`}
+            >
+              {item.isDoc
+                ? (isProtected ? "Dokumen Aktif" : "Dokumen Nonaktif")
+                : (isProtected ? "Proteksi Aktif" : "Proteksi Nonaktif")}
+            </span>
+          </div>
+
+          <h3 className="font-display text-base sm:text-lg font-black text-text mt-0.5">{item.name}</h3>
+          <p className="text-xs font-bold text-muted leading-relaxed sm:leading-5">{item.description}</p>
+        </div>
+
+        <div className="pt-4 border-t border-line w-full">
+          <MagneticButton className="w-full">
+            <motion.button
+              type="button"
+              disabled={isLoading}
+              onClick={() => handleToggle(item.type, isProtected)}
+              whileHover="hover"
+              whileTap="press"
+              variants={{
+                hover: { scale: 1.02, y: -2 },
+                press: { scale: 0.97 }
+              }}
+              transition={{ type: "spring", stiffness: 380, damping: 12 }}
+              className={cn(
+                "button-primary focus-ring w-full py-3 text-xs sm:text-sm font-black flex items-center justify-center gap-2 border-0 select-none cursor-pointer disabled:opacity-50",
+                isProtected
+                  ? "!bg-none !bg-rose-600 hover:!bg-rose-500 active:!bg-rose-700 !text-white shadow-md shadow-rose-600/20"
+                  : "!bg-none !bg-emerald-600 hover:!bg-emerald-500 active:!bg-emerald-700 !text-white shadow-md shadow-emerald-600/20"
+              )}
+            >
+              {isLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin shrink-0" />
+              ) : isProtected ? (
+                <ToggleRight className="h-4 w-4 shrink-0" />
+              ) : (
+                <ToggleLeft className="h-4 w-4 shrink-0" />
+              )}
+              <span>
+                {item.isDoc
+                  ? (isProtected ? "Nonaktifkan Dokumen" : "Aktifkan Dokumen")
+                  : (isProtected ? "Matikan Proteksi" : "Aktifkan Proteksi")}
+              </span>
+            </motion.button>
+          </MagneticButton>
+        </div>
+      </motion.div>
+    );
+  };
+
   return (
-    <div className="flex flex-col gap-6 relative">
+    <div className="flex flex-col gap-8 w-full">
       {/* Standar Top Header Card (Seragam 1:1) */}
       <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
         <div className="flex items-center gap-3.5 relative z-10">
@@ -142,146 +291,30 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {featuresList.map((item) => {
-          const isProtected = localOverrides[item.type] !== undefined
-            ? localOverrides[item.type]!
-            : toggles ? toggles[item.type]?.protected ?? true : true;
-          const isLoading = loadingFeature === item.type;
+      {/* Group 1: Halaman & Fitur Utama */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-2 border-b border-line pb-2.5">
+          <ShieldCheck className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-xs sm:text-sm font-black text-primary uppercase tracking-wider">
+            Akses Proteksi Halaman & Fitur Utama
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          {mainFeatures.map((item) => renderCard(item))}
+        </div>
+      </div>
 
-          return (
-            <motion.div
-              key={item.type}
-              whileHover={{ y: -2 }}
-              className="premium-card relative p-6 rounded-3xl border border-line bg-surface flex flex-col justify-between gap-6 shadow-sm overflow-hidden"
-            >
-              {/* In-Card Transition Animation Overlay (Non-fullscreen) */}
-              <AnimatePresence>
-                {isLoading ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute inset-0 z-20 bg-surface/95 backdrop-blur-md p-6 flex flex-col items-center justify-center text-center gap-3"
-                  >
-                    <div
-                      className={`grid h-12 w-12 place-items-center rounded-2xl border ${
-                        transitioningAction === "enabling"
-                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20"
-                          : "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20"
-                      }`}
-                    >
-                      <RefreshCw className="h-6 w-6 animate-spin" />
-                    </div>
-
-                    <div>
-                      <div
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 ${
-                          transitioningAction === "enabling"
-                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                            : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                        }`}
-                      >
-                        <span>SINKRONISASI</span>
-                      </div>
-                      <h4
-                        className={`font-display text-sm font-black ${
-                          transitioningAction === "enabling" ? "text-emerald-500" : "text-rose-500"
-                        }`}
-                      >
-                        {transitioningAction === "enabling"
-                          ? "Menerapkan Proteksi..."
-                          : "Menyinkronkan Status..."}
-                      </h4>
-                    </div>
-
-                    <div
-                      className={`w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border ${
-                        transitioningAction === "enabling"
-                          ? "bg-emerald-500/15 border-emerald-500/20"
-                          : "bg-rose-500/15 border-rose-500/20"
-                      }`}
-                    >
-                      <motion.div
-                        className={
-                          transitioningAction === "enabling"
-                            ? "bg-emerald-500 h-full rounded-full"
-                            : "bg-rose-500 h-full rounded-full"
-                        }
-                        initial={{ width: "0%" }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: 0.8, ease: "easeInOut" }}
-                      />
-                    </div>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <motion.div
-                    whileHover={{ scale: 1.06, rotate: 6 }}
-                    whileTap={{ scale: 0.94, rotate: 3 }}
-                    transition={{ type: "spring", stiffness: 450, damping: 18 }}
-                    className={`icon-orbit grid h-12 w-12 place-items-center rounded-2xl border ${
-                      isProtected
-                        ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-500"
-                        : "border-rose-500/25 bg-rose-500/10 text-rose-500"
-                    } cursor-pointer select-none`}
-                  >
-                    {isProtected ? <ShieldCheck className="h-6 w-6" /> : <ShieldAlert className="h-6 w-6" />}
-                  </motion.div>
-
-                  <span
-                    className={`px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                      isProtected
-                        ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                        : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                    }`}
-                  >
-                    {isProtected ? "Proteksi Aktif" : "Proteksi Nonaktif"}
-                  </span>
-                </div>
-
-                <h3 className="font-display text-lg font-black text-text mt-1">{item.name}</h3>
-                <p className="text-xs font-bold text-muted leading-5">{item.description}</p>
-              </div>
-
-              <div className="pt-4 border-t border-line w-full">
-                <MagneticButton className="w-full">
-                  <motion.button
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => handleToggle(item.type, isProtected)}
-                    whileHover="hover"
-                    whileTap="press"
-                    variants={{
-                      hover: { scale: 1.02, y: -2 },
-                      press: { scale: 0.97 }
-                    }}
-                    transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                    className={cn(
-                      "button-primary focus-ring w-full py-3 text-xs sm:text-sm font-black flex items-center justify-center gap-2 border-0 select-none cursor-pointer disabled:opacity-50",
-                      isProtected
-                        ? "!bg-none !bg-rose-600 hover:!bg-rose-500 active:!bg-rose-700 !text-white shadow-md shadow-rose-600/20"
-                        : "!bg-none !bg-emerald-600 hover:!bg-emerald-500 active:!bg-emerald-700 !text-white shadow-md shadow-emerald-600/20"
-                    )}
-                  >
-                    {isLoading ? (
-                      <RefreshCw className="h-4 w-4 animate-spin shrink-0" />
-                    ) : isProtected ? (
-                      <ToggleRight className="h-4 w-4 shrink-0" />
-                    ) : (
-                      <ToggleLeft className="h-4 w-4 shrink-0" />
-                    )}
-                    <span>{isProtected ? "Matikan Proteksi" : "Aktifkan Proteksi"}</span>
-                  </motion.button>
-                </MagneticButton>
-              </div>
-            </motion.div>
-          );
-        })}
+      {/* Group 2: Berkas & Dokumen ECL */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-2 border-b border-line pb-2.5">
+          <FileText className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-xs sm:text-sm font-black text-primary uppercase tracking-wider">
+            Status Akses Berkas & Dokumen ECL
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          {docFeatures.map((item) => renderCard(item))}
+        </div>
       </div>
     </div>
   );

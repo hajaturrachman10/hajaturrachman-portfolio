@@ -46,9 +46,6 @@ export const adminToggleService = {
         updatedAt: now
       };
 
-      if (!wasProtected && protectedStatus && (feature === "cv" || feature === "vault" || feature === "ecl")) {
-        draft.globalEpoch = now;
-      }
       return draft;
     });
 

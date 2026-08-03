@@ -43,22 +43,22 @@
     },
     "ecl": {
       "protected": true,
-      "updatedAt": 1785454648862
+      "updatedAt": 1785752589834
     },
     "ecl_doc1": {
       "protected": true,
-      "updatedAt": 1785745098187
+      "updatedAt": 1785752814884
     },
     "ecl_doc2": {
       "protected": true,
-      "updatedAt": 1785745098187
+      "updatedAt": 1785752722914
     },
     "ecl_doc3": {
       "protected": false,
       "updatedAt": 1785745396835
     }
   },
-  "globalEpoch": 1785454699919,
+  "globalEpoch": 1785752077882,
   "stats": {
     "totalVisitors": 1420,
     "cvUnlocks": 128,

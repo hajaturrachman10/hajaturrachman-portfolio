@@ -26,7 +26,7 @@ export function AdminOverviewTab({ stats, toggles, healthStatus }: AdminOverview
     },
     {
       label: "Fitur Terproteksi",
-      value: `${protectedCount} / 3`,
+      value: `${protectedCount} / 6`,
       icon: ToggleLeft,
       subtext: "Protection Engine Active",
       color: "text-primary",
@@ -83,7 +83,7 @@ export function AdminOverviewTab({ stats, toggles, healthStatus }: AdminOverview
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
       {cards.map((item, idx) => {
         const Icon = item.icon;
         return (

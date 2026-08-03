@@ -18,6 +18,7 @@ import { SystemHealthReport } from "@/services/admin/adminHealthService";
 import { subscribeCrossTabSync } from "@/lib/crossTabSync";
 import { cn } from "@/lib/utils";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
+import { useLanguage } from "@/components/providers/LanguageContext";
 
 type AdminTabKey = "overview" | "features" | "security" | "statistics" | "messages" | "settings" | "history" | "health" | "audit";
 
@@ -27,6 +28,7 @@ type AdminDashboardViewProps = {
 };
 
 export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardViewProps) {
+  const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState<AdminTabKey>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("admin_active_tab") as AdminTabKey | null;
@@ -151,16 +153,16 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
     };
   }, [fetchDashboardData, onLogout]);
 
-  const navTabs: Array<{ key: AdminTabKey; label: string; icon: typeof LayoutDashboard }> = [
-    { key: "overview", label: "Overview", icon: LayoutDashboard },
-    { key: "features", label: "Features", icon: ToggleLeft },
-    { key: "security", label: "Security", icon: Shield },
-    { key: "statistics", label: "Statistics", icon: BarChart3 },
-    { key: "messages", label: "Messages", icon: Mail },
-    { key: "settings", label: "Settings", icon: Settings },
-    { key: "history", label: "Config History", icon: History },
-    { key: "health", label: "Health", icon: Activity },
-    { key: "audit", label: "Audit Log", icon: ListFilter }
+  const navTabs: Array<{ key: AdminTabKey; label: { id: string; de: string }; icon: typeof LayoutDashboard }> = [
+    { key: "overview", label: { id: "Ikhtisar", de: "Übersicht" }, icon: LayoutDashboard },
+    { key: "features", label: { id: "Sakelar Fitur", de: "Funktionen" }, icon: ToggleLeft },
+    { key: "security", label: { id: "Keamanan", de: "Sicherheit" }, icon: Shield },
+    { key: "statistics", label: { id: "Statistik", de: "Statistiken" }, icon: BarChart3 },
+    { key: "messages", label: { id: "Kotak Masuk", de: "Nachrichten" }, icon: Mail },
+    { key: "settings", label: { id: "Pengaturan", de: "Einstellungen" }, icon: Settings },
+    { key: "history", label: { id: "Riwayat Konfig", de: "Verlauf" }, icon: History },
+    { key: "health", label: { id: "Kesehatan", de: "Zustand" }, icon: Activity },
+    { key: "audit", label: { id: "Log Audit", de: "Audit-Log" }, icon: ListFilter }
   ];
 
 
@@ -280,12 +282,12 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
       </header>
 
       {/* Top Navigation Tabs */}
-      <nav className="flex items-center gap-1.5 overflow-x-auto py-2 px-4 -mx-4 scrollbar-none touch-pan-x snap-x snap-mandatory">
+      <nav className="flex items-center gap-1.5 overflow-x-auto py-2 px-4 -mx-4 scrollbar-none touch-pan-x">
         {navTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
           return (
-            <MagneticButton key={tab.key} className="shrink-0 snap-start">
+            <MagneticButton key={tab.key} className="shrink-0">
               <button
                 type="button"
                 onClick={() => handleTabChange(tab.key)}
@@ -296,11 +298,13 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
                 }`}
               >
                 <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-                <span>{tab.label}</span>
+                <span>{language === "id" ? tab.label.id : tab.label.de}</span>
               </button>
             </MagneticButton>
           );
         })}
+        {/* Spacer to prevent cut-off at the end of horizontal scroll */}
+        <div className="w-4 shrink-0" aria-hidden="true" />
       </nav>
 
       {/* Tab Content Panel */}

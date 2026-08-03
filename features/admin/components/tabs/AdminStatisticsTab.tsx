@@ -88,7 +88,7 @@ export function AdminStatisticsTab({ stats }: AdminStatisticsTabProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* 5 Primary Metric Cards (Colors 1:1 with Overview Tab) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6">
         {metrics.map((item, idx) => {
           const Icon = item.icon;
           return (
