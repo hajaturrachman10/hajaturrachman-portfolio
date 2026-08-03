@@ -70,25 +70,15 @@ export function CVAccessSection() {
             syncLocalToggles(data.toggles, data.globalEpoch);
           }
 
-          // Mobile/Polling change detection for transition overlays
-          // Use refs (not stale closure state) for accurate comparison
-          const nextOverride = !!data.overrides?.cv;
-          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
-          
-          if (hasOverrideChanged) {
-            const isEnabling = !nextOverride;
-            setAdminTransition({ active: true, isEnabling });
-            await new Promise((r) => setTimeout(r, 1200));
-          }
-
+          // NOTE: No animation from polling — only from cross-tab sync (BroadcastChannel).
+          // Serverless containers return inconsistent states causing false flip-flop animations.
+          isAdminOverrideRef.current = !!data.overrides?.cv;
           if (data.overrides?.cv) {
             // Admin Override Active: Instant transition, no restore session animation!
-            isAdminOverrideRef.current = true;
             setIsAdminOverride(true);
             setUnlocked(true);
             setCheckingAuth(false);
           } else if (data.cvUnlocked) {
-            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") === "true";
             if (!remember) {
@@ -129,8 +119,6 @@ export function CVAccessSection() {
             setUnlocked(false);
             setCheckingAuth(false);
           }
-
-          setAdminTransition(null);
         }
       } catch (err) {
         console.error("Gagal memeriksa status login:", err);

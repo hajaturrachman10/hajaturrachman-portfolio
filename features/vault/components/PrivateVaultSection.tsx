@@ -134,25 +134,15 @@ export function PrivateVaultSection() {
             syncLocalToggles(data.toggles, data.globalEpoch);
           }
 
-          // Mobile/Polling change detection for transition overlays
-          // Use refs (not stale closure state) for accurate comparison
-          const nextOverride = !!data.overrides?.vault;
-          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
-          
-          if (hasOverrideChanged) {
-            const isEnabling = !nextOverride;
-            setAdminTransition({ active: true, isEnabling });
-            await new Promise((r) => setTimeout(r, 1200));
-          }
-
+          // NOTE: No animation from polling — only from cross-tab sync (BroadcastChannel).
+          // Serverless containers return inconsistent states causing false flip-flop animations.
+          isAdminOverrideRef.current = !!data.overrides?.vault;
           if (data.overrides?.vault) {
-            isAdminOverrideRef.current = true;
             setIsAdminOverride(true);
             await fetchVaultData();
             setUnlocked(true);
             setCheckingAuth(false);
           } else if (data.vaultUnlocked) {
-            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") === "true";
             if (!remember) {

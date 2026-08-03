@@ -86,44 +86,22 @@ export function ECLMaterialSection() {
             syncLocalToggles(data.toggles, data.globalEpoch);
           }
 
-          // Mobile/Polling change detection for transition overlays
-          // Use refs (not stale closure state) for accurate comparison
-          const nextOverride = !!data.overrides?.ecl;
-          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
-          
-          if (hasOverrideChanged) {
-            const isEnabling = !nextOverride;
-            setAdminTransition({ active: true, isEnabling, type: "ecl" });
-            await new Promise((r) => setTimeout(r, 1200));
-          }
-
-          let changedDocKey: "doc1" | "doc2" | "doc3" | null = null;
-          if (!isInitial && data.docToggles && unlockedRef.current && docTogglesInitialized.current) {
-            if (data.docToggles.doc1 !== docTogglesRef.current.doc1) changedDocKey = "doc1";
-            else if (data.docToggles.doc2 !== docTogglesRef.current.doc2) changedDocKey = "doc2";
-            else if (data.docToggles.doc3 !== docTogglesRef.current.doc3) changedDocKey = "doc3";
-          }
-
-          if (changedDocKey && data.docToggles) {
-            const isEnabling = Boolean(data.docToggles[changedDocKey]);
-            setAdminTransition({ active: true, isEnabling, type: "document" });
-            await new Promise((r) => setTimeout(r, 1200));
-          }
-
+          // NOTE: No animation transitions from polling — only from cross-tab sync (BroadcastChannel).
+          // Polling from different serverless containers returns inconsistent states,
+          // which would cause false flip-flop animations. Animations are only reliable
+          // when triggered directly by the admin panel via subscribeCrossTabSync below.
           if (data.docToggles) {
-            // Update both state and ref so next poll comparison is accurate
             docTogglesRef.current = data.docToggles;
             docTogglesInitialized.current = true;
             setDocToggles(data.docToggles);
           }
 
+          isAdminOverrideRef.current = !!data.overrides?.ecl;
           if (data.overrides?.ecl) {
-            isAdminOverrideRef.current = true;
             setIsAdminOverride(true);
             setUnlocked(true);
             setCheckingAuth(false);
           } else if (data.eclUnlocked) {
-            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
             if (!remember) {
