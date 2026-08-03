@@ -38,6 +38,23 @@ export function CVAccessSection() {
   const [adminTransition, setAdminTransition] = useState<{ active: boolean; isEnabling: boolean } | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const raw = localStorage.getItem("hajat_toggles_state");
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.cv !== undefined && !parsed.cv) {
+            setIsAdminOverride(true);
+            setUnlocked(true);
+          }
+        } catch {
+          // Ignore
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     async function checkAuth() {
       try {
         const response = await fetch("/api/auth/status", { cache: "no-store" });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, RefreshCw, Sparkles, ToggleLeft, ToggleRight } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
@@ -17,6 +17,20 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
   const [loadingFeature, setLoadingFeature] = useState<FeatureType | null>(null);
   const [transitioningAction, setTransitioningAction] = useState<"enabling" | "disabling" | null>(null);
   const [localOverrides, setLocalOverrides] = useState<Partial<Record<FeatureType, boolean>>>({});
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const raw = localStorage.getItem("hajat_toggles_state");
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          setLocalOverrides((prev) => ({ ...parsed, ...prev }));
+        } catch {
+          // Ignore
+        }
+      }
+    }
+  }, []);
 
   const featuresList: Array<{ type: FeatureType; name: string; description: string; isDoc?: boolean }> = [
     {

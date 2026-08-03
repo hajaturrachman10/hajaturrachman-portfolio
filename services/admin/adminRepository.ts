@@ -135,6 +135,25 @@ export const adminRepository = {
         loginHistory: loginHistory as LoginHistoryStats
       };
 
+      try {
+        const { cookies } = require("next/headers");
+        const togglesCookie = cookies().get("hajat_toggles_state")?.value;
+        if (togglesCookie) {
+          const cookieMap = JSON.parse(decodeURIComponent(togglesCookie));
+          Object.keys(cookieMap).forEach((key) => {
+            const k = key as keyof typeof fullState.toggles;
+            if (fullState.toggles[k]) {
+              fullState.toggles[k] = {
+                ...fullState.toggles[k],
+                protected: Boolean(cookieMap[key])
+              };
+            }
+          });
+        }
+      } catch {
+        // Ignore if outside request context
+      }
+
       inMemoryState = fullState;
       (globalThis as any).__adminStateCache = fullState;
       return fullState;
