@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, Eye, LockKeyhole, ShieldCheck, Sparkles, X, RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { PasswordModal } from "@/components/modals/PasswordModal";
@@ -36,6 +36,7 @@ export function CVAccessSection() {
 
   const [isAdminOverride, setIsAdminOverride] = useState(false);
   const [adminTransition, setAdminTransition] = useState<{ active: boolean; isEnabling: boolean } | null>(null);
+  const isAdminOverrideRef = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -70,8 +71,9 @@ export function CVAccessSection() {
           }
 
           // Mobile/Polling change detection for transition overlays
+          // Use refs (not stale closure state) for accurate comparison
           const nextOverride = !!data.overrides?.cv;
-          const hasOverrideChanged = !isInitial && (isAdminOverride !== nextOverride);
+          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
           
           if (hasOverrideChanged) {
             const isEnabling = !nextOverride;
@@ -81,10 +83,12 @@ export function CVAccessSection() {
 
           if (data.overrides?.cv) {
             // Admin Override Active: Instant transition, no restore session animation!
+            isAdminOverrideRef.current = true;
             setIsAdminOverride(true);
             setUnlocked(true);
             setCheckingAuth(false);
           } else if (data.cvUnlocked) {
+            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") === "true";
             if (!remember) {
@@ -120,6 +124,7 @@ export function CVAccessSection() {
               }
             }
           } else {
+            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             setUnlocked(false);
             setCheckingAuth(false);

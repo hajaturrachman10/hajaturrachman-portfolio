@@ -36,11 +36,16 @@ export function ECLMaterialSection() {
   
   const unlockedRef = useRef(unlocked);
   unlockedRef.current = unlocked;
+  // Refs for stale-closure-safe polling comparisons
+  const isAdminOverrideRef = useRef(false);
   const [docToggles, setDocToggles] = useState<{ doc1: boolean; doc2: boolean; doc3: boolean }>({
     doc1: true,
     doc2: true,
     doc3: true
   });
+  const docTogglesRef = useRef({ doc1: true, doc2: true, doc3: true });
+  // Keep the initialized flag so we never compare on the very first fetch
+  const docTogglesInitialized = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -82,8 +87,9 @@ export function ECLMaterialSection() {
           }
 
           // Mobile/Polling change detection for transition overlays
+          // Use refs (not stale closure state) for accurate comparison
           const nextOverride = !!data.overrides?.ecl;
-          const hasOverrideChanged = !isInitial && (isAdminOverride !== nextOverride);
+          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
           
           if (hasOverrideChanged) {
             const isEnabling = !nextOverride;
@@ -92,10 +98,10 @@ export function ECLMaterialSection() {
           }
 
           let changedDocKey: "doc1" | "doc2" | "doc3" | null = null;
-          if (!isInitial && data.docToggles && unlockedRef.current) {
-            if (data.docToggles.doc1 !== docToggles.doc1) changedDocKey = "doc1";
-            else if (data.docToggles.doc2 !== docToggles.doc2) changedDocKey = "doc2";
-            else if (data.docToggles.doc3 !== docToggles.doc3) changedDocKey = "doc3";
+          if (!isInitial && data.docToggles && unlockedRef.current && docTogglesInitialized.current) {
+            if (data.docToggles.doc1 !== docTogglesRef.current.doc1) changedDocKey = "doc1";
+            else if (data.docToggles.doc2 !== docTogglesRef.current.doc2) changedDocKey = "doc2";
+            else if (data.docToggles.doc3 !== docTogglesRef.current.doc3) changedDocKey = "doc3";
           }
 
           if (changedDocKey && data.docToggles) {
@@ -105,14 +111,19 @@ export function ECLMaterialSection() {
           }
 
           if (data.docToggles) {
+            // Update both state and ref so next poll comparison is accurate
+            docTogglesRef.current = data.docToggles;
+            docTogglesInitialized.current = true;
             setDocToggles(data.docToggles);
           }
 
           if (data.overrides?.ecl) {
+            isAdminOverrideRef.current = true;
             setIsAdminOverride(true);
             setUnlocked(true);
             setCheckingAuth(false);
           } else if (data.eclUnlocked) {
+            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
             if (!remember) {
@@ -148,6 +159,7 @@ export function ECLMaterialSection() {
               }
             }
           } else {
+            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             setUnlocked(false);
             setCheckingAuth(false);

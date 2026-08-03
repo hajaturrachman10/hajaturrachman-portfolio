@@ -100,6 +100,7 @@ export function PrivateVaultSection() {
 
   const [isAdminOverride, setIsAdminOverride] = useState(false);
   const [adminTransition, setAdminTransition] = useState<{ active: boolean; isEnabling: boolean } | null>(null);
+  const isAdminOverrideRef = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -134,8 +135,9 @@ export function PrivateVaultSection() {
           }
 
           // Mobile/Polling change detection for transition overlays
+          // Use refs (not stale closure state) for accurate comparison
           const nextOverride = !!data.overrides?.vault;
-          const hasOverrideChanged = !isInitial && (isAdminOverride !== nextOverride);
+          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
           
           if (hasOverrideChanged) {
             const isEnabling = !nextOverride;
@@ -144,11 +146,13 @@ export function PrivateVaultSection() {
           }
 
           if (data.overrides?.vault) {
+            isAdminOverrideRef.current = true;
             setIsAdminOverride(true);
             await fetchVaultData();
             setUnlocked(true);
             setCheckingAuth(false);
           } else if (data.vaultUnlocked) {
+            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") === "true";
             if (!remember) {
@@ -186,6 +190,7 @@ export function PrivateVaultSection() {
               }
             }
           } else {
+            isAdminOverrideRef.current = false;
             setIsAdminOverride(false);
             setUnlocked(false);
             setCheckingAuth(false);

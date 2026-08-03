@@ -106,13 +106,13 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
         centered
       />
 
-      {/* Central Card Harmonized 1:1 with Portfolio Design System */}
+      {/* Central Card */}
       <Reveal className="max-w-2xl w-full mt-4 sm:mt-6">
         <motion.article
           initial={{ opacity: 0, y: 15, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 border border-line bg-surface flex flex-col items-center justify-center text-center gap-6 relative overflow-hidden shadow-card select-none"
+          className="premium-card rounded-3xl p-6 sm:p-10 border border-line bg-surface flex flex-col items-center justify-center text-center gap-5 relative overflow-hidden shadow-card select-none w-full"
         >
           {/* Glowing Orbit Icon */}
           <div className="relative">
@@ -127,42 +127,42 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
             </motion.div>
           </div>
 
-          <div>
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-500 border border-rose-500/20 mb-3 inline-block shadow-xs">
+          <div className="w-full">
+            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-500 border border-rose-500/20 mb-3 inline-block">
               {language === "id" ? "STATUS: NONAKTIF SEMENTARA" : "STATUS: VORÜBERGEHEND DEAKTIVIERT"}
             </span>
             <h2 className="font-display text-xl sm:text-2xl font-black text-primary">
               {language === "id" ? "Dokumen Tidak Dapat Diakses" : "Dokument zurzeit nicht verfügbar"}
             </h2>
-            <div className="mt-3 p-3.5 rounded-2xl bg-surface/80 border border-line flex items-center justify-center gap-2.5 max-w-md mx-auto">
-              <FileText className="h-4.5 w-4.5 text-primary shrink-0" />
-              <span className="text-xs sm:text-sm font-black text-primary truncate">
+            <div className="mt-3 p-3 rounded-2xl bg-surface/80 border border-line flex items-center justify-center gap-2 w-full">
+              <FileText className="h-4 w-4 text-primary shrink-0" />
+              <span className="text-xs font-black text-primary truncate min-w-0">
                 {docName}
               </span>
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm font-bold leading-relaxed text-muted max-w-lg">
+          <p className="text-xs sm:text-sm font-bold leading-relaxed text-muted w-full text-center">
             {language === "id"
               ? "Mohon maaf, dokumen ini sedang dinonaktifkan sementara oleh Administrator untuk pembaruan materi, revisi berkas, atau pemeliharaan sistem."
               : "Entschuldigung, dieses Dokument wurde vom Administrator vorübergehend für Aktualisierungen, Überarbeitungen oder Wartungsarbeiten deaktiviert."}
           </p>
 
-          <div className="p-4 rounded-2xl bg-amber-500/[0.04] border border-amber-500/20 text-left text-xs font-bold text-muted flex items-start gap-3 max-w-lg w-full">
-            <AlertTriangle className="h-4.5 w-4.5 text-amber-500 shrink-0 mt-0.5" />
+          <div className="p-4 rounded-2xl bg-amber-500/[0.04] border border-amber-500/20 text-left text-xs font-bold text-muted flex items-start gap-3 w-full">
+            <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
             <span>
               {language === "id"
-                ? "Silakan periksa kembali secara berkala atau hubungi Hajat via WhatsApp jika Anda memerlukan akses dokumen secara mendesak. Kami akan mengalihkan Anda secara otomatis begitu akses dipulihkan."
-                : "Bitte überprüfen Sie die Seite später erneut oder kontaktieren Sie Hajat per WhatsApp, falls Sie dringenden Zugriff benötigen. Wir werden Sie automatisch weiterleiten, sobald der Zugriff wiederhergestellt ist."}
+                ? "Silakan periksa kembali secara berkala atau hubungi Hajat jika Anda memerlukan akses mendesak. Kami akan mengalihkan Anda secara otomatis begitu akses dipulihkan."
+                : "Bitte überprüfen Sie die Seite später erneut oder kontaktieren Sie Hajat per WhatsApp. Wir werden Sie automatisch weiterleiten, sobald der Zugriff wiederhergestellt ist."}
             </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3.5 w-full max-w-lg mt-2">
+          <div className="flex flex-col sm:flex-row gap-3 w-full">
             <MagneticButton className="flex-1">
               <button
                 type="button"
                 onClick={() => router.push("/ecl-b2")}
-                className="button-secondary focus-ring w-full py-3.5 text-xs font-black flex items-center justify-center gap-2 rounded-2xl cursor-pointer"
+                className="button-secondary focus-ring w-full py-3 text-xs font-black flex items-center justify-center gap-2 rounded-2xl cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4 shrink-0" />
                 <span>{language === "id" ? "Kembali ke ECL B2" : "Zurück zu ECL B2"}</span>
@@ -178,7 +178,7 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="button-primary focus-ring flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white px-5 py-3.5 text-xs font-black transition-colors duration-300 cursor-pointer select-none shadow-md shadow-emerald-600/10 w-full border-0"
+                className="button-primary focus-ring flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white px-4 py-3 text-xs font-black transition-colors duration-300 cursor-pointer select-none shadow-md shadow-emerald-600/10 w-full border-0"
               >
                 <MessageCircle className="h-4 w-4 shrink-0" />
                 <span>{language === "id" ? "Tanya Hajat" : "Hajat Fragen"}</span>
