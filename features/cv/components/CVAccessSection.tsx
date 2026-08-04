@@ -80,9 +80,11 @@ export function CVAccessSection() {
             setCheckingAuth(false);
           } else if (data.cvUnlocked) {
             setIsAdminOverride(false);
-            const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") === "true";
-            if (!remember) {
-              if (isInitial) {
+            if (isInitial) {
+              // On initial load: check if user opted in to remember this session
+              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") === "true";
+              if (!remember) {
+                // Not remembered: show locking animation and kick out
                 setIsLocking(true);
                 setCheckingAuth(false);
                 try {
@@ -98,20 +100,18 @@ export function CVAccessSection() {
                 setUnlocked(false);
                 setIsLocking(false);
               } else {
-                setUnlocked(false);
-                setCheckingAuth(false);
-              }
-            } else {
-              if (isInitial) {
+                // Remembered: restore session with unlock animation
                 setIsUnlocking(true);
                 setCheckingAuth(false);
                 await new Promise((resolve) => setTimeout(resolve, 1500));
                 setUnlocked(true);
                 setIsUnlocking(false);
-              } else {
-                setUnlocked(true);
-                setCheckingAuth(false);
               }
+            } else {
+              // On subsequent polls: server says session valid → KEEP unlocked.
+              // Never auto-kick during an active session.
+              setUnlocked(true);
+              setCheckingAuth(false);
             }
           } else {
             isAdminOverrideRef.current = false;

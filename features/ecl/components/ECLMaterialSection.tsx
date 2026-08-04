@@ -103,9 +103,11 @@ export function ECLMaterialSection() {
             setCheckingAuth(false);
           } else if (data.eclUnlocked) {
             setIsAdminOverride(false);
-            const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
-            if (!remember) {
-              if (isInitial) {
+            if (isInitial) {
+              // On initial load: check if user opted in to remember this session
+              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
+              if (!remember) {
+                // Not remembered: show locking animation and kick out
                 setIsLocking(true);
                 setCheckingAuth(false);
                 try {
@@ -121,20 +123,19 @@ export function ECLMaterialSection() {
                 setUnlocked(false);
                 setIsLocking(false);
               } else {
-                setUnlocked(false);
-                setCheckingAuth(false);
-              }
-            } else {
-              if (isInitial) {
+                // Remembered: restore session with unlock animation
                 setIsUnlocking(true);
                 setCheckingAuth(false);
                 await new Promise((resolve) => setTimeout(resolve, 1500));
                 setUnlocked(true);
                 setIsUnlocking(false);
-              } else {
-                setUnlocked(true);
-                setCheckingAuth(false);
               }
+            } else {
+              // On subsequent polls: server says session is valid → KEEP unlocked.
+              // Never auto-kick during an active session — user needs time to interact.
+              // If they navigate away and come back (isInitial=true), THEN check remember.
+              setUnlocked(true);
+              setCheckingAuth(false);
             }
           } else {
             isAdminOverrideRef.current = false;
