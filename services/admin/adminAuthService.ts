@@ -135,14 +135,6 @@ export const adminAuthService = {
     const { valid, session } = adminSecurity.verifySession(token);
     const state = adminRepository.read();
 
-    const fallbackSession: AdminSession = {
-      username: state.auth.username || "hajat_admin",
-      remember: true,
-      issuedAt: Date.now(),
-      expiresAt: Date.now() + 100 * 365 * 24 * 60 * 60 * 1000,
-      globalEpoch: state.globalEpoch
-    };
-
     if (valid && session) {
       return {
         success: true,
@@ -150,9 +142,14 @@ export const adminAuthService = {
       };
     }
 
+    // Invalid or missing token - return unauthorized, not a silent fallback
     return {
-      success: true,
-      data: { valid: true, session: fallbackSession }
+      success: false,
+      error: {
+        code: "UNAUTHORIZED",
+        message: "Sesi tidak valid atau sudah berakhir.",
+        status: 401
+      }
     };
   },
 

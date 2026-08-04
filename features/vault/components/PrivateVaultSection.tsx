@@ -77,7 +77,7 @@ export function PrivateVaultSection() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setRememberSession(localStorage.getItem("remember_session_private-vault") === "true");
+      setRememberSession(localStorage.getItem("remember_session_private-vault") !== "false");
     }
   }, []);
 
@@ -146,7 +146,7 @@ export function PrivateVaultSection() {
             setIsAdminOverride(false);
             if (isInitial) {
               // On initial load: check if user opted in to remember this session
-              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") === "true";
+              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") !== "false";
               if (!remember) {
                 // Not remembered: show locking animation and kick out
                 setIsLocking(true);

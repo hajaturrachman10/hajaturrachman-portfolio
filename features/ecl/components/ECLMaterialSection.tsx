@@ -27,7 +27,7 @@ export function ECLMaterialSection() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setRememberSession(localStorage.getItem("remember_session_ecl-material") === "true");
+      setRememberSession(localStorage.getItem("remember_session_ecl-material") !== "false");
     }
   }, []);
 
@@ -105,7 +105,7 @@ export function ECLMaterialSection() {
             setIsAdminOverride(false);
             if (isInitial) {
               // On initial load: check if user opted in to remember this session
-              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") === "true";
+              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") !== "false";
               if (!remember) {
                 // Not remembered: show locking animation and kick out
                 setIsLocking(true);

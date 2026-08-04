@@ -45,12 +45,12 @@ const DEFAULT_STATE: AdminState = {
     ecl: { type: "YEAR_RANGE", base: "10juli", startYear: 2006, endYear: 2026 }
   },
   toggles: {
-    cv: { protected: true, updatedAt: Date.now() },
-    vault: { protected: true, updatedAt: Date.now() },
-    ecl: { protected: true, updatedAt: Date.now() },
-    ecl_doc1: { protected: true, updatedAt: Date.now() },
-    ecl_doc2: { protected: true, updatedAt: Date.now() },
-    ecl_doc3: { protected: true, updatedAt: Date.now() }
+    cv: { protected: true, updatedAt: 0 },
+    vault: { protected: true, updatedAt: 0 },
+    ecl: { protected: true, updatedAt: 0 },
+    ecl_doc1: { protected: true, updatedAt: 0 },
+    ecl_doc2: { protected: true, updatedAt: 0 },
+    ecl_doc3: { protected: true, updatedAt: 0 }
   },
   globalEpoch: 1785752077882, // Static base timestamp to prevent container boot flip-flops
   stats: {

@@ -27,7 +27,7 @@ export function CVAccessSection() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setRememberSession(localStorage.getItem("remember_session_cv") === "true");
+      setRememberSession(localStorage.getItem("remember_session_cv") !== "false");
     }
   }, []);
   
@@ -82,7 +82,7 @@ export function CVAccessSection() {
             setIsAdminOverride(false);
             if (isInitial) {
               // On initial load: check if user opted in to remember this session
-              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") === "true";
+              const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") !== "false";
               if (!remember) {
                 // Not remembered: show locking animation and kick out
                 setIsLocking(true);
