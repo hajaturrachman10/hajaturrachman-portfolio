@@ -68,43 +68,20 @@ export const authService = {
   getAuthStatus(cvToken?: string, vaultToken?: string, eclToken?: string, togglesCookie?: string) {
     let adminState;
     try {
-      adminState = adminRepository.read();
+      // Pass togglesCookie explicitly — adminRepository.read() applies cookie LWW internally.
+      // This is the ONLY correct way; do NOT re-parse the cookie here as well.
+      adminState = adminRepository.read(togglesCookie);
     } catch {
       adminState = null;
     }
 
-    let cookieToggles: Record<string, boolean> | null = null;
-    if (togglesCookie) {
-      try {
-        cookieToggles = JSON.parse(togglesCookie);
-      } catch {
-        cookieToggles = null;
-      }
-    }
-
-    const isCvProtected = cookieToggles && cookieToggles.cv !== undefined
-      ? cookieToggles.cv
-      : (adminState ? (adminState.toggles?.cv?.protected ?? true) : true);
-
-    const isVaultProtected = cookieToggles && cookieToggles.vault !== undefined
-      ? cookieToggles.vault
-      : (adminState ? (adminState.toggles?.vault?.protected ?? true) : true);
-
-    const isEclProtected = cookieToggles && cookieToggles.ecl !== undefined
-      ? cookieToggles.ecl
-      : (adminState ? (adminState.toggles?.ecl?.protected ?? true) : true);
-
-    const isDoc1Protected = cookieToggles && cookieToggles.ecl_doc1 !== undefined
-      ? cookieToggles.ecl_doc1
-      : (adminState ? (adminState.toggles?.ecl_doc1?.protected ?? true) : true);
-
-    const isDoc2Protected = cookieToggles && cookieToggles.ecl_doc2 !== undefined
-      ? cookieToggles.ecl_doc2
-      : (adminState ? (adminState.toggles?.ecl_doc2?.protected ?? true) : true);
-
-    const isDoc3Protected = cookieToggles && cookieToggles.ecl_doc3 !== undefined
-      ? cookieToggles.ecl_doc3
-      : (adminState ? (adminState.toggles?.ecl_doc3?.protected ?? true) : true);
+    // adminRepository.read() already merged the cookie LWW — use adminState.toggles directly
+    const isCvProtected = adminState ? (adminState.toggles?.cv?.protected ?? true) : true;
+    const isVaultProtected = adminState ? (adminState.toggles?.vault?.protected ?? true) : true;
+    const isEclProtected = adminState ? (adminState.toggles?.ecl?.protected ?? true) : true;
+    const isDoc1Protected = adminState ? (adminState.toggles?.ecl_doc1?.protected ?? true) : true;
+    const isDoc2Protected = adminState ? (adminState.toggles?.ecl_doc2?.protected ?? true) : true;
+    const isDoc3Protected = adminState ? (adminState.toggles?.ecl_doc3?.protected ?? true) : true;
 
     return {
       cvUnlocked: verifySessionToken(cvToken, "cv"),

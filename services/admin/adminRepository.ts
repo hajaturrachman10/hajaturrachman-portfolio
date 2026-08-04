@@ -45,6 +45,7 @@ const DEFAULT_STATE: AdminState = {
     ecl: { type: "YEAR_RANGE", base: "10juli", startYear: 2006, endYear: 2026 }
   },
   toggles: {
+    // updatedAt: 0 ensures any real admin change (with actual timestamp) always wins LWW
     cv: { protected: true, updatedAt: 0 },
     vault: { protected: true, updatedAt: 0 },
     ecl: { protected: true, updatedAt: 0 },
@@ -75,14 +76,78 @@ const DEFAULT_STATE: AdminState = {
   }
 };
 
+/**
+ * Apply cookie Last-Write-Wins (LWW) merge onto the given state.
+ * The cookie is passed explicitly from the request context (no dynamic require).
+ * This ensures toggle changes from admin propagate to all serverless containers
+ * even if they don't have the file on their filesystem.
+ */
+function applyToggleCookieLWW(state: AdminState, togglesCookie: string): AdminState {
+  try {
+    const cookieData = JSON.parse(decodeURIComponent(togglesCookie));
+    if (!cookieData || typeof cookieData !== "object") return state;
+
+    const togglesSource = cookieData.toggles && typeof cookieData.toggles === "object"
+      ? cookieData.toggles          // nested format: { toggles: { ecl: { protected, updatedAt } }, globalEpoch }
+      : cookieData;                 // legacy flat format: { ecl: { protected, updatedAt } }
+
+    const newToggles = { ...state.toggles };
+    let changed = false;
+
+    Object.keys(togglesSource).forEach((key) => {
+      const k = key as keyof typeof newToggles;
+      if (!newToggles[k]) return;
+
+      const cookieEntry = togglesSource[key];
+      if (!cookieEntry) return;
+
+      // Cookie entry can be { protected: bool, updatedAt: number } or just a boolean
+      const cookieTime = typeof cookieEntry === "object" ? (Number(cookieEntry.updatedAt) || 0) : 0;
+      const cookieProtected = typeof cookieEntry === "object" ? Boolean(cookieEntry.protected) : Boolean(cookieEntry);
+      const dbTime = Number(newToggles[k].updatedAt) || 0;
+
+      if (cookieTime > dbTime) {
+        newToggles[k] = { protected: cookieProtected, updatedAt: cookieTime };
+        changed = true;
+      }
+    });
+
+    if (!changed) return state;
+
+    let newEpoch = state.globalEpoch;
+    if (cookieData.toggles) {
+      const cookieEpoch = Number(cookieData.globalEpoch) || 0;
+      if (cookieEpoch > newEpoch) newEpoch = cookieEpoch;
+    }
+
+    return { ...state, toggles: newToggles, globalEpoch: newEpoch };
+  } catch {
+    return state;
+  }
+}
+
 export const adminRepository = {
-  read(): AdminState {
+  /**
+   * Read admin state from file (with in-memory cache), then apply cookie LWW.
+   *
+   * IMPORTANT: togglesCookie MUST be passed explicitly from the request context
+   * (e.g., from cookies() in the route handler). Do NOT use require("next/headers")
+   * inside this method — it silently fails in some serverless contexts.
+   */
+  read(togglesCookie?: string): AdminState {
     const currentMtime = getFileMtime();
+
+    // Cache hit: file hasn't changed since last read
     if (inMemoryState && currentMtime > 0 && currentMtime <= lastFileMtimeMs) {
+      // Even on cache hit, apply cookie LWW — the cookie may have newer toggle state
+      // (e.g., admin changed toggle on a different container that wrote to its own file)
+      if (togglesCookie) {
+        return applyToggleCookieLWW(inMemoryState, togglesCookie);
+      }
       return inMemoryState;
     }
 
-    // Parse file state (if any) — fall through to cookie merge regardless
+    // No cache hit — read from filesystem
     let parsedFileState: any = null;
     try {
       let raw = "";
@@ -94,21 +159,17 @@ export const adminRepository = {
         lastFileMtimeMs = fs.statSync(DEV_STORAGE_PATH).mtimeMs;
       }
       (globalThis as any).__adminStateMtime = lastFileMtimeMs;
-
-      if (raw) {
-        parsedFileState = JSON.parse(raw);
-      }
-      // If no file: parsedFileState stays null — use DEFAULT_STATE as base
-      // DO NOT return early or write DEFAULT_STATE to disk here.
-      // We must still apply the cookie LWW below to get correct admin state.
+      if (raw) parsedFileState = JSON.parse(raw);
+      // If no file: parsedFileState = null → use DEFAULT_STATE as base
+      // Do NOT return early here — must still apply cookie LWW below
     } catch {
-      // Ignore read errors
+      // Ignore read errors — fall through to use DEFAULT_STATE
     }
 
     const parsed = parsedFileState || {};
     const loginHistory = { ...DEFAULT_STATE.loginHistory, ...parsed.loginHistory };
 
-    const fullState: AdminState = {
+    let fullState: AdminState = {
       auth: { ...DEFAULT_STATE.auth, ...parsed.auth },
       accounts: parsed.accounts && parsed.accounts.length > 0 ? parsed.accounts : defaultAccounts,
       strategies: { ...DEFAULT_STATE.strategies, ...parsed.strategies },
@@ -119,56 +180,10 @@ export const adminRepository = {
       globalEpoch: Number(parsed.globalEpoch) || DEFAULT_STATE.globalEpoch
     };
 
-    // ALWAYS apply cookie LWW — even when no file exists on this container.
-    // This ensures admin toggle changes propagate correctly across serverless instances.
-    try {
-      const { cookies } = require("next/headers");
-      const togglesCookie = cookies().get("hajat_toggles_state")?.value;
-      if (togglesCookie) {
-        const cookieData = JSON.parse(decodeURIComponent(togglesCookie));
-
-        if (cookieData && typeof cookieData === "object") {
-          if (cookieData.toggles && typeof cookieData.toggles === "object") {
-            // New nested format: { toggles: { cv: { protected, updatedAt } }, globalEpoch: 123 }
-            Object.keys(cookieData.toggles).forEach((key) => {
-              const k = key as keyof typeof fullState.toggles;
-              if (fullState.toggles[k] && cookieData.toggles[k]) {
-                const cookieTime = Number(cookieData.toggles[k].updatedAt) || 0;
-                const dbTime = Number(fullState.toggles[k].updatedAt) || 0;
-                if (cookieTime > dbTime) {
-                  fullState.toggles[k] = {
-                    protected: Boolean(cookieData.toggles[k].protected),
-                    updatedAt: cookieTime
-                  };
-                }
-              }
-            });
-
-            const cookieEpoch = Number(cookieData.globalEpoch) || 0;
-            if (cookieEpoch > fullState.globalEpoch) {
-              fullState.globalEpoch = cookieEpoch;
-            }
-          } else {
-            // Legacy flat format: { cv: true, ... }
-            Object.keys(cookieData).forEach((key) => {
-              const k = key as keyof typeof fullState.toggles;
-              if (fullState.toggles[k]) {
-                const val = cookieData[key];
-                // Handle both flat boolean and nested { protected, updatedAt } object
-                const protectedVal = typeof val === "object" && val !== null
-                  ? Boolean(val.protected)
-                  : Boolean(val);
-                fullState.toggles[k] = {
-                  ...fullState.toggles[k],
-                  protected: protectedVal
-                };
-              }
-            });
-          }
-        }
-      }
-    } catch {
-      // Ignore if outside request context
+    // Apply cookie LWW using the explicitly passed cookie.
+    // This is the ONLY cookie read — no dynamic require("next/headers") here.
+    if (togglesCookie) {
+      fullState = applyToggleCookieLWW(fullState, togglesCookie);
     }
 
     inMemoryState = fullState;
