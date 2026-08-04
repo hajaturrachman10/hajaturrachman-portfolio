@@ -82,6 +82,8 @@ export const adminRepository = {
       return inMemoryState;
     }
 
+    // Parse file state (if any) — fall through to cookie merge regardless
+    let parsedFileState: any = null;
     try {
       let raw = "";
       if (fs.existsSync(TMP_STORAGE_PATH)) {
@@ -93,83 +95,85 @@ export const adminRepository = {
       }
       (globalThis as any).__adminStateMtime = lastFileMtimeMs;
 
-      if (!raw) {
-        inMemoryState = DEFAULT_STATE;
-        (globalThis as any).__adminStateCache = DEFAULT_STATE;
-        this.write(DEFAULT_STATE);
-        return DEFAULT_STATE;
+      if (raw) {
+        parsedFileState = JSON.parse(raw);
       }
+      // If no file: parsedFileState stays null — use DEFAULT_STATE as base
+      // DO NOT return early or write DEFAULT_STATE to disk here.
+      // We must still apply the cookie LWW below to get correct admin state.
+    } catch {
+      // Ignore read errors
+    }
 
-      const parsed = JSON.parse(raw);
-      const loginHistory = {
-        ...DEFAULT_STATE.loginHistory,
-        ...parsed.loginHistory
-      };
-      
-      const fullState: AdminState = {
-        auth: { ...DEFAULT_STATE.auth, ...parsed.auth },
-        accounts: parsed.accounts && parsed.accounts.length > 0 ? parsed.accounts : defaultAccounts,
-        strategies: { ...DEFAULT_STATE.strategies, ...parsed.strategies },
-        toggles: { ...DEFAULT_STATE.toggles, ...parsed.toggles },
-        stats: { ...DEFAULT_STATE.stats, ...parsed.stats },
-        lastLogin: (parsed.lastLogin ? { ...DEFAULT_STATE.lastLogin, ...parsed.lastLogin } : DEFAULT_STATE.lastLogin)!,
-        loginHistory: loginHistory as LoginHistoryStats,
-        globalEpoch: Number(parsed.globalEpoch) || DEFAULT_STATE.globalEpoch
-      };
+    const parsed = parsedFileState || {};
+    const loginHistory = { ...DEFAULT_STATE.loginHistory, ...parsed.loginHistory };
 
-      try {
-        const { cookies } = require("next/headers");
-        const togglesCookie = cookies().get("hajat_toggles_state")?.value;
-        if (togglesCookie) {
-          const cookieData = JSON.parse(decodeURIComponent(togglesCookie));
-          
-          if (cookieData && typeof cookieData === "object") {
-            if (cookieData.toggles && typeof cookieData.toggles === "object") {
-              // New nested format: { toggles: { cv: { protected, updatedAt } }, globalEpoch: 123 }
-              Object.keys(cookieData.toggles).forEach((key) => {
-                const k = key as keyof typeof fullState.toggles;
-                if (fullState.toggles[k] && cookieData.toggles[k]) {
-                  const cookieTime = Number(cookieData.toggles[k].updatedAt) || 0;
-                  const dbTime = Number(fullState.toggles[k].updatedAt) || 0;
-                  if (cookieTime > dbTime) {
-                    fullState.toggles[k] = {
-                      protected: Boolean(cookieData.toggles[k].protected),
-                      updatedAt: cookieTime
-                    };
-                  }
-                }
-              });
+    const fullState: AdminState = {
+      auth: { ...DEFAULT_STATE.auth, ...parsed.auth },
+      accounts: parsed.accounts && parsed.accounts.length > 0 ? parsed.accounts : defaultAccounts,
+      strategies: { ...DEFAULT_STATE.strategies, ...parsed.strategies },
+      toggles: { ...DEFAULT_STATE.toggles, ...parsed.toggles },
+      stats: { ...DEFAULT_STATE.stats, ...parsed.stats },
+      lastLogin: (parsed.lastLogin ? { ...DEFAULT_STATE.lastLogin, ...parsed.lastLogin } : DEFAULT_STATE.lastLogin)!,
+      loginHistory: loginHistory as LoginHistoryStats,
+      globalEpoch: Number(parsed.globalEpoch) || DEFAULT_STATE.globalEpoch
+    };
 
-              const cookieEpoch = Number(cookieData.globalEpoch) || 0;
-              if (cookieEpoch > fullState.globalEpoch) {
-                fullState.globalEpoch = cookieEpoch;
-              }
-            } else {
-              // Legacy flat format: { cv: true, ... }
-              Object.keys(cookieData).forEach((key) => {
-                const k = key as keyof typeof fullState.toggles;
-                if (fullState.toggles[k]) {
+    // ALWAYS apply cookie LWW — even when no file exists on this container.
+    // This ensures admin toggle changes propagate correctly across serverless instances.
+    try {
+      const { cookies } = require("next/headers");
+      const togglesCookie = cookies().get("hajat_toggles_state")?.value;
+      if (togglesCookie) {
+        const cookieData = JSON.parse(decodeURIComponent(togglesCookie));
+
+        if (cookieData && typeof cookieData === "object") {
+          if (cookieData.toggles && typeof cookieData.toggles === "object") {
+            // New nested format: { toggles: { cv: { protected, updatedAt } }, globalEpoch: 123 }
+            Object.keys(cookieData.toggles).forEach((key) => {
+              const k = key as keyof typeof fullState.toggles;
+              if (fullState.toggles[k] && cookieData.toggles[k]) {
+                const cookieTime = Number(cookieData.toggles[k].updatedAt) || 0;
+                const dbTime = Number(fullState.toggles[k].updatedAt) || 0;
+                if (cookieTime > dbTime) {
                   fullState.toggles[k] = {
-                    ...fullState.toggles[k],
-                    protected: Boolean(cookieData[key])
+                    protected: Boolean(cookieData.toggles[k].protected),
+                    updatedAt: cookieTime
                   };
                 }
-              });
+              }
+            });
+
+            const cookieEpoch = Number(cookieData.globalEpoch) || 0;
+            if (cookieEpoch > fullState.globalEpoch) {
+              fullState.globalEpoch = cookieEpoch;
             }
+          } else {
+            // Legacy flat format: { cv: true, ... }
+            Object.keys(cookieData).forEach((key) => {
+              const k = key as keyof typeof fullState.toggles;
+              if (fullState.toggles[k]) {
+                const val = cookieData[key];
+                // Handle both flat boolean and nested { protected, updatedAt } object
+                const protectedVal = typeof val === "object" && val !== null
+                  ? Boolean(val.protected)
+                  : Boolean(val);
+                fullState.toggles[k] = {
+                  ...fullState.toggles[k],
+                  protected: protectedVal
+                };
+              }
+            });
           }
         }
-      } catch {
-        // Ignore if outside request context
       }
-
-      inMemoryState = fullState;
-      (globalThis as any).__adminStateCache = fullState;
-      return fullState;
     } catch {
-      inMemoryState = DEFAULT_STATE;
-      (globalThis as any).__adminStateCache = DEFAULT_STATE;
-      return DEFAULT_STATE;
+      // Ignore if outside request context
     }
+
+    inMemoryState = fullState;
+    (globalThis as any).__adminStateCache = fullState;
+    return fullState;
   },
 
   write(state: AdminState): void {
