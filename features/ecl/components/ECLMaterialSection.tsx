@@ -86,17 +86,37 @@ export function ECLMaterialSection() {
             syncLocalToggles(data.toggles, data.globalEpoch);
           }
 
-          // NOTE: No animation transitions from polling — only from cross-tab sync (BroadcastChannel).
-          // Polling from different serverless containers returns inconsistent states,
-          // which would cause false flip-flop animations. Animations are only reliable
-          // when triggered directly by the admin panel via subscribeCrossTabSync below.
+          const nextOverride = !!data.overrides?.ecl;
+          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
+
+          // Detect document toggle changes from polling (cross-device)
+          let hasDocChanged = false;
+          let changedDocKey: string | null = null;
+          if (!isInitial && docTogglesInitialized.current && docTogglesRef.current && data.docToggles) {
+            const prev = docTogglesRef.current;
+            const next = data.docToggles;
+            if (prev.doc1 !== next.doc1) { hasDocChanged = true; changedDocKey = "doc1"; }
+            else if (prev.doc2 !== next.doc2) { hasDocChanged = true; changedDocKey = "doc2"; }
+            else if (prev.doc3 !== next.doc3) { hasDocChanged = true; changedDocKey = "doc3"; }
+          }
+
           if (data.docToggles) {
             docTogglesRef.current = data.docToggles;
             docTogglesInitialized.current = true;
             setDocToggles(data.docToggles);
           }
 
-          isAdminOverrideRef.current = !!data.overrides?.ecl;
+          if (hasOverrideChanged) {
+            const isEnabling = !nextOverride;
+            setAdminTransition({ active: true, isEnabling, type: "ecl" });
+            await new Promise((r) => setTimeout(r, 1200));
+          } else if (hasDocChanged && unlockedRef.current && changedDocKey && data.docToggles) {
+            const isEnabling = Boolean((data.docToggles as any)[changedDocKey]);
+            setAdminTransition({ active: true, isEnabling, type: "document" });
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+
+          isAdminOverrideRef.current = nextOverride;
           if (data.overrides?.ecl) {
             setIsAdminOverride(true);
             setUnlocked(true);

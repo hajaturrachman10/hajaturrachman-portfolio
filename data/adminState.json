@@ -42,23 +42,22 @@
       "updatedAt": 1785454699919
     },
     "ecl": {
-      "protected": true,
-      "updatedAt": 1785752589834
+      "protected": false,
+      "updatedAt": 1786101148108
     },
     "ecl_doc1": {
       "protected": true,
-      "updatedAt": 1785752814884
+      "updatedAt": 1786101092090
     },
     "ecl_doc2": {
       "protected": true,
       "updatedAt": 1785752722914
     },
     "ecl_doc3": {
-      "protected": false,
-      "updatedAt": 1785745396835
+      "protected": true,
+      "updatedAt": 1786101176103
     }
   },
-  "globalEpoch": 1785752077882,
   "stats": {
     "totalVisitors": 1420,
     "cvUnlocks": 128,
@@ -78,5 +77,6 @@
     "totalFailed": 37,
     "totalSuccess": 8,
     "lastResetDate": "2026-08-03"
-  }
+  },
+  "globalEpoch": 1785752077882
 }

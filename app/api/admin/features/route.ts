@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminAuthService } from "@/services/admin/adminAuthService";
 import { adminToggleService } from "@/services/admin/adminToggleService";
+import { adminRepository } from "@/services/admin/adminRepository";
 import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
 
 export async function GET() {
@@ -52,18 +53,34 @@ export async function PATCH(request: Request) {
       });
     }
 
+    const latestState = adminRepository.read();
+
     const response = NextResponse.json({
       success: true,
       data: toggleResult.data,
       togglesMap
     });
 
-    response.cookies.set("hajat_toggles_state", JSON.stringify(togglesMap), {
-      path: "/",
-      httpOnly: false,
-      sameSite: "lax",
-      maxAge: 31536000
-    });
+    try {
+      const togglesPayload = JSON.stringify({
+        toggles: latestState.toggles,
+        globalEpoch: latestState.globalEpoch
+      });
+      response.cookies.set("hajat_toggles_state", encodeURIComponent(togglesPayload), {
+        path: "/",
+        httpOnly: false,
+        sameSite: "lax",
+        maxAge: 31536000
+      });
+    } catch {
+      // Fallback: set unencoded JSON if stringify fails
+      response.cookies.set("hajat_toggles_state", JSON.stringify(togglesMap), {
+        path: "/",
+        httpOnly: false,
+        sameSite: "lax",
+        maxAge: 31536000
+      });
+    }
 
     return response;
   } catch {

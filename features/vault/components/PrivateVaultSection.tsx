@@ -134,9 +134,16 @@ export function PrivateVaultSection() {
             syncLocalToggles(data.toggles, data.globalEpoch);
           }
 
-          // NOTE: No animation from polling — only from cross-tab sync (BroadcastChannel).
-          // Serverless containers return inconsistent states causing false flip-flop animations.
-          isAdminOverrideRef.current = !!data.overrides?.vault;
+          const nextOverride = !!data.overrides?.vault;
+          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
+
+          if (hasOverrideChanged) {
+            const isEnabling = !nextOverride;
+            setAdminTransition({ active: true, isEnabling });
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+
+          isAdminOverrideRef.current = nextOverride;
           if (data.overrides?.vault) {
             setIsAdminOverride(true);
             await fetchVaultData();

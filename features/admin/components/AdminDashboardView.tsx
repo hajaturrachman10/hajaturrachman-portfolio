@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { useLanguage } from "@/components/providers/LanguageContext";
 
-type AdminTabKey = "overview" | "features" | "security" | "statistics" | "messages" | "settings" | "history" | "health" | "audit";
+type AdminTabKey = "overview" | "security" | "messages" | "settings";
 
 type AdminDashboardViewProps = {
   adminUsername: string;
@@ -31,13 +31,22 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
   const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState<AdminTabKey>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("admin_active_tab") as AdminTabKey | null;
-      if (saved && ["overview", "features", "security", "statistics", "messages", "settings", "history", "health", "audit"].includes(saved)) {
+      const saved = localStorage.getItem("admin_active_tab");
+      if (saved === "overview" || saved === "security" || saved === "messages" || saved === "settings") {
         return saved;
       }
+      // Migration mapping for legacy tab keys
+      if (saved === "features") return "security";
+      if (saved === "statistics" || saved === "health") return "overview";
+      if (saved === "history" || saved === "audit") return "settings";
     }
     return "overview";
   });
+
+  // Internal Sub-tab states for consolidated tabs
+  const [overviewSubTab, setOverviewSubTab] = useState<"analytics" | "health">("analytics");
+  const [securitySubTab, setSecuritySubTab] = useState<"features" | "sessions">("features");
+  const [settingsSubTab, setSettingsSubTab] = useState<"account" | "history" | "audit">("account");
 
   const handleTabChange = (tab: AdminTabKey) => {
     setActiveTab(tab);
@@ -153,19 +162,13 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
     };
   }, [fetchDashboardData, onLogout]);
 
+  // Consolidated 4 Primary Tabs
   const navTabs: Array<{ key: AdminTabKey; label: { id: string; de: string }; icon: typeof LayoutDashboard }> = [
-    { key: "overview", label: { id: "Ikhtisar", de: "Übersicht" }, icon: LayoutDashboard },
-    { key: "features", label: { id: "Sakelar Fitur", de: "Funktionen" }, icon: ToggleLeft },
-    { key: "security", label: { id: "Keamanan", de: "Sicherheit" }, icon: Shield },
-    { key: "statistics", label: { id: "Statistik", de: "Statistiken" }, icon: BarChart3 },
+    { key: "overview", label: { id: "Ikhtisar & Analisis", de: "Übersicht & Statistik" }, icon: LayoutDashboard },
+    { key: "security", label: { id: "Proteksi & Keamanan", de: "Schutz & Sicherheit" }, icon: Shield },
     { key: "messages", label: { id: "Kotak Masuk", de: "Nachrichten" }, icon: Mail },
-    { key: "settings", label: { id: "Pengaturan", de: "Einstellungen" }, icon: Settings },
-    { key: "history", label: { id: "Riwayat Konfig", de: "Verlauf" }, icon: History },
-    { key: "health", label: { id: "Kesehatan", de: "Zustand" }, icon: Activity },
-    { key: "audit", label: { id: "Log Audit", de: "Audit-Log" }, icon: ListFilter }
+    { key: "settings", label: { id: "Pengaturan & Log", de: "Einstellungen & Logs" }, icon: Settings }
   ];
-
-
 
   if (isSecuringSession) {
     return (
@@ -281,30 +284,28 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
         </div>
       </header>
 
-      {/* Top Navigation Tabs */}
-      <nav className="flex items-center gap-1.5 overflow-x-auto py-2 px-4 -mx-4 scrollbar-none touch-pan-x">
+      {/* Simplified Top Navigation Tabs (4 Clean Tabs) */}
+      <nav className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-1 select-none">
         {navTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
           return (
-            <MagneticButton key={tab.key} className="shrink-0">
+            <MagneticButton key={tab.key} className="w-full">
               <button
                 type="button"
                 onClick={() => handleTabChange(tab.key)}
-                className={`relative px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-[11px] sm:text-xs font-black flex items-center gap-1.5 sm:gap-2 whitespace-nowrap transition-all duration-200 cursor-pointer select-none ${
+                className={`w-full relative px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-200 cursor-pointer select-none ${
                   isActive
-                    ? "bg-primary text-surface shadow-md shadow-primary/20"
+                    ? "bg-primary text-surface shadow-md shadow-primary/25 border border-primary/50"
                     : "bg-surface/70 text-muted border border-line hover:text-primary hover:bg-surface shadow-xs"
                 }`}
               >
-                <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                <Icon className="h-4 w-4 shrink-0" />
                 <span>{language === "id" ? tab.label.id : tab.label.de}</span>
               </button>
             </MagneticButton>
           );
         })}
-        {/* Spacer to prevent cut-off at the end of horizontal scroll */}
-        <div className="w-4 shrink-0" aria-hidden="true" />
       </nav>
 
       {/* Tab Content Panel */}
@@ -316,29 +317,227 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
+            className="flex flex-col gap-6"
           >
+            {/* 1. OVERVIEW & ANALYTICS TAB */}
             {activeTab === "overview" && (
-              <AdminOverviewTab
-                stats={stats}
-                toggles={toggles}
-                healthStatus={health?.status || "OK"}
-              />
+              <div className="flex flex-col gap-6">
+                <AdminOverviewTab
+                  stats={stats}
+                  toggles={toggles}
+                  healthStatus={health?.status || "OK"}
+                />
+
+                {/* Sub-Pills for Overview detail view */}
+                <div className="flex items-center justify-between gap-3 border-b border-line pb-3">
+                  <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+                    <button
+                      type="button"
+                      onClick={() => setOverviewSubTab("analytics")}
+                      className={cn(
+                        "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5",
+                        overviewSubTab === "analytics"
+                          ? "bg-primary/10 text-primary border border-primary/30"
+                          : "text-muted hover:text-primary border border-transparent"
+                      )}
+                    >
+                      <BarChart3 className="h-3.5 w-3.5" />
+                      <span>Grafik & Analisis Pengunjung</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setOverviewSubTab("health")}
+                      className={cn(
+                        "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5",
+                        overviewSubTab === "health"
+                          ? "bg-primary/10 text-primary border border-primary/30"
+                          : "text-muted hover:text-primary border border-transparent"
+                      )}
+                    >
+                      <Activity className="h-3.5 w-3.5" />
+                      <span>Diagnostik Kesehatan System</span>
+                    </button>
+                  </div>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {overviewSubTab === "analytics" ? (
+                    <motion.div
+                      key="analytics"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <AdminStatisticsTab stats={stats} />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="health"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <AdminHealthTab health={health} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
-            {activeTab === "features" && (
-              <AdminFeaturesTab toggles={toggles} onRefresh={fetchDashboardData} />
+
+            {/* 2. PROTEKSI & KEAMANAN TAB */}
+            {activeTab === "security" && (
+              <div className="flex flex-col gap-6">
+                {/* Sub-Pills for Protection & Security */}
+                <div className="flex items-center gap-2 border-b border-line pb-3 overflow-x-auto scrollbar-none">
+                  <button
+                    type="button"
+                    onClick={() => setSecuritySubTab("features")}
+                    className={cn(
+                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
+                      securitySubTab === "features"
+                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
+                        : "text-muted hover:text-primary border border-transparent"
+                    )}
+                  >
+                    <ToggleLeft className="h-4 w-4" />
+                    <span>Sakelar Proteksi Fitur & Dokumen</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSecuritySubTab("sessions")}
+                    className={cn(
+                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
+                      securitySubTab === "sessions"
+                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
+                        : "text-muted hover:text-primary border border-transparent"
+                    )}
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span>Keamanan Sesi & Reset IP Lockout</span>
+                  </button>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {securitySubTab === "features" ? (
+                    <motion.div
+                      key="features"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <AdminFeaturesTab toggles={toggles} onRefresh={fetchDashboardData} />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="sessions"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <AdminSecurityTab onLogout={() => setConfirmLogout(true)} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
-            {activeTab === "security" && <AdminSecurityTab onLogout={() => setConfirmLogout(true)} />}
-            {activeTab === "statistics" && <AdminStatisticsTab stats={stats} />}
+
+            {/* 3. KOTAK MASUK TAB */}
             {activeTab === "messages" && <AdminMessagesTab />}
+
+            {/* 4. PENGATURAN & LOG TAB */}
             {activeTab === "settings" && (
-              <AdminSettingsTab
-                currentUsername={adminUsername}
-                onRefresh={fetchDashboardData}
-              />
+              <div className="flex flex-col gap-6">
+                {/* Sub-Pills for Settings & Logs */}
+                <div className="flex items-center gap-2 border-b border-line pb-3 overflow-x-auto scrollbar-none">
+                  <button
+                    type="button"
+                    onClick={() => setSettingsSubTab("account")}
+                    className={cn(
+                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
+                      settingsSubTab === "account"
+                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
+                        : "text-muted hover:text-primary border border-transparent"
+                    )}
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>Pengaturan Akun & Akses</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSettingsSubTab("history")}
+                    className={cn(
+                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
+                      settingsSubTab === "history"
+                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
+                        : "text-muted hover:text-primary border border-transparent"
+                    )}
+                  >
+                    <History className="h-4 w-4" />
+                    <span>Riwayat Snapshot Konfig</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSettingsSubTab("audit")}
+                    className={cn(
+                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
+                      settingsSubTab === "audit"
+                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
+                        : "text-muted hover:text-primary border border-transparent"
+                    )}
+                  >
+                    <ListFilter className="h-4 w-4" />
+                    <span>Catatan Log Audit</span>
+                  </button>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {settingsSubTab === "account" && (
+                    <motion.div
+                      key="account"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <AdminSettingsTab
+                        currentUsername={adminUsername}
+                        onRefresh={fetchDashboardData}
+                      />
+                    </motion.div>
+                  )}
+                  {settingsSubTab === "history" && (
+                    <motion.div
+                      key="history"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <AdminConfigHistoryTab />
+                    </motion.div>
+                  )}
+                  {settingsSubTab === "audit" && (
+                    <motion.div
+                      key="audit"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <AdminAuditTab />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
-            {activeTab === "history" && <AdminConfigHistoryTab />}
-            {activeTab === "health" && <AdminHealthTab health={health} />}
-            {activeTab === "audit" && <AdminAuditTab />}
           </motion.div>
         </AnimatePresence>
       </main>
