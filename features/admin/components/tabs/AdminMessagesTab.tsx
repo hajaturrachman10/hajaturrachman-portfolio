@@ -4,7 +4,12 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Search, MessageSquare, CheckCircle2, Clock, Trash2, Send, CornerUpRight, Filter, AlertCircle, ChevronRight, User, Inbox, Eye, EyeOff, X, Copy, Check } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import dynamic from "next/dynamic";
+
+const ConfirmModal = dynamic(
+  () => import("@/components/modals/ConfirmModal").then((mod) => mod.ConfirmModal),
+  { ssr: false }
+);
 import { cn } from "@/lib/utils";
 
 export type ContactMessage = {

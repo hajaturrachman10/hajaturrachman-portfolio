@@ -834,6 +834,8 @@ export function PasswordModal({
                                   ? "Halo Hajat, saya [Nama]. Saya lupa kata sandi untuk mengakses portofolio Anda. Apakah bisa dibantu?"
                                   : "Hallo Hajat, ich bin [Name]. Ich habe das Passwort untuk mengakses portofolio Anda. Apakah bisa dibantu?"
                               )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               className="text-primary hover:underline font-black cursor-pointer"
                             >
                               {language === "id" ? "Lupa kata sandi? Hubungi via WhatsApp." : "Passwort vergessen? Per WhatsApp kontaktieren."}

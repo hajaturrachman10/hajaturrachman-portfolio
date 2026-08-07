@@ -4,7 +4,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Users, FileText, Lock, BookOpen, TrendingUp, PieChart, Activity, Zap, Mail, Trash2 } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import dynamic from "next/dynamic";
+
+const ConfirmModal = dynamic(
+  () => import("@/components/modals/ConfirmModal").then((mod) => mod.ConfirmModal),
+  { ssr: false }
+);
 import { AdminStats } from "@/services/admin/adminTypes";
 import { cn } from "@/lib/utils";
 

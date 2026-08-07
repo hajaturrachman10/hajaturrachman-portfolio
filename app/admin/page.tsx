@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { AdminContainer } from "@/features/admin";
+import dynamic from "next/dynamic";
+
+const AdminContainer = dynamic(
+  () => import("@/features/admin").then((mod) => mod.AdminContainer),
+  { ssr: false }
+);
 
 export const metadata: Metadata = {
   title: "Pusat Kendali Admin — Hajaturrachman",

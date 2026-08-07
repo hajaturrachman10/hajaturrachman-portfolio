@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, LockKeyhole, ShieldCheck, Instagram, MessageCircle, ExternalLink, FileText, Sparkles, RefreshCw } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
-import { PasswordModal } from "@/components/modals/PasswordModal";
-import { ConfirmModal } from "@/components/modals/ConfirmModal";
+
+const PasswordModal = dynamic(
+  () => import("@/components/modals/PasswordModal").then((mod) => mod.PasswordModal),
+  { ssr: false }
+);
+const ConfirmModal = dynamic(
+  () => import("@/components/modals/ConfirmModal").then((mod) => mod.ConfirmModal),
+  { ssr: false }
+);
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { useSiteData } from "@/data/site";
 import { useLanguage } from "@/components/providers/LanguageContext";
@@ -286,6 +294,7 @@ export function ECLMaterialSection() {
     <>
       <Reveal id="ecl-b2" className="container-page section-space overflow-hidden">
         <SectionHeader
+          as="h1"
           eyebrow={language === "id" ? "Materi Persiapan" : "Vorbereitungsmaterialien"}
           title="ECL Deutsch B2"
           description={language === "id"

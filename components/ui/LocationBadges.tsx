@@ -3,7 +3,12 @@
 import { motion } from "framer-motion";
 import { Home, MapPin } from "lucide-react";
 import { useState } from "react";
-import { LocationConfirmModal } from "@/components/modals/LocationConfirmModal";
+import dynamic from "next/dynamic";
+
+const LocationConfirmModal = dynamic(
+  () => import("@/components/modals/LocationConfirmModal").then((mod) => mod.LocationConfirmModal),
+  { ssr: false }
+);
 import { useSiteData } from "@/data/site";
 import { useLanguage } from "@/components/providers/LanguageContext";
 

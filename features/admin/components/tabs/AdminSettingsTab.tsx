@@ -4,7 +4,12 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings, User, Lock, Save, AlertCircle, CheckCircle2, KeyRound, Check, X, Play, ChevronDown, Plus, Trash2, ShieldCheck, Key, Edit3 } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import dynamic from "next/dynamic";
+
+const ConfirmModal = dynamic(
+  () => import("@/components/modals/ConfirmModal").then((mod) => mod.ConfirmModal),
+  { ssr: false }
+);
 import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
 import { FeatureType, AdminAccount } from "@/services/admin/adminTypes";
 import { StrategyType, PasswordStrategyConfig } from "@/services/admin/passwordEngine";

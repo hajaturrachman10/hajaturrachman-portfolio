@@ -15,6 +15,7 @@ export function JourneySection() {
   return (
     <Reveal id="journey" className="container-page section-space overflow-hidden">
       <SectionHeader
+        as="h1"
         eyebrow={language === "id" ? "Cerita & Arah Hidup" : "Lebensweg & Werte"}
         title={language === "id" ? "Lebih dari portofolio: ini adalah peta perjalanan Hajaturrachman." : "Mehr als ein Portfolio: Dies ist die Lebenskarte von Hajaturrachman."}
         description={language === "id" ? "Bagian ini menampilkan sisi personal yang tetap aman untuk publik: asal perjalanan, arah Jerman, mimpi keliling dunia, dan nilai yang sedang dibangun." : "Dieser Bereich zeigt persönliche Aspekte: meine Herkunft, den Weg nach Deutschland, Träume von Weltreisen und erlernte Werte."}

@@ -3,9 +3,17 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, Eye, LockKeyhole, ShieldCheck, Sparkles, X, RefreshCw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import dynamic from "next/dynamic";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { PasswordModal } from "@/components/modals/PasswordModal";
+
+const ConfirmModal = dynamic(
+  () => import("@/components/modals/ConfirmModal").then((mod) => mod.ConfirmModal),
+  { ssr: false }
+);
+const PasswordModal = dynamic(
+  () => import("@/components/modals/PasswordModal").then((mod) => mod.PasswordModal),
+  { ssr: false }
+);
 import { useSiteData, useLanguageSelector } from "@/data/site";
 import { useLanguage } from "@/components/providers/LanguageContext";
 import { cn } from "@/lib/utils";

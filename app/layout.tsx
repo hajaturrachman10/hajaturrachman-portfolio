@@ -142,8 +142,6 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://api.qrserver.com" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-icon.svg" />
@@ -199,7 +197,8 @@ export default function RootLayout({
                 "@type": "WebSite",
                 "@id": "https://hajat.vercel.app/#website",
                 "url": "https://hajat.vercel.app",
-                "name": "Hajaturrachman Portofolio",
+                "name": "Hajaturrachman",
+                "alternateName": ["Hajaturrachman", "Hajaturrachman Portofolio", "Hajat"],
                 "description":
                   "Website portofolio pribadi Hajaturrachman: perjalanan bahasa Jerman ECL B2, Ausbildung perawat di Jerman, dan proyek kreatif.",
                 "inLanguage": ["id-ID", "de-DE"],
@@ -220,16 +219,6 @@ export default function RootLayout({
             ])
           }}
         />
-        {/* Hidden Semantic SEO Anchor Block for Search Engine Crawlers */}
-        <div className="sr-only">
-          <h1>Hajaturrachman — Personal Portofolio Resmi | Hajat ECL B2</h1>
-          <h2>Website Resmi Hajaturrachman: Perjalanan Bahasa Jerman ECL B2, Ausbildung Perawat di Jerman, & Karya Kreatif</h2>
-          <p>
-            Selamat datang di website portofolio pribadi resmi Hajaturrachman (Hajat).
-            Menampilkan rekam jejak sertifikat ECL Deutsch B2, persiapan Ausbildung perawat di Jerman,
-            proyek web development, galeri video karya, dan informasi kontak resmi.
-          </p>
-        </div>
 
         <Providers>
           <ScrollProgress />

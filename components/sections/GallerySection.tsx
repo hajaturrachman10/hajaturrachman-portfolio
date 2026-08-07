@@ -34,6 +34,7 @@ export function GallerySection() {
     <>
       <Reveal id="gallery" className="container-page section-space overflow-hidden">
         <SectionHeader
+          as="h1"
           eyebrow={language === "id" ? "Galeri" : "Galerie"}
           title={language === "id" ? "Ruang visual untuk cerita yang terus bertambah." : "Visueller Raum für wachsende Lebensabschnitte."}
           description={language === "id"

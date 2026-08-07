@@ -4,7 +4,12 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShieldAlert, RefreshCw, Lock, AlertCircle, CheckCircle2, Download, ShieldCheck, Clock, Users, Key } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import dynamic from "next/dynamic";
+
+const ConfirmModal = dynamic(
+  () => import("@/components/modals/ConfirmModal").then((mod) => mod.ConfirmModal),
+  { ssr: false }
+);
 import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
 
 type AdminSecurityTabProps = {

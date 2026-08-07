@@ -6,7 +6,12 @@ import { FormEvent, useState } from "react";
 import { Instagram, Mail, MapPin, Phone, Send } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
-import { LocationConfirmModal } from "@/components/modals/LocationConfirmModal";
+import dynamic from "next/dynamic";
+
+const LocationConfirmModal = dynamic(
+  () => import("@/components/modals/LocationConfirmModal").then((mod) => mod.LocationConfirmModal),
+  { ssr: false }
+);
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { useSiteData } from "@/data/site";
 import { useLanguage } from "@/components/providers/LanguageContext";
@@ -141,6 +146,8 @@ export function ContactSection() {
                 label={language === "id" ? "Domisili" : "Wohnort"}
                 value={siteConfig.location}
                 href="https://maps.app.goo.gl/xmndeJxn1jGunPZFA"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={handleDomisiliClick}
               />
             </div>

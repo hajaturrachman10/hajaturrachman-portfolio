@@ -15,10 +15,18 @@ import {
 } from "lucide-react";
 import { ImageWithShimmer } from "@/components/ui/ImageWithShimmer";
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { ConfirmModal } from "@/components/modals/ConfirmModal";
-import { PasswordModal } from "@/components/modals/PasswordModal";
 import { subscribeCrossTabSync } from "@/lib/crossTabSync";
+
+const ConfirmModal = dynamic(
+  () => import("@/components/modals/ConfirmModal").then((mod) => mod.ConfirmModal),
+  { ssr: false }
+);
+const PasswordModal = dynamic(
+  () => import("@/components/modals/PasswordModal").then((mod) => mod.PasswordModal),
+  { ssr: false }
+);
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { useSiteData } from "@/data/site";

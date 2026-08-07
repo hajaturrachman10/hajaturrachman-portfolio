@@ -4,7 +4,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, FileText, Layers3, X } from "lucide-react";
 import { ImageWithShimmer } from "@/components/ui/ImageWithShimmer";
 import { useEffect, useMemo, useState } from "react";
-import { GalleryCarousel } from "@/components/sections/GalleryCarousel";
+import dynamic from "next/dynamic";
+
+const GalleryCarousel = dynamic(
+  () => import("@/components/sections/GalleryCarousel").then((mod) => mod.GalleryCarousel),
+  { ssr: false }
+);
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { cn } from "@/lib/utils";
@@ -44,6 +49,7 @@ export function ProjectsSection() {
     <>
       <Reveal id="projects" className="container-page section-space overflow-hidden">
         <SectionHeader
+          as="h1"
           eyebrow={language === "id" ? "Portofolio" : "Portfolio"}
           title={language === "id" ? "Karya dan proyek yang bisa dibuka seperti cerita." : "Werke und Projekte, die wie Geschichten erzählt werden."}
           description={language === "id"
@@ -189,6 +195,8 @@ function ProjectCard({ project, onOpen }: { project: PortofolioProject; onOpen: 
             <MagneticButton>
               <motion.a
                 href={project.demoLinks[0].href}
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover="hover"
                 whileTap="press"
                 variants={{
@@ -289,6 +297,8 @@ function ProjectModal({ project, onClose }: { project: PortofolioProject | null;
                             <MagneticButton key={link.href}>
                               <motion.a
                                 href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 whileHover="hover"
                                 whileTap="press"
                                 variants={{
@@ -311,7 +321,7 @@ function ProjectModal({ project, onClose }: { project: PortofolioProject | null;
                         <h4 className="font-display text-xl font-black">{language === "id" ? "Dokumen" : "Unterlagen"}</h4>
                         <div className="mt-4 grid gap-3">
                           {project.documents.map((doc) => (
-                            <motion.a key={doc.href} href={doc.href} whileTap={{ scale: 0.96 }} className="flex items-center gap-3 rounded-3xl border border-line bg-surface p-4 font-black text-muted transition hover:border-primary/60 hover:text-text cursor-pointer select-none">
+                            <motion.a key={doc.href} href={doc.href} target="_blank" rel="noopener noreferrer" whileTap={{ scale: 0.96 }} className="flex items-center gap-3 rounded-3xl border border-line bg-surface p-4 font-black text-muted transition hover:border-primary/60 hover:text-text cursor-pointer select-none">
                               <FileText className="h-5 w-5 text-primary" />
                               {doc.title}
                             </motion.a>

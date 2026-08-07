@@ -65,6 +65,8 @@ export function AchievementsSection() {
               <div className="px-6 pb-6 pt-0">
                 <motion.a
                   href={item.document}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileTap={{ scale: 0.95 }}
                   className="button-secondary focus-ring w-full text-sm py-2.5 flex items-center justify-center gap-2 cursor-pointer select-none"
                 >
