@@ -265,9 +265,9 @@ export function Navbar() {
             <motion.span
               whileHover={{ scale: 1.08, rotate: 6 }}
               whileTap={{ scale: 0.95 }}
-              className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-primary via-secondary to-accent text-sm font-black text-white shadow-glow group-hover:shadow-primary/20"
+              className="relative grid h-10 w-10 place-items-center rounded-2xl overflow-hidden shadow-glow group-hover:shadow-primary/20 shrink-0 border border-line"
             >
-              H
+              <Image src="/assets/logo.jpg" alt="Logo Hajaturrachman" fill className="object-cover" />
             </motion.span>
             
             <span className="hidden leading-tight sm:block transition-transform duration-300 group-hover:translate-x-0.5">

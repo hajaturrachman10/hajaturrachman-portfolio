@@ -89,6 +89,14 @@ export const metadata: Metadata = {
   verification: {
     google: "googled2a36b14141fb43d",
   },
+  icons: {
+    icon: [
+      { url: "/assets/icon.jpg" },
+      { url: "/icon.jpg" }
+    ],
+    shortcut: "/assets/icon.jpg",
+    apple: "/assets/icon.jpg",
+  },
   openGraph: {
     title: `${siteConfig.name} — Personal Portofolio`,
     description:
@@ -137,6 +145,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://api.qrserver.com" />
+        <link rel="icon" href="/assets/icon.jpg" type="image/jpeg" />
+        <link rel="apple-touch-icon" href="/assets/icon.jpg" />
         <meta name="thumbnail" content="https://hajat.vercel.app/assets/profile.jpg" />
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
