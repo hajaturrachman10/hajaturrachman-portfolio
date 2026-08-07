@@ -173,8 +173,8 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
               <a
                 href={`https://wa.me/6285158518090?text=${encodeURIComponent(
                   language === "id"
-                    ? `Halo Hajat, saya ingin menanyakan status akses ${docName} yang saat ini sedang nonaktif.`
-                    : `Hallo Hajat, ich möchte nach dem Status von ${docName} fragen.`
+                    ? `Halo Hajat, perkenalkan saya [Nama Anda]. Saya ingin menanyakan status ketersediaan ${docName} yang saat ini sedang dinonaktifkan. Terima kasih.`
+                    : `Hallo Hajat, ich bin [Ihr Name]. Ich möchte nach dem Status von ${docName} fragen. Vielen Dank.`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

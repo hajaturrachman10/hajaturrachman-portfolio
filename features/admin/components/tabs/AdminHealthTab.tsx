@@ -41,9 +41,6 @@ export function AdminHealthTab({ health }: AdminHealthTabProps) {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-xl font-black text-primary">Kesehatan & Performa Sistem</h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                Status: {health.status}
-              </span>
             </div>
             <p className="text-xs font-bold text-muted mt-0.5">
               {health.build} — {health.runtime}

@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "./LanguageContext";
+import { ToastProvider } from "@/components/ui/Toast";
 import type { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -13,7 +14,9 @@ export function Providers({ children }: { children: ReactNode }) {
         enableSystem={false}
         disableTransitionOnChange={true}
       >
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </ThemeProvider>
     </LanguageProvider>
   );

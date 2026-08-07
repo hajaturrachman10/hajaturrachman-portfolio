@@ -1,24 +1,42 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Languages, Menu, X } from "lucide-react";
+import { Languages, Menu, X, Share2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSiteData, useLanguageSelector } from "@/data/site";
 import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
+import { Tooltip } from "@/components/ui/Tooltip";
+import { toast } from "@/components/ui/Toast";
+
+const ShareModal = dynamic(() => import("@/components/modals/ShareModal").then((mod) => mod.ShareModal), {
+  ssr: false,
+});
 
 export function Navbar() {
   const { siteConfig } = useSiteData();
   const { language, setLanguage } = useLanguageSelector();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hash, setHash] = useState("");
   const pathname = usePathname();
   const [activeSection, setActiveSection] = useState(pathname === "/" ? "/" : pathname);
+
+  const handleLanguageToggle = () => {
+    const nextLang = language === "id" ? "de" : "id";
+    setLanguage(nextLang);
+    toast({
+      message: nextLang === "id" ? "Bahasa Indonesia Aktif" : "Deutsch Aktiviert",
+      type: "info",
+      duration: 2000
+    });
+  };
  
   useEffect(() => {
     setActiveSection(pathname === "/" ? "/" : pathname);
@@ -90,10 +108,26 @@ export function Navbar() {
   }, [pathname, menuOpen]);
  
   useEffect(() => {
+    let scrollTimer: NodeJS.Timeout | null = null;
+
     function handleScroll() {
       // If scroll is locked (e.g. mobile menu or modals open), ignore scroll events
       const isLocked = typeof document !== "undefined" && (document.body.style.position === "fixed" || document.body.classList.contains("modal-open"));
       if (isLocked) return;
+
+      if (typeof document !== "undefined") {
+        // Blur JS focus
+        if (document.activeElement && document.activeElement !== document.body) {
+          (document.activeElement as HTMLElement)?.blur();
+        }
+        // Force WebKit/Safari/Chrome mobile engines to strip touch hover state immediately
+        document.body.classList.add("is-scrolling");
+
+        if (scrollTimer) clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+          document.body.classList.remove("is-scrolling");
+        }, 150);
+      }
 
       setScrolled(window.scrollY > 18);
       if (pathname === "/") {
@@ -107,7 +141,15 @@ export function Navbar() {
     }
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("touchmove", handleScroll, { passive: true });
+    return () => {
+      if (scrollTimer) clearTimeout(scrollTimer);
+      if (typeof document !== "undefined") {
+        document.body.classList.remove("is-scrolling");
+      }
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("touchmove", handleScroll);
+    };
   }, [pathname]);
 
   useEffect(() => {
@@ -315,30 +357,59 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 180, damping: 15, delay: 0.1 }}
           >
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.94 }}
-              onClick={() => setLanguage(language === "id" ? "de" : "id")}
-              className="focus-ring flex h-10 px-3 items-center justify-center gap-1.5 rounded-full border border-line bg-surface/90 text-xs font-black hover:border-primary/60 cursor-pointer select-none transition group"
-              aria-label="Switch Language"
-            >
-              <motion.span
-                animate={{ rotate: language === "id" ? 0 : 180 }}
-                transition={{ type: "spring", stiffness: 200, damping: 13 }}
-                className="inline-block"
+            <Tooltip content={language === "id" ? "Bahasa" : "Sprache"} position="bottom">
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={(e) => {
+                  (e.currentTarget as HTMLElement)?.blur();
+                  if (typeof document !== "undefined") {
+                    (document.activeElement as HTMLElement)?.blur();
+                  }
+                  handleLanguageToggle();
+                }}
+                className="focus-ring flex h-11 px-3.5 items-center justify-center gap-1.5 rounded-full border border-line bg-surface/90 text-xs font-black active:border-primary/60 sm:hover:border-primary/60 cursor-pointer select-none transition group backdrop-blur-xl shadow-sm"
+                aria-label="Switch Language"
               >
-                <Languages className="h-3.5 w-3.5 text-muted group-hover:text-primary transition-colors" />
-              </motion.span>
-              <span>{language === "id" ? "ID" : "DE"}</span>
-            </motion.button>
+                <motion.span
+                  animate={{ rotate: language === "id" ? 0 : 180 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 13 }}
+                  className="inline-block"
+                >
+                  <Languages className="h-4 w-4 text-muted group-active:text-primary sm:group-hover:text-primary transition-colors" />
+                </motion.span>
+                <span>{language === "id" ? "ID" : "DE"}</span>
+              </motion.button>
+            </Tooltip>
           </motion.div>
           
           <motion.div
             initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 180, damping: 15, delay: 0.12 }}
+            className="flex items-center gap-2"
           >
+            <Tooltip content={language === "id" ? "Bagikan" : "Teilen"} position="bottom">
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={(e) => {
+                  (e.currentTarget as HTMLElement)?.blur();
+                  if (typeof document !== "undefined") {
+                    (document.activeElement as HTMLElement)?.blur();
+                  }
+                  setShareOpen(true);
+                }}
+                className="focus-ring group relative grid h-11 w-11 place-items-center overflow-hidden rounded-full border border-line bg-surface/90 text-text shadow-sm backdrop-blur-xl transition-colors duration-300 active:border-primary/60 sm:hover:border-primary/60 cursor-pointer select-none"
+                aria-label="Bagikan Portofolio"
+              >
+                <span className="absolute inset-0 bg-gradient-to-br from-primary/12 via-secondary/10 to-accent/12 opacity-0 transition-opacity duration-300 group-active:opacity-100 sm:group-hover:opacity-100" />
+                <Share2 className="h-5 w-5 relative text-text group-active:text-primary sm:group-hover:text-primary transition-colors" />
+              </motion.button>
+            </Tooltip>
+
             <ThemeToggle />
           </motion.div>
 
@@ -379,16 +450,16 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.18, ease: "easeInOut" }}
               onClick={() => setMenuOpen(false)}
-              className="fixed inset-0 z-30 bg-slate-950/65 backdrop-blur-md lg:hidden"
+              className="fixed inset-0 z-30 bg-slate-950/65 backdrop-blur-sm lg:hidden transform-gpu will-change-[opacity]"
             />
             <motion.div
-              initial={{ opacity: 0, y: -12, scale: 0.98 }}
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -12, scale: 0.98 }}
-              transition={{ duration: 0.22 }}
-              className="container-page mt-3 overflow-hidden rounded-4xl border border-line bg-surface/90 backdrop-blur-md p-3 shadow-card lg:hidden relative z-50"
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="container-page mt-3 overflow-hidden rounded-4xl border border-line bg-surface/95 backdrop-blur-md p-3 shadow-card lg:hidden relative z-50 transform-gpu will-change-[transform,opacity]"
             >
               <div 
                 className="grid gap-1"
@@ -465,6 +536,8 @@ export function Navbar() {
           </>
         ) : null}
       </AnimatePresence>
+
+      <ShareModal open={shareOpen} onClose={() => setShareOpen(false)} />
     </header>
   );
 }

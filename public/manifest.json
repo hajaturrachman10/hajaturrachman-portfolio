@@ -1,0 +1,16 @@
+{
+  "name": "Hajaturrachman — Personal Portofolio Resmi",
+  "short_name": "Hajaturrachman",
+  "description": "Website portofolio pribadi resmi Hajaturrachman: perjalanan bahasa Jerman ECL B2, Ausbildung perawat di Jerman, dan proyek.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070b18",
+  "theme_color": "#070b18",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

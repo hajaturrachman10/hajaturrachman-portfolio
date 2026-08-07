@@ -12,6 +12,8 @@ import { useSiteData } from "@/data/site";
 import { useLanguage } from "@/components/providers/LanguageContext";
 import { cn } from "@/lib/utils";
 
+import { toast } from "@/components/ui/Toast";
+
 export function ContactSection() {
   const { siteConfig } = useSiteData();
   const { language } = useLanguage();
@@ -48,8 +50,10 @@ export function ContactSection() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setStatus(language === "id" ? "Pesan Anda berhasil dikirim secara aman!" : "Ihre Nachricht wurde erfolgreich gesendet!");
+        const msg = language === "id" ? "Pesan Anda berhasil dikirim secara aman!" : "Ihre Nachricht wurde erfolgreich gesendet!";
+        setStatus(msg);
         setIsSuccess(true);
+        toast({ message: msg, type: "success", title: language === "id" ? "Pesan Terkirim!" : "Nachricht Gesendet!" });
         form.reset();
 
         // Dispatch real-time event so Admin Dashboard Messages tab updates instantly
@@ -102,13 +106,15 @@ export function ContactSection() {
                 value={siteConfig.email}
                 href={`https://mail.google.com/mail/?view=cm&fs=1&to=${siteConfig.email}&su=${encodeURIComponent(
                   language === "id"
-                    ? "Diskusi & Kontak Portofolio — [Nama]"
-                    : "Portfolio-Anfrage & Kontakt — [Name]"
+                    ? "Diskusi & Kontak Portofolio — [Nama Anda]"
+                    : "Portfolio-Anfrage & Kontakt — [Ihr Name]"
                 )}&body=${encodeURIComponent(
                   language === "id"
-                    ? "Halo Hajat,\n\nSaya [Nama], ingin menghubungi Anda mengenai..."
-                    : "Hallo Hajat,\n\nich bin [Name] und möchte mich bezüglich Ihres Portfolios bei Ihnen melden..."
+                    ? "Halo Hajat,\n\nPerkenalkan saya [Nama Anda]. Saya tertarik dengan portofolio Anda dan ingin menghubungi Anda mengenai...\n\nTerima kasih."
+                    : "Hallo Hajat,\n\nich bin [Ihr Name]. Ich habe Ihr Portfolio gesehen und möchte mich bezüglich... bei Ihnen melden.\n\nVielen Dank."
                 )}`}
+                target="_blank"
+                rel="noopener noreferrer"
               />
               <ContactLink
                 icon={Phone}
@@ -116,15 +122,19 @@ export function ContactSection() {
                 value={siteConfig.phone}
                 href={`https://wa.me/62${siteConfig.phone.replace(/[^0-9]/g, "").substring(1)}?text=${encodeURIComponent(
                   language === "id"
-                    ? "Halo Hajat, saya [Nama], saya tertarik dengan portofolio Anda dan ingin terhubung lebih lanjut."
-                    : "Hallo Hajat, ich bin [Name]. Ich interessiere mich für Ihr Portfolio und möchte mich gerne mit Ihnen austauschen."
+                    ? "Halo Hajat, perkenalkan saya [Nama Anda]. Saya tertarik dengan portofolio Anda dan ingin terhubung/berdiskusi lebih lanjut."
+                    : "Hallo Hajat, ich bin [Ihr Name]. Ich interessiere mich für Ihr Portfolio und möchte mich gerne mit Ihnen austauschen."
                 )}`}
+                target="_blank"
+                rel="noopener noreferrer"
               />
               <ContactLink
                 icon={Instagram}
                 label="Instagram"
                 value={siteConfig.instagram}
                 href="https://instagram.com/saya.hajat"
+                target="_blank"
+                rel="noopener noreferrer"
               />
               <ContactLink
                 icon={MapPin}
@@ -242,45 +252,49 @@ function ContactLink({
   label,
   value,
   href,
+  target,
+  rel,
   onClick
 }: {
   icon: LucideIcon;
   label: string;
   value: string;
   href: string;
+  target?: string;
+  rel?: string;
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   return (
-    <MagneticButton className="w-full">
-      <motion.a
-        href={href}
-        onClick={onClick}
-        whileHover="hover"
-        whileTap="press"
+    <motion.a
+      href={href}
+      target={target}
+      rel={rel}
+      onClick={onClick}
+      whileHover="hover"
+      whileTap="press"
+      variants={{
+        hover: { scale: 1.015, y: -2 },
+        press: { scale: 0.975 }
+      }}
+      transition={{ type: "spring", stiffness: 450, damping: 18 }}
+      className="group flex items-center gap-4 rounded-3xl border border-line bg-surface/82 p-4 cursor-pointer select-none text-text hover:border-primary/58 hover:bg-primary/5 hover:text-primary transition-colors duration-300 w-full"
+    >
+      <motion.div
         variants={{
-          hover: { scale: 1.015, y: -2 },
-          press: { scale: 0.975 }
+          hover: { scale: 1.18, rotate: 10, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)" },
+          press: { scale: 0.9, rotate: 0 }
         }}
-        transition={{ type: "spring", stiffness: 450, damping: 18 }}
-        className="group flex items-center gap-4 rounded-3xl border border-line bg-surface/82 p-4 cursor-pointer select-none text-text hover:border-primary/58 hover:bg-primary/5 hover:text-primary transition-colors duration-300 w-full"
+        transition={{ type: "spring", stiffness: 400, damping: 12 }}
+        className="icon-orbit grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
       >
-        <motion.div
-          variants={{
-            hover: { scale: 1.18, rotate: 10, boxShadow: "0 0 15px rgb(var(--color-primary) / 0.3)" },
-            press: { scale: 0.9, rotate: 0 }
-          }}
-          transition={{ type: "spring", stiffness: 400, damping: 12 }}
-          className="icon-orbit grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
-        >
-          <Icon className="h-5 w-5" />
-        </motion.div>
-        <span className="min-w-0">
-          <span className="block text-xs font-black uppercase tracking-[0.18em] text-muted group-hover:text-primary/70">
-            {label}
-          </span>
-          <span className="block break-all font-black text-sm sm:text-base">{value}</span>
+        <Icon className="h-5 w-5" />
+      </motion.div>
+      <span className="min-w-0">
+        <span className="block text-xs font-black uppercase tracking-[0.18em] text-muted group-hover:text-primary/70">
+          {label}
         </span>
-      </motion.a>
-    </MagneticButton>
+        <span className="block break-all font-black text-sm sm:text-base">{value}</span>
+      </span>
+    </motion.a>
   );
 }

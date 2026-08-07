@@ -354,9 +354,6 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-xl font-black text-primary">Pengaturan Sistem & Kredensial</h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                Multi-Admin Engine
-              </span>
             </div>
             <p className="text-xs font-bold text-muted mt-0.5">
               Kelola strategi kata sandi terproteksi, daftar akun admin, dan multi-password terpusat.
@@ -419,26 +416,38 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
               className={cn(
-                "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black shadow-xs cursor-pointer select-none border transition-all",
+                "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black shadow-xs cursor-pointer select-none border transition-all duration-300",
                 showAddAccountForm
                   ? "border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white"
                   : "border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-600 hover:text-white"
               )}
             >
-              {showAddAccountForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              <motion.div
+                animate={{ rotate: showAddAccountForm ? 135 : 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                className="shrink-0"
+              >
+                <Plus className="h-4 w-4" />
+              </motion.div>
               <span>{showAddAccountForm ? "Tutup Form" : "Tambah Akun Admin Baru"}</span>
             </motion.button>
           </MagneticButton>
         </div>
 
         {/* Form Tambah Akun Admin Baru (AnimatePresence expansion dengan Transisi Mulus) */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {showAddAccountForm && (
             <motion.form
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              key="add-account-form"
+              initial={{ opacity: 0, y: -16, scale: 0.98, height: 0 }}
+              animate={{ opacity: 1, y: 0, scale: 1, height: "auto" }}
+              exit={{ opacity: 0, y: -12, scale: 0.98, height: 0 }}
+              transition={{
+                height: { duration: 0.28, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.2, ease: "linear" },
+                y: { duration: 0.28, ease: [0.16, 1, 0.3, 1] },
+                scale: { duration: 0.28, ease: [0.16, 1, 0.3, 1] }
+              }}
               onSubmit={handleCreateAccount}
               className="overflow-hidden p-5 rounded-2xl border border-blue-500/30 bg-blue-500/[0.03] flex flex-col gap-4 shadow-xs relative z-10"
             >
@@ -515,7 +524,7 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
             return (
               <motion.div
                 key={acc.id}
-                layout
+                layout="position"
                 className="p-5 rounded-2xl border border-line bg-surface/90 flex flex-col gap-4 shadow-xs relative overflow-hidden"
               >
                 {/* Header Akun */}
@@ -553,13 +562,19 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         className={cn(
-                          "w-full px-3 py-1.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none border",
+                          "w-full px-3 py-1.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all duration-300 cursor-pointer select-none border",
                           isAddPassActive
                             ? "border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white"
                             : "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-600 hover:text-white"
                         )}
                       >
-                        {isAddPassActive ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                        <motion.div
+                          animate={{ rotate: isAddPassActive ? 135 : 0 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                          className="shrink-0"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </motion.div>
                         <span>{isAddPassActive ? "Tutup Form" : "Tambah Password"}</span>
                       </motion.button>
                     </MagneticButton>
@@ -581,13 +596,19 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
                   </div>
                 </div>
 
-                <AnimatePresence initial={false}>
+                <AnimatePresence mode="wait">
                   {isAddPassActive && (
                     <motion.div
-                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                      animate={{ opacity: 1, height: "auto", marginTop: 12 }}
-                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                      key={`add-pass-${acc.id}`}
+                      initial={{ opacity: 0, y: -12, scale: 0.98, height: 0, marginTop: 0 }}
+                      animate={{ opacity: 1, y: 0, scale: 1, height: "auto", marginTop: 12 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.98, height: 0, marginTop: 0 }}
+                      transition={{
+                        height: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
+                        opacity: { duration: 0.18, ease: "linear" },
+                        y: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
+                        scale: { duration: 0.25, ease: [0.16, 1, 0.3, 1] }
+                      }}
                       className="overflow-hidden p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.04] flex flex-col sm:flex-row items-center gap-3"
                     >
                       <input
@@ -659,16 +680,13 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
             </div>
             <div>
               <h3 className="font-display text-base font-black text-primary">
-                Universal Resource Password Policy Engine
+                Pengaturan Kebijakan Kata Sandi Akses
               </h3>
               <p className="text-xs font-bold text-muted mt-0.5">
                 Konfigurasi metode validasi kata sandi untuk CV, Private Vault, dan Materi ECL Deutsch B2.
               </p>
             </div>
           </div>
-          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 hidden sm:inline-block">
-            Engine PR-006A
-          </span>
         </div>
 
         <form onSubmit={handleSaveStrategy} className="flex flex-col gap-6 relative z-10">
@@ -911,7 +929,7 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
           <div className="soft-card p-5 rounded-2xl border border-line bg-surface/60 flex flex-col gap-3 shadow-xs">
             <div className="flex items-center justify-between">
               <label className="text-xs font-black text-primary uppercase tracking-wider">
-                Live Interactive Validator Tester
+                Penguji Validasi Kata Sandi Interaktif
               </label>
               <span className="text-[10px] font-bold text-muted">Uji aturan secara instant</span>
             </div>

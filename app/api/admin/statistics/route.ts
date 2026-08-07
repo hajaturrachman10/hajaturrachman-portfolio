@@ -23,3 +23,23 @@ export async function GET() {
     stats: result.data
   });
 }
+
+export async function DELETE() {
+  const cookieStore = cookies();
+  const token = cookieStore.get(ADMIN_CONFIG.COOKIE_NAME)?.value;
+
+  const authCheck = adminAuthService.validateSession(token);
+  if (!authCheck.success) {
+    return NextResponse.json(
+      { success: false, error: authCheck.error.message, code: authCheck.error.code },
+      { status: authCheck.error.status }
+    );
+  }
+
+  const result = adminStatsService.resetAll();
+
+  return NextResponse.json({
+    success: true,
+    stats: result.data
+  });
+}

@@ -5,37 +5,7 @@ import path from "path";
 const DATA_DIR = path.join(process.cwd(), "data");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 
-const INITIAL_DEMO_MESSAGES = [
-  {
-    id: "msg-1",
-    name: "Sarah Jenkins",
-    email: "sarah.j@techrecruiter.com",
-    subject: "Penawaran Posisi Senior Fullstack Developer",
-    message: "Halo Hajat, kami sangat terkesan dengan portofolio Antigravity dan proyek-proyek AI yang Anda bangun. Kami ingin mengundang Anda untuk diskusi peluang karir sebagai Senior Fullstack Developer di tim kami secara remote dengan benefit menarik.\n\nApakah Anda ada waktu luang untuk sesi perkenalan singkat minggu ini?",
-    timestamp: "2026-07-31T05:20:00.000Z",
-    status: "unread"
-  },
-  {
-    id: "msg-2",
-    name: "Dr. Klaus Weber",
-    email: "klaus.weber@deutsch-akademie.de",
-    subject: "Pertanyaan seputar Materi ECL Deutsch B2",
-    message: "Sehr geehrter Herr Hajaturrachman,\n\nvielen Dank für das Teilen der strukturierten ECL B2 Vorbereitungsmaterialien auf Ihrer Website. Die Zusammenfassung der Grammatik und Wortschatzlisten ist wirklich hervorragend zusammengestellt.\n\nIch würde gerne fragen, ob Sie auch Tipps untuk ujian lisan (Mündliche Prüfung) yang bisa saya bagikan ke siswa saya?\n\nMit freundlichen Grüßen,\nDr. Klaus Weber",
-    timestamp: "2026-07-30T14:45:00.000Z",
-    status: "replied"
-  },
-  {
-    id: "msg-3",
-    name: "Rian Firmansyah",
-    email: "rian.firmansyah@digitalstudio.id",
-    subject: "Undangan Kolaborasi Project UI/UX Portfolio",
-    message: "Halo Mas Hajat,\n\nDesain portofolio Anda luar biasa futuristik, clean, dan sangat responsif! Kami dari Digital Studio saat ini sedang menggarap platform SaaS analitik terbaru dan tertarik untuk berkolaborasi dengan Mas Hajat sebagai Lead Design Architect.\n\nBoleh minta nomor WhatsApp atau jadwal yang pas untuk Zoom meeting?",
-    timestamp: "2026-07-29T09:12:00.000Z",
-    status: "read"
-  }
-];
-
-function readLocalMessages() {
+function readLocalMessages(): any[] {
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -43,7 +13,7 @@ function readLocalMessages() {
     if (fs.existsSync(MESSAGES_FILE)) {
       const raw = fs.readFileSync(MESSAGES_FILE, "utf-8");
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return parsed.map((m: any) => ({
           id: m.id || String(Date.now()),
           name: m.name || "Anonim",
@@ -58,7 +28,7 @@ function readLocalMessages() {
   } catch (err) {
     console.error("Error reading messages file:", err);
   }
-  return INITIAL_DEMO_MESSAGES;
+  return [];
 }
 
 export async function GET() {

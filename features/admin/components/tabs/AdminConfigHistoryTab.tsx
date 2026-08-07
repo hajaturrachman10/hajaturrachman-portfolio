@@ -78,6 +78,28 @@ export function AdminConfigHistoryTab() {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Standar Top Header Card (Seragam 1:1) */}
+      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+        <div className="flex items-center gap-3.5 relative z-10">
+          <motion.div
+            whileHover={{ scale: 1.06, rotate: 6 }}
+            whileTap={{ scale: 0.94, rotate: 3 }}
+            transition={{ type: "spring", stiffness: 450, damping: 18 }}
+            className="icon-orbit grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/25 bg-primary/10 text-primary cursor-pointer select-none"
+          >
+            <History className="h-6 w-6" />
+          </motion.div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-display text-xl font-black text-primary">Histori Snapshot & Pemulihan</h3>
+            </div>
+            <p className="text-xs font-bold text-muted mt-0.5">
+              Lihat snapshot konfigurasi sistem otomatis dan pulihkan ke versi sebelumnya kapan saja.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {feedback ? (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -136,9 +158,6 @@ export function AdminConfigHistoryTab() {
             </div>
 
             <div>
-              <span className="px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 mb-2 inline-block shadow-xs">
-                Audit Engine System
-              </span>
               <h4 className="font-display text-base font-black text-primary">
                 Memuat Data Histori Snapshot...
               </h4>

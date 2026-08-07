@@ -161,9 +161,6 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-xl font-black text-primary">Keamanan & Integritas Sesi</h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
-                Security Level 3
-              </span>
             </div>
             <p className="text-xs font-bold text-muted mt-0.5">
               Pantau riwayat enkripsi HMAC, reset pembekuan IP, dan kelola sesi pengunjung.
@@ -214,11 +211,8 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
         <div className="flex items-center justify-between border-b border-line pb-4 mb-4">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary shrink-0" />
-            <h3 className="font-display text-base sm:text-lg font-black text-primary">Security Overview & Activity Dashboard</h3>
+            <h3 className="font-display text-base sm:text-lg font-black text-primary">Ringkasan Keamanan & Aktivitas Admin</h3>
           </div>
-          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 hidden sm:inline-block">
-            Realtime Audit
-          </span>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

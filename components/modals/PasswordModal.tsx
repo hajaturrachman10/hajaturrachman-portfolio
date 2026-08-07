@@ -349,24 +349,24 @@ export function PasswordModal({
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="modal-backdrop fixed inset-0 z-[120] grid place-items-center px-4 py-8"
+          className="modal-backdrop fixed inset-0 z-[120] grid place-items-center px-4 py-8 transform-gpu will-change-[opacity]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.28, ease: "easeOut" }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
           role="dialog"
           aria-modal="true"
         >
           <motion.div
-            initial={{ opacity: 0, y: 35, scale: 0.93 }}
+            initial={{ opacity: 0, y: 25, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.90 }}
+            exit={{ opacity: 0, y: 25, scale: 0.93 }}
             transition={{
               type: "spring",
-              stiffness: 350,
-              damping: 22
+              stiffness: 420,
+              damping: 26
             }}
-            className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden"
+            className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden transform-gpu will-change-[transform,opacity]"
           >
             <AnimatePresence mode="wait">
               {success ? (
@@ -528,9 +528,9 @@ export function PasswordModal({
                           <MagneticButton className="w-full">
                             <motion.a
                               href={`https://wa.me/6285158518090?text=${encodeURIComponent(
-                                language === "id"
-                                  ? "Halo Hajat, saya [Nama]. Akses kata sandi saya terkunci karena salah 5 kali. Apakah bisa tolong dibantu untuk membuka kembali?"
-                                  : "Hallo Hajat, ich bin [Name]. Mein Passwort-Zugang wurde nach 5 Fehlversuchen gesperrt. Könnten Sie mir bitte helfen, den Zugang wieder freizuschalten?"
+                                 language === "id"
+                                   ? "Halo Hajat, perkenalkan saya [Nama Anda]. Akses kata sandi saya terkunci karena salah 5 kali. Bisakah minta tolong dibantu dipulihkan? Terima kasih."
+                                   : "Hallo Hajat, ich bin [Ihr Name]. Mein Passwort-Zugang wurde nach 5 Fehlversuchen gesperrt. Könnten Sie mir bitte helfen, den Zugang wieder freizuschalten? Vielen Dank."
                               )}`}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -661,14 +661,19 @@ export function PasswordModal({
                               <span className="text-sm font-black">{language === "id" ? "Kata Sandi" : "Passwort"}</span>
                               <div className="relative">
                                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted pointer-events-none" />
+                                {/* Decoy fields to block Chrome / Google Password Manager popups */}
+                                <input type="text" name="fake_user" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
+                                <input type="password" name="fake_pass" style={{ display: "none" }} tabIndex={-1} autoComplete="new-password" />
                                 <input
                                   type="text"
                                   style={{
                                     WebkitTextSecurity: showPassword ? "none" : "disc"
                                   } as React.CSSProperties}
-                                  autoComplete="off"
+                                  autoComplete="new-password"
+                                  aria-autocomplete="none"
                                   data-lpignore="true"
                                   data-1p-ignore="true"
+                                  data-bwignore="true"
                                   data-form-type="other"
                                   name="secure_vault_pin"
                                   id="secure_vault_pin"

@@ -495,9 +495,11 @@ export function ECLMaterialSection() {
                     <motion.a
                       href={`https://wa.me/6285158518090?text=${encodeURIComponent(
                         language === "id"
-                          ? "Halo Hajat, saya [Nama], boleh saya meminta kata sandi untuk materi ECL Deutsch B2 di portofolio Anda?"
-                          : "Hallo Hajat, ich bin [Name]. Könnte ich bitte das Passwort für die ECL Deutsch B2-Materialien auf Ihrem Portfolio erhalten?"
+                          ? "Halo Hajat, perkenalkan saya [Nama Anda]. Bolehkah saya meminta kata sandi untuk mengakses materi latihan ECL Deutsch B2 di portofolio Anda? Terima kasih."
+                          : "Hallo Hajat, ich bin [Ihr Name]. Könnte ich bitte das Passwort für die ECL Deutsch B2-Materialien auf Ihrem Portfolio erhalten? Vielen Dank."
                       )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       whileHover="hover"
                       whileTap="press"
                       variants={{
@@ -514,6 +516,8 @@ export function ECLMaterialSection() {
                   <MagneticButton className="w-full">
                     <motion.a
                       href="https://instagram.com/saya.hajat"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       whileHover="hover"
                       whileTap="press"
                       variants={{

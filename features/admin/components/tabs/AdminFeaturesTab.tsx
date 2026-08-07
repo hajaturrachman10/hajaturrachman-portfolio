@@ -280,9 +280,6 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-xl font-black text-primary">Sakelar Proteksi Fitur</h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                Gatekeeper Engine
-              </span>
             </div>
             <p className="text-xs font-bold text-muted mt-0.5">
               Aktifkan atau nonaktifkan sistem proteksi kata sandi publik secara instan.

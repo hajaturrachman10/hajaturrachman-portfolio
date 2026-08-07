@@ -45,26 +45,26 @@ export function ConfirmModal({
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="modal-backdrop fixed inset-0 z-[120] grid place-items-center px-4 py-8"
+          className="modal-backdrop fixed inset-0 z-[120] grid place-items-center px-4 py-8 transform-gpu will-change-[opacity]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.28, ease: "easeOut" }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
           onClick={onCancel}
           role="dialog"
           aria-modal="true"
         >
           <motion.div
-            initial={{ opacity: 0, y: 35, scale: 0.93 }}
+            initial={{ opacity: 0, y: 25, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.90 }}
+            exit={{ opacity: 0, y: 25, scale: 0.93 }}
             transition={{
               type: "spring",
-              stiffness: 350,
-              damping: 22
+              stiffness: 420,
+              damping: 26
             }}
             onClick={(e) => e.stopPropagation()}
-            className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden"
+            className="premium-card w-full max-w-md rounded-3xl sm:rounded-4xl p-6 sm:p-8 border border-line bg-surface shadow-2xl relative flex flex-col gap-6 transform-gpu will-change-[transform,opacity]"
           >
             <div className="flex flex-col items-center text-center gap-4">
               <motion.div

@@ -1,4 +1,14 @@
-import { UnavailableCard } from "./UnavailableCard";
+import type { Metadata } from "next";
+import { UnavailableCard } from "@/features/ecl";
+
+export const metadata: Metadata = {
+  title: "Dokumen Belum Tersedia — Hajaturrachman",
+  description: "Dokumen materi latihan ECL Deutsch B2 ini saat ini belum dipublikasikan atau sedang diperbarui.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const DOC_NAMES: Record<string, { id: string; de: string }> = {
   "1": {

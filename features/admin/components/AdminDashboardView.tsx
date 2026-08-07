@@ -62,6 +62,30 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
   const [isSecuringSession, setIsSecuringSession] = useState(false);
   const [rememberSession, setRememberSession] = useState(true);
 
+  // Dynamic Browser Tab Title updating based on active admin tab & language
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const tabTitlesID: Record<AdminTabKey, string> = {
+      overview: "Ikhtisar & Performa Admin",
+      security: "Proteksi & Keamanan Sesi",
+      messages: "Kotak Masuk Pesan Publik",
+      settings: "Pengaturan Sistem & Log"
+    };
+
+    const tabTitlesDE: Record<AdminTabKey, string> = {
+      overview: "Übersicht & Statistik",
+      security: "Schutz & Sicherheit",
+      messages: "Nachrichten Posteingang",
+      settings: "Einstellungen & Logs"
+    };
+
+    const currentTabTitle = language === "de" ? tabTitlesDE[activeTab] : tabTitlesID[activeTab];
+    const prefix = language === "de" ? "Admin-Kontrollzentrum" : "Pusat Kendali Admin";
+
+    document.title = `${currentTabTitle} — ${prefix} | Hajaturrachman`;
+  }, [activeTab, language]);
+
   // Initialize rememberSession default TRUE if not stored yet
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -124,9 +148,11 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
   useEffect(() => {
     fetchDashboardData();
 
-    // 1. Periodic Real-Time Heartbeat Sync every 4 seconds
+    // 1. Periodic Real-Time Heartbeat Sync every 4 seconds (runs ONLY when tab is visible to save Vercel serverless quota)
     const intervalId = setInterval(() => {
-      fetchDashboardData();
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        fetchDashboardData();
+      }
     }, 4000);
 
     // 2. Real-time Event Listeners (Tab Focus, Storage, Contact Submissions)
@@ -221,13 +247,13 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <h1 className="font-display text-lg sm:text-xl font-black text-primary truncate">Admin Control Center</h1>
-              <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shrink-0">
-                v2.2 Active
-              </span>
+              <h1 className="font-display text-lg sm:text-xl font-black text-primary truncate flex items-center gap-2">
+                <span>{language === "de" ? "Admin-Kontrollzentrum" : "Pusat Kendali Admin"}</span>
+                <span className="text-xs sm:text-sm font-bold text-muted/70 font-mono">v2.3</span>
+              </h1>
             </div>
             <p className="text-[11px] sm:text-xs font-bold text-muted mt-0.5 truncate">
-              Logged in as <span className="text-primary">{adminUsername}</span>
+              {language === "de" ? "Angemeldet als" : "Masuk sebagai"} <span className="text-primary">{adminUsername}</span>
             </p>
           </div>
         </div>
@@ -248,7 +274,7 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
               className="flex items-center justify-center gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white hover:border-rose-600 active:bg-rose-700 shadow-sm hover:shadow-md hover:shadow-rose-600/20 px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black transition-all duration-300 focus-ring cursor-pointer select-none w-full sm:w-[240px]"
             >
               <LogOut className="h-4 w-4 shrink-0" />
-              <span>Logout Admin</span>
+              <span>{language === "de" ? "Admin Abmelden" : "Keluar Admin"}</span>
             </motion.button>
           </MagneticButton>
           
@@ -370,7 +396,7 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
                       exit={{ opacity: 0, y: -6 }}
                       transition={{ duration: 0.15 }}
                     >
-                      <AdminStatisticsTab stats={stats} />
+                      <AdminStatisticsTab stats={stats} onRefresh={fetchDashboardData} />
                     </motion.div>
                   ) : (
                     <motion.div

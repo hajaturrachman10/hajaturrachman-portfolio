@@ -56,6 +56,16 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
   const tapTimerRef = useRef<NodeJS.Timeout | null>(null);
   const shakeControls = useAnimation();
 
+  // Dynamic Browser Tab Title updating for Admin Login
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.title =
+        language === "de"
+          ? "Login — Admin-Kontrollzentrum | Hajaturrachman"
+          : "Login Admin — Pusat Kendali | Hajaturrachman";
+    }
+  }, [language]);
+
   // Focus username input on mount
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -396,12 +406,12 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                   transition={{ duration: 0.22, ease: "easeInOut" }}
                 >
                   <h3 className="font-display text-2xl font-black">
-                    {isBlocked ? "Akses Dibekukan Sementara" : "Admin Control Center"}
+                    {isBlocked ? "Akses Dibekukan Sementara" : (language === "de" ? "Admin-Kontrollzentrum" : "Pusat Kendali Admin")}
                   </h3>
                   <p className="mt-2 text-sm font-bold leading-6 text-muted">
                     {isBlocked
                       ? "Batas 5 kali percobaan salah tercapai. Akses dikunci sementara demi keamanan."
-                      : "Portfolio v2.2 — Ruang Kendali Internal Terisolasi"}
+                      : "Portfolio v2.3 — Ruang Kendali Internal Terisolasi"}
                   </p>
                 </motion.div>
               </AnimatePresence>
@@ -451,7 +461,9 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                   <MagneticButton className="w-full">
                     <motion.a
                       href={`https://wa.me/6285158518090?text=${encodeURIComponent(
-                        "Halo Hajat, saya ingin mengonfirmasi akun admin saya."
+                        language === "id"
+                          ? "Halo Hajat, perkenalkan saya [Nama Anda]. Saya ingin mengonfirmasi sesi akses admin di Pusat Kendali Portofolio. Terima kasih."
+                          : "Hallo Hajat, ich bin [Ihr Name]. Ich möchte meine Admin-Zugangssitzung im Portfolio-Kontrollzentrum bestätigen. Vielen Dank."
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -541,7 +553,10 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                 transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                 className="mt-6"
               >
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4" autoComplete="off">
+                  {/* Decoy fields to block Chrome / Google Password Manager popups */}
+                  <input type="text" name="fake_user" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
+                  <input type="password" name="fake_pass" style={{ display: "none" }} tabIndex={-1} autoComplete="new-password" />
                   <motion.div animate={shakeControls} className="flex flex-col gap-4">
                     {/* Username Field */}
                     <label className="grid gap-2 text-left">
@@ -553,6 +568,14 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                           disabled={loading}
                           ref={usernameRef}
                           value={username}
+                          autoComplete="off"
+                          aria-autocomplete="none"
+                          data-lpignore="true"
+                          data-1p-ignore="true"
+                          data-bwignore="true"
+                          data-form-type="other"
+                          name="admin_usr_key"
+                          id="admin_usr_key"
                           onChange={(e) => {
                             setUsername(e.target.value);
                             if (isEmptyWarning) setIsEmptyWarning(false);
@@ -587,12 +610,14 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                         <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted pointer-events-none" />
                         <input
                           type={showPassword ? "text" : "password"}
-                          autoComplete="off"
+                          autoComplete="new-password"
+                          aria-autocomplete="none"
                           data-lpignore="true"
                           data-1p-ignore="true"
+                          data-bwignore="true"
                           data-form-type="other"
-                          name="secure_admin_pass"
-                          id="secure_admin_pass"
+                          name="admin_pwd_key"
+                          id="admin_pwd_key"
                           autoCapitalize="off"
                           autoCorrect="off"
                           spellCheck="false"

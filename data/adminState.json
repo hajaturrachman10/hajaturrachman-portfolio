@@ -35,35 +35,35 @@
   "toggles": {
     "cv": {
       "protected": true,
-      "updatedAt": 1785454531937
+      "updatedAt": 0
     },
     "vault": {
       "protected": true,
-      "updatedAt": 1785454699919
+      "updatedAt": 0
     },
     "ecl": {
-      "protected": false,
-      "updatedAt": 1786101148108
+      "protected": true,
+      "updatedAt": 0
     },
     "ecl_doc1": {
       "protected": true,
-      "updatedAt": 1786101092090
+      "updatedAt": 0
     },
     "ecl_doc2": {
       "protected": true,
-      "updatedAt": 1785752722914
+      "updatedAt": 0
     },
     "ecl_doc3": {
       "protected": true,
-      "updatedAt": 1786101176103
+      "updatedAt": 0
     }
   },
   "stats": {
-    "totalVisitors": 1420,
-    "cvUnlocks": 128,
-    "vaultUnlocks": 45,
-    "eclUnlocks": 89,
-    "contactSubmissions": 8
+    "totalVisitors": 0,
+    "cvUnlocks": 0,
+    "vaultUnlocks": 0,
+    "eclUnlocks": 0,
+    "contactSubmissions": 1
   },
   "lastLogin": {
     "time": 1785448800773,

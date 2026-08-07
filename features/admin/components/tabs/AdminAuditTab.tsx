@@ -9,7 +9,7 @@ export function AdminAuditTab() {
     { event: "TOGGLE_CHANGED", desc: "Status proteksi fitur divalidasi via Admin Toggle Service", time: "1 jam lalu" },
     { event: "SESSION_REVOKED", desc: "Global Epoch diperbarui untuk pembatalan sesi publik", time: "3 jam lalu" },
     { event: "LOCKOUT_RESET", desc: "Pembekuan rate limit IP berhasil di-reset", time: "5 jam lalu" },
-    { event: "SYSTEM_INITIALIZED", desc: "Sistem Admin Control Center v2.2 aktif", time: "1 hari lalu" }
+    { event: "SYSTEM_INITIALIZED", desc: "Sistem Pusat Kendali Admin aktif", time: "1 hari lalu" }
   ];
 
   return (
@@ -28,9 +28,6 @@ export function AdminAuditTab() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-xl font-black text-primary">Audit Log Sistem</h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                Security Audit
-              </span>
             </div>
             <p className="text-xs font-bold text-muted mt-0.5">
               Rekam jejak real-time seluruh aktivitas penting dan peristiwa sistem admin.

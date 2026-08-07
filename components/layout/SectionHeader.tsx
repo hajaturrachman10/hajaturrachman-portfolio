@@ -1,5 +1,3 @@
-"use client";
-
 import { LocationBadges } from "@/components/ui/LocationBadges";
 
 type SectionHeaderProps = {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Search, MessageSquare, CheckCircle2, Clock, Trash2, Send, CornerUpRight, Filter, AlertCircle, ChevronRight, User, Inbox, Eye, EyeOff, X } from "lucide-react";
+import { Mail, Search, MessageSquare, CheckCircle2, Clock, Trash2, Send, CornerUpRight, Filter, AlertCircle, ChevronRight, User, Inbox, Eye, EyeOff, X, Copy, Check } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { cn } from "@/lib/utils";
@@ -17,49 +17,8 @@ export type ContactMessage = {
   status: "unread" | "read" | "replied";
 };
 
-// Initial realistic demonstration messages with 3 distinct statuses
-const INITIAL_DEMO_MESSAGES: ContactMessage[] = [
-  {
-    id: "msg-1",
-    name: "Sarah Jenkins",
-    email: "sarah.j@techrecruiter.com",
-    subject: "Penawaran Posisi Senior Fullstack Developer",
-    message: "Halo Hajat, kami sangat terkesan dengan portofolio Antigravity dan proyek-proyek AI yang Anda bangun. Kami ingin mengundang Anda untuk diskusi peluang karir sebagai Senior Fullstack Developer di tim kami secara remote dengan benefit menarik.\n\nApakah Anda ada waktu luang untuk sesi perkenalan singkat minggu ini?",
-    timestamp: "2026-07-31T05:20:00.000Z",
-    status: "unread"
-  },
-  {
-    id: "msg-2",
-    name: "Dr. Klaus Weber",
-    email: "klaus.weber@deutsch-akademie.de",
-    subject: "Pertanyaan seputar Materi ECL Deutsch B2",
-    message: "Sehr geehrter Herr Hajaturrachman,\n\nvielen Dank für das Teilen der strukturierten ECL B2 Vorbereitungsmaterialien auf Ihrer Website. Die Zusammenfassung der Grammatik und Wortschatzlisten ist wirklich hervorragend zusammengestellt.\n\nIch würde gerne fragen, ob Sie auch Tipps untuk ujian lisan (Mündliche Prüfung) yang bisa saya bagikan ke siswa saya?\n\nMit freundlichen Grüßen,\nDr. Klaus Weber",
-    timestamp: "2026-07-30T14:45:00.000Z",
-    status: "replied"
-  },
-  {
-    id: "msg-3",
-    name: "Rian Firmansyah",
-    email: "rian.firmansyah@digitalstudio.id",
-    subject: "Undangan Kolaborasi Project UI/UX Portfolio",
-    message: "Halo Mas Hajat,\n\nDesain portofolio Anda luar biasa futuristik, clean, dan sangat responsif! Kami dari Digital Studio saat ini sedang menggarap platform SaaS analitik terbaru dan tertarik untuk berkolaborasi dengan Mas Hajat sebagai Lead Design Architect.\n\nBoleh minta nomor WhatsApp atau jadwal yang pas untuk Zoom meeting?",
-    timestamp: "2026-07-29T09:12:00.000Z",
-    status: "read"
-  }
-];
-
 export function AdminMessagesTab() {
-  const [messages, setMessages] = useState<ContactMessage[]>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("admin_contact_messages");
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch {}
-      }
-    }
-    return INITIAL_DEMO_MESSAGES;
-  });
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "unread" | "read" | "replied">("all");
@@ -67,6 +26,29 @@ export function AdminMessagesTab() {
   const [selectedMessageId, setSelectedMessageId] = useState<string>("");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [copiedEmailId, setCopiedEmailId] = useState<string | null>(null);
+
+  const [showQuickReply, setShowQuickReply] = useState(false);
+  const [quickReplyBody, setQuickReplyBody] = useState("");
+  const [copyReplyToast, setCopyReplyToast] = useState(false);
+
+  const handleCopyEmail = (email: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(email);
+      setCopiedEmailId(email);
+      setTimeout(() => setCopiedEmailId(null), 2500);
+    }
+  };
+
+  const handleSendViaEmailClient = (email: string, subject: string, body: string, messageId: string) => {
+    handleSetReadStatus(messageId, "replied");
+    const targetEmail = email || "";
+    const cleanSubject = subject ? (subject.startsWith("Re:") ? subject : `Re: ${subject}`) : "Re: Pesan Portofolio";
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(cleanSubject)}&body=${encodeURIComponent(body || "")}`;
+    if (typeof window !== "undefined") {
+      window.open(gmailUrl, "_blank", "noopener,noreferrer");
+    }
+  };
 
   // Real-time synchronization with server API & homepage contact submissions
   const fetchRealtimeMessages = async () => {
@@ -84,6 +66,9 @@ export function AdminMessagesTab() {
   };
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("admin_contact_messages");
+    }
     fetchRealtimeMessages();
 
     // Listen to real-time custom events from ContactSection
@@ -91,8 +76,12 @@ export function AdminMessagesTab() {
     window.addEventListener("contact_message_submitted", handleNewMessage);
     window.addEventListener("storage", handleNewMessage);
 
-    // Periodic heartbeat sync every 4 seconds
-    const interval = setInterval(fetchRealtimeMessages, 4000);
+    // Periodic heartbeat sync every 4 seconds (runs ONLY when tab is visible)
+    const interval = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        fetchRealtimeMessages();
+      }
+    }, 4000);
 
     return () => {
       window.removeEventListener("contact_message_submitted", handleNewMessage);
@@ -100,6 +89,11 @@ export function AdminMessagesTab() {
       clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    setShowQuickReply(false);
+    setQuickReplyBody("");
+  }, [selectedMessageId]);
 
   const handleSetReadStatus = async (id: string, targetStatus: "unread" | "read" | "replied") => {
     setMessages((prev) =>
@@ -131,23 +125,27 @@ export function AdminMessagesTab() {
   };
 
   const confirmDelete = async () => {
-    if (messageToDelete) {
-      const nextMessages = messages.filter((m) => m.id !== messageToDelete);
-      setMessages(nextMessages);
-      if (selectedMessageId === messageToDelete) {
+    const id = messageToDelete;
+    // 1. Close modal IMMEDIATELY to eliminate any network delay feeling
+    setDeleteModalOpen(false);
+    setMessageToDelete(null);
+
+    if (id) {
+      // 2. Optimistically remove message from local list
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+      if (selectedMessageId === id) {
         setSelectedMessageId("");
       }
 
+      // 3. Perform network delete request
       try {
-        await fetch(`/api/messages?id=${encodeURIComponent(messageToDelete)}`, {
+        await fetch(`/api/messages?id=${encodeURIComponent(id)}`, {
           method: "DELETE"
         });
       } catch (err) {
         console.error("Gagal menghapus pesan:", err);
       }
     }
-    setDeleteModalOpen(false);
-    setMessageToDelete(null);
   };
 
   // Compute filtered messages seamlessly
@@ -242,9 +240,6 @@ export function AdminMessagesTab() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-xl font-black text-primary">Kotak Masuk Pesan Publik</h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
-                Live Inbox
-              </span>
             </div>
             <p className="text-xs font-bold text-muted mt-0.5">
               Kelola, baca, dan balas pesan dari pengunjung portofolio secara terpusat.
@@ -444,13 +439,33 @@ export function AdminMessagesTab() {
                     </div>
                     <div>
                       <h4 className="font-display text-lg font-black text-primary">{selectedMessage.name}</h4>
-                      <a
-                        href={`mailto:${selectedMessage.email}`}
-                        className="text-xs font-bold text-muted hover:text-primary transition-colors flex items-center gap-1 mt-0.5"
-                      >
-                        <span>{selectedMessage.email}</span>
-                        <CornerUpRight className="h-3 w-3" />
-                      </a>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <a
+                          href={`mailto:${selectedMessage.email}`}
+                          className="text-xs font-bold text-muted hover:text-primary transition-colors flex items-center gap-1"
+                        >
+                          <span>{selectedMessage.email}</span>
+                          <CornerUpRight className="h-3 w-3" />
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyEmail(selectedMessage.email)}
+                          className="px-2 py-0.5 rounded-lg border border-line bg-surface/80 hover:bg-primary/10 hover:text-primary text-[10px] font-bold text-muted transition-all flex items-center gap-1 cursor-pointer select-none"
+                          title="Salin Alamat Email"
+                        >
+                          {copiedEmailId === selectedMessage.email ? (
+                            <>
+                              <Check className="h-3 w-3 text-emerald-500" />
+                              <span className="text-emerald-500 font-black">Tersalin!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              <span>Salin</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -505,17 +520,152 @@ export function AdminMessagesTab() {
                 <div className="soft-card p-5 rounded-2xl border border-line bg-surface/60 text-xs sm:text-sm font-medium leading-relaxed text-primary/90 whitespace-pre-wrap shadow-xs">
                   {selectedMessage.message}
                 </div>
+
+                {/* Interactive Quick Reply Drawer */}
+                <AnimatePresence mode="wait">
+                  {showQuickReply && (
+                    <motion.div
+                      key="quick-reply-drawer"
+                      initial={{ opacity: 0, y: -16, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -12, scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 26 }}
+                      className="w-full max-w-full p-4 sm:p-5 rounded-2xl border border-primary/30 bg-primary/[0.03] flex flex-col gap-4 shadow-xs box-border overflow-visible"
+                    >
+                      <div className="flex items-center justify-between border-b border-primary/20 pb-3">
+                        <span className="text-xs font-black text-primary uppercase tracking-wider flex items-center gap-1.5">
+                          <MessageSquare className="h-4 w-4 text-primary" />
+                          <span>Form Draf Balas Cepat</span>
+                        </span>
+                        <span className="text-[11px] font-bold text-muted">Pilih draf cepat atau ketik pesan balasan Anda</span>
+                      </div>
+
+                      {/* Template Chips (3 Preset Template Single-Line Chips) */}
+                      <div className="flex flex-wrap items-center gap-2 w-full pb-1">
+                        <motion.button
+                          type="button"
+                          whileHover={{ scale: 1.02, y: -1 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() =>
+                            setQuickReplyBody(
+                              `Halo ${selectedMessage.name},\n\nTerima kasih banyak telah menghubungi saya melalui situs portofolio resmi saya.\n\nSaya telah membaca dan mempelajari pesan Anda mengenai "${selectedMessage.subject}". Saya sangat menghargai ketertarikan dan waktu yang Anda luangkan untuk menghubungi saya.\n\nPesan Anda telah saya catat dan saya akan dengan senang hati menindaklanjuti serta memberikan tanggapan lebih detail segera setelah jadwal aktivitas saya memungkinkan.\n\nJika ada informasi tambahan atau dokumen pendukung yang ingin Anda sampaikan, Anda juga dapat mengirimkannya langsung ke email ini atau melalui WhatsApp resmi saya di 0851-5851-8090.\n\nTerima kasih sekali lagi atas perhatian dan apresiasi Anda.\n\nSalam hangat dan hormat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: https://hajat.vercel.app`
+                            )
+                          }
+                          className="px-3 py-1.5 rounded-xl border border-line bg-surface hover:border-primary/40 hover:bg-primary/10 text-xs font-bold text-muted hover:text-primary transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5"
+                        >
+                          💬 Draf Terima Kasih
+                        </motion.button>
+
+                        <motion.button
+                          type="button"
+                          whileHover={{ scale: 1.02, y: -1 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() =>
+                            setQuickReplyBody(
+                              `Halo ${selectedMessage.name},\n\nTerima kasih yang sebesar-besarnya atas apresiasi, tawaran peluang karir, serta tawaran kolaborasi profesional yang Anda sampaikan melalui portofolio saya.\n\nMengenai hal yang Anda sampaikan perihal "${selectedMessage.subject}", saya sangat tertarik dan menyambut baik potensi kerjasama ini. Saya selalu terbuka untuk mengeksplorasi ide-ide baru, proyek inovatif, serta peluang pengembangan diri dan kontribusi bersama.\n\nUntuk mendiskusikan rencana kolaborasi ini secara lebih komprehensif, saya menyarankan agar kita dapat menjadwalkan sesi diskusi singkat (baik via Google Meet/Zoom maupun WhatsApp Call).\n\nMohon beri tahu saya ketersediaan waktu Anda, atau Anda dapat menghubungi saya langsung melalui WhatsApp di 0851-5851-8090 agar dapat kita cocokkan dengan jadwal bersama.\n\nTerima kasih atas kepercayaan dan tawaran luar biasa ini. Saya sangat menantikan diskusi hangat kita selanjutnya.\n\nSalam hangat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: https://hajat.vercel.app`
+                            )
+                          }
+                          className="px-3 py-1.5 rounded-xl border border-line bg-surface hover:border-primary/40 hover:bg-primary/10 text-xs font-bold text-muted hover:text-primary transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5"
+                        >
+                          💼 Draf Kolaborasi
+                        </motion.button>
+
+                        <motion.button
+                          type="button"
+                          whileHover={{ scale: 1.02, y: -1 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() =>
+                            setQuickReplyBody(
+                              `Halo ${selectedMessage.name},\n\nTerima kasih banyak atas pesan dan inisiatif komunikasi Anda perihal "${selectedMessage.subject}".\n\nSaya sangat senang bisa terhubung dengan Anda. Agar diskusi kita dapat berlangsung dengan lebih efisien, terarah, dan fokus, saya menyambut baik rencana untuk mengatur jadwal pertemuan online atau wawancara singkat.\n\nBerikut adalah beberapa opsi slot waktu yang fleksibel bagi saya:\n• Senin – Jumat: 16.00 – 20.00 WIB\n• Sabtu – Minggu: 10.00 – 17.00 WIB (Dengan konfirmasi H-1)\n\nSilakan tentukan waktu dan platform komunikasi yang paling nyaman bagi Anda (WhatsApp Call / Google Meet / Zoom). Anda juga dapat langsung mengonfirmasi jadwal melalui kontak WhatsApp resmi saya di 0851-5851-8090.\n\nTerima kasih atas fleksibilitas Anda. Saya menantikan pertemuan dan perkenalan diskusi kita.\n\nSalam hangat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: https://hajat.vercel.app`
+                            )
+                          }
+                          className="px-3 py-1.5 rounded-xl border border-line bg-surface hover:border-primary/40 hover:bg-primary/10 text-xs font-bold text-muted hover:text-primary transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5"
+                        >
+                          📅 Draf Atur Jadwal
+                        </motion.button>
+                      </div>
+
+                      {/* Textarea Container Bergaya Rapi (Slider Terbingkai Inset & Gagang Resize Theme Dark Sleek) */}
+                      <div
+                        className="w-full rounded-2xl border border-line bg-surface/90 p-4 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 shadow-xs relative transition-all"
+                        onWheel={(e) => e.stopPropagation()}
+                      >
+                        <textarea
+                          rows={6}
+                          value={quickReplyBody}
+                          onChange={(e) => setQuickReplyBody(e.target.value)}
+                          onWheel={(e) => e.stopPropagation()}
+                          placeholder="Tulis draf balasan Anda di sini..."
+                          className="w-full bg-transparent text-xs sm:text-sm font-medium leading-relaxed text-primary focus:outline-none resize-y min-h-[140px] max-h-[350px] overflow-y-auto pr-1.5 pb-1.5"
+                          style={{ overscrollBehavior: "contain" }}
+                        />
+                      </div>
+
+                      {/* Action Buttons in Quick Reply */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* Button 1: Kirim via Email Client */}
+                          <MagneticButton>
+                            <button
+                              type="button"
+                              onClick={() => handleSendViaEmailClient(selectedMessage.email, selectedMessage.subject, quickReplyBody, selectedMessage.id)}
+                              className="button-primary focus-ring px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 cursor-pointer select-none min-h-0 shadow-md shadow-primary/20"
+                            >
+                              <Send className="h-4 w-4 shrink-0" />
+                              <span>Kirim via Email Client</span>
+                            </button>
+                          </MagneticButton>
+
+                          {/* Button 2: Salin Teks Balasan */}
+                          <MagneticButton>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (typeof navigator !== "undefined" && navigator.clipboard) {
+                                  navigator.clipboard.writeText(quickReplyBody);
+                                  setCopyReplyToast(true);
+                                  handleSetReadStatus(selectedMessage.id, "replied");
+                                  setTimeout(() => setCopyReplyToast(false), 2500);
+                                }
+                              }}
+                              className="button-secondary focus-ring px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 cursor-pointer select-none min-h-0"
+                            >
+                              {copyReplyToast ? <Check className="h-4 w-4 text-emerald-500 shrink-0" /> : <Copy className="h-4 w-4 shrink-0" />}
+                              <span>{copyReplyToast ? "Balasan Tersalin!" : "Salin Teks Balasan"}</span>
+                            </button>
+                          </MagneticButton>
+                        </div>
+
+                        {/* Button 3: Kosongkan Draf */}
+                        <MagneticButton>
+                          <button
+                            type="button"
+                            onClick={() => setQuickReplyBody("")}
+                            disabled={!quickReplyBody}
+                            className={cn(
+                              "button-secondary-negative focus-ring px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 cursor-pointer select-none min-h-0 transition-all",
+                              !quickReplyBody && "opacity-50 cursor-not-allowed pointer-events-none"
+                            )}
+                          >
+                            <Trash2 className="h-4 w-4 shrink-0" />
+                            <span>Kosongkan Draf</span>
+                          </button>
+                        </MagneticButton>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Quick Reply & Action Control Panel */}
               <div className="flex flex-col gap-3 border-t border-line pt-5 relative z-10">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    {/* Action 1: Balas Email */}
+                    {/* Action 1: Form Balas Cepat */}
                     <MagneticButton>
-                      <motion.a
-                        href={`mailto:${selectedMessage.email}?subject=${encodeURIComponent("Re: " + selectedMessage.subject)}`}
-                        onClick={() => handleSetReadStatus(selectedMessage.id, "replied")}
+                      <motion.button
+                        type="button"
+                        onClick={() => setShowQuickReply(!showQuickReply)}
                         whileHover="hover"
                         whileTap="press"
                         variants={{
@@ -523,11 +673,16 @@ export function AdminMessagesTab() {
                           press: { scale: 0.97 }
                         }}
                         transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                        className="flex items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary active:bg-primary/90 shadow-sm hover:shadow-md hover:shadow-primary/20 px-4 py-2.5 text-xs font-black transition-all duration-300 focus-ring cursor-pointer select-none"
+                        className={cn(
+                          "flex items-center justify-center gap-2 rounded-2xl border px-4 py-2.5 text-xs font-black transition-all duration-300 focus-ring cursor-pointer select-none",
+                          showQuickReply
+                            ? "border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white"
+                            : "border-primary/30 bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                        )}
                       >
-                        <Send className="h-4 w-4" />
-                        <span>Balas Email</span>
-                      </motion.a>
+                        <MessageSquare className="h-4 w-4" />
+                        <span>{showQuickReply ? "Tutup Form Balas" : "Form Balas Cepat"}</span>
+                      </motion.button>
                     </MagneticButton>
 
                     {/* Action 2: Tandai Dibaca / Belum Dibaca */}

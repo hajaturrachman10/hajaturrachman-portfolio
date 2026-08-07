@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
 import { siteConfig } from "@/data/site";
@@ -7,6 +8,20 @@ import { Footer } from "@/components/layout/Footer";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { ScrollRestoration } from "@/components/providers/ScrollRestoration";
 import { PageRestoreOverlay } from "@/components/providers/PageRestoreOverlay";
+import { ScrollProgress } from "@/components/ui/ScrollProgress";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  weight: ["500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+  variable: "--font-poppins",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://hajat.vercel.app"),
@@ -17,9 +32,13 @@ export const metadata: Metadata = {
       "de-DE": "https://hajat.vercel.app/?lang=de",
     },
   },
-  title: `${siteConfig.name} — Personal Portofolio`,
+  title: {
+    default: `${siteConfig.name} — Personal Portofolio Resmi | Hajat ECL B2`,
+    template: `%s | ${siteConfig.name}`
+  },
+  manifest: "/manifest.json",
   description:
-    "Website portofolio pribadi Hajaturrachman: perjalanan, karya, Ausbildung Jerman, dan mimpi berkeliling dunia.",
+    "Website portofolio pribadi Hajaturrachman: perjalanan bahasa Jerman ECL B2, Ausbildung perawat di Jerman, karya kreatif, dan proyek web.",
   keywords: [
     "Hajaturrachman",
     "Hajat",
@@ -27,22 +46,53 @@ export const metadata: Metadata = {
     "Hajat ECL B2",
     "Hajaturrachman ECL B2",
     "Hajaturrachman Portofolio",
-    "Portofolio",
-    "Ausbildung",
-    "Perawat",
-    "Jerman",
-    "ECL B2",
-    "Personal Website"
+    "Portofolio Hajaturrachman",
+    "Ausbildung Perawat Jerman",
+    "Bahasa Jerman ECL B2",
+    "CV Hajaturrachman",
+    "Hajat Nurse Ausbildung",
+    "Krankenpflege Ausbildung Germany",
+    "Ausbildung Pflegefachmann Deutschland",
+    "Hajaturrachman Resume",
+    "Portofolio Perawat Jerman"
   ],
-  authors: [{ name: siteConfig.name }],
+  authors: [{ name: siteConfig.name, url: "https://hajat.vercel.app" }],
   creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "Personal Portfolio",
+  classification: "Portfolio & Resume",
+  applicationName: "Hajaturrachman Portfolio",
+  referrer: "origin-when-cross-origin",
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Hajaturrachman Portfolio",
+    statusBarStyle: "black-translucent"
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
   verification: {
     google: "google-site-verification-placeholder",
   },
   openGraph: {
     title: `${siteConfig.name} — Personal Portofolio`,
     description:
-      "Portofolio personal Hajaturrachman: perjalanan bahasa Jerman, pengalaman organisasi, proyek kreatif, target Ausbildung perawat di Jerman, dan mimpi berkeliling dunia.",
+      "Portofolio personal Hajaturrachman: perjalanan bahasa Jerman ECL B2, pengalaman organisasi, proyek kreatif, target Ausbildung perawat di Jerman, dan mimpi berkeliling dunia.",
     type: "website",
     locale: "id_ID",
     url: "https://hajat.vercel.app",
@@ -82,33 +132,90 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className="antialiased">
+      <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ProfilePage",
-              "mainEntity": {
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
                 "@type": "Person",
+                "@id": "https://hajat.vercel.app/#person",
                 "name": "Hajaturrachman",
-                "alternateName": "Hajat",
-                "jobTitle": "Future Nursing Ausbildung Candidate",
+                "alternateName": ["Hajat", "Hajaturrachman ECL B2", "Hajat Portfolio"],
+                "url": "https://hajat.vercel.app",
+                "image": "https://hajat.vercel.app/assets/profile.jpg",
+                "jobTitle": "Calon Peserta Ausbildung Perawat di Jerman",
                 "nationality": "ID",
+                "knowsLanguage": [
+                  {
+                    "@type": "Language",
+                    "name": "Indonesian",
+                    "alternateName": "id"
+                  },
+                  {
+                    "@type": "Language",
+                    "name": "German",
+                    "alternateName": "de"
+                  }
+                ],
                 "address": {
                   "@type": "PostalAddress",
                   "addressLocality": "Jakarta Timur",
-                  "addressCountry": "ID",
-                  "image": "https://hajat.vercel.app/assets/profile.jpg",
-                  "sameAs": [
-                    "https://instagram.com/saya.hajat"
-                  ]
+                  "addressCountry": "ID"
+                },
+                "sameAs": ["https://instagram.com/saya.hajat"],
+                "hasCredential": [
+                  {
+                    "@type": "EducationalOccupationalCredential",
+                    "credentialCategory": "certificate",
+                    "name": "Sertifikat Bahasa Jerman ECL Deutsch B2",
+                    "recognizedBy": {
+                      "@type": "Organization",
+                      "name": "ECL European Language Competence"
+                    }
+                  }
+                ]
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "@id": "https://hajat.vercel.app/#website",
+                "url": "https://hajat.vercel.app",
+                "name": "Hajaturrachman Portofolio",
+                "description":
+                  "Website portofolio pribadi Hajaturrachman: perjalanan bahasa Jerman ECL B2, Ausbildung perawat di Jerman, dan proyek kreatif.",
+                "inLanguage": ["id-ID", "de-DE"],
+                "publisher": {
+                  "@id": "https://hajat.vercel.app/#person"
+                }
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "ProfilePage",
+                "@id": "https://hajat.vercel.app/#webpage",
+                "url": "https://hajat.vercel.app",
+                "name": "Hajaturrachman — Personal Portofolio",
+                "mainEntity": {
+                  "@id": "https://hajat.vercel.app/#person"
                 }
               }
-            })
+            ])
           }}
         />
+        {/* Hidden Semantic SEO Anchor Block for Search Engine Crawlers */}
+        <div className="sr-only">
+          <h1>Hajaturrachman — Personal Portofolio Resmi | Hajat ECL B2</h1>
+          <h2>Website Resmi Hajaturrachman: Perjalanan Bahasa Jerman ECL B2, Ausbildung Perawat di Jerman, & Karya Kreatif</h2>
+          <p>
+            Selamat datang di website portofolio pribadi resmi Hajaturrachman (Hajat).
+            Menampilkan rekam jejak sertifikat ECL Deutsch B2, persiapan Ausbildung perawat di Jerman,
+            proyek web development, galeri video karya, dan informasi kontak resmi.
+          </p>
+        </div>
+
         <Providers>
+          <ScrollProgress />
           <ScrollRestoration />
           <PageRestoreOverlay />
           <Navbar />
