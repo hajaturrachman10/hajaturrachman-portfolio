@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowRight, MapPin, Sparkles } from "lucide-react";
 import Image from "next/image";
@@ -15,81 +14,10 @@ import { useLanguage } from "@/components/providers/LanguageContext";
 export function HeroSection() {
   const { siteConfig } = useSiteData();
   const { language } = useLanguage();
-  const [mounted, setMounted] = useState(false);
 
   const floatingLabels = language === "id"
     ? ["Bahasa Jerman B2", "Ausbildung Keperawatan", "Keperawatan", "Impian Dunia"]
     : ["Deutsch B2", "Pflege-Ausbildung", "Krankenpflege", "Traum von Weltreise"];
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <section
-        id="home"
-        className="relative isolate flex min-h-screen items-center overflow-hidden pb-16 pt-28 sm:pt-[7.5rem]"
-      >
-        <ParticleBackground />
-        <div className="container-page flex flex-col justify-center gap-8">
-          {/* Top Columns Grid */}
-          <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] w-full">
-            <div style={{ opacity: 1 }}>
-              <h1 className="display-title mt-0 max-w-5xl break-words">
-                {language === "id" ? "Halo, saya" : "Hallo, ich bin"}
-                <br className="sm:hidden" />{" "}
-                <span className="gradient-text inline-block">{siteConfig.name}</span>
-              </h1>
-              <div className="mt-3 text-base font-black tracking-tight text-text sm:text-2xl min-h-[48px] xs:min-h-[44px] sm:min-h-[40px] flex items-center">
-                <Typewriter
-                  words={[
-                    ...siteConfig.headline.split(" | "),
-                    language === "id" ? "Pembelajar Bahasa Jerman" : "Deutschlernender",
-                    language === "id" ? "Pembuat Proyek Kreatif" : "Kreativer Projektentwickler",
-                    language === "id" ? "Calon Perawat di Jerman" : "Zukünftige Pflegekraft in DE",
-                    language === "id" ? "Calon Penjelajah Dunia" : "Zukünftiger Weltreisender"
-                  ]}
-                />
-              </div>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                {siteConfig.bio}
-              </p>
-              <LocationBadges />
-            </div>
-            <div className="relative mx-auto w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px]">
-              <div className="premium-card relative overflow-hidden rounded-[3rem] p-4 cursor-pointer">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950">
-                  <Image
-                    src={siteConfig.profileImage}
-                    alt={`Foto profil ${siteConfig.name}`}
-                    fill
-                    priority
-                    quality={85}
-                    sizes="(max-width: 640px) 280px, (max-width: 1024px) 360px, 400px"
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Stats Grid */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 w-full mt-4 lg:mt-6">
-            {siteConfig.stats.map((stat) => (
-              <div key={stat.label} className="premium-card rounded-3xl p-4 text-center cursor-pointer select-none">
-                <div className="icon-orbit mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl border border-line bg-primary/10 text-primary">
-                  <stat.icon className="h-5 w-5" />
-                </div>
-                <div className="font-display text-2xl font-black gradient-text">{stat.value}</div>
-                <div className="mt-1 text-xs font-black text-muted">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section

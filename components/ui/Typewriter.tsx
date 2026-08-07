@@ -43,9 +43,9 @@ export function Typewriter({ words }: TypewriterProps) {
   const currentWord = safeWords[wordIndex] ?? "";
 
   return (
-    <span className="inline-block w-full align-middle">
+    <span className="inline-flex items-center align-middle">
       <span className="gradient-text break-words">{currentWord.slice(0, letterIndex)}</span>
-      <span className="inline-block ml-1 h-6 w-0.5 align-middle animate-pulse rounded-full bg-primary" />
+      <span className="inline-block ml-1 h-[1.1em] w-0.5 align-middle animate-pulse rounded-full bg-primary shrink-0" />
     </span>
   );
 }
