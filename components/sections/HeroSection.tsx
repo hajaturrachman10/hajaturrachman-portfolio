@@ -57,7 +57,7 @@ export function HeroSection() {
               </p>
               <LocationBadges />
             </div>
-            <div className="relative mx-auto w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px] animate-pulse" style={{ opacity: 1 }}>
+            <div className="relative mx-auto w-full max-w-[320px] sm:max-w-[360px] lg:max-w-[400px]">
               <div className="premium-card relative overflow-hidden rounded-[3rem] p-4 cursor-pointer">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-blue-50 via-white to-amber-50 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950">
                   <Image
@@ -65,7 +65,8 @@ export function HeroSection() {
                     alt={`Foto profil ${siteConfig.name}`}
                     fill
                     priority
-                    sizes="(max-width: 768px) 88vw, 24rem"
+                    quality={85}
+                    sizes="(max-width: 640px) 280px, (max-width: 1024px) 360px, 400px"
                     className="object-cover"
                   />
                 </div>
@@ -78,7 +79,7 @@ export function HeroSection() {
             {siteConfig.stats.map((stat) => (
               <div key={stat.label} className="premium-card rounded-3xl p-4 text-center cursor-pointer select-none">
                 <div className="icon-orbit mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl border border-line bg-primary/10 text-primary">
-                  <stat.icon className="h-5 w-5 animate-pulse" />
+                  <stat.icon className="h-5 w-5" />
                 </div>
                 <div className="font-display text-2xl font-black gradient-text">{stat.value}</div>
                 <div className="mt-1 text-xs font-black text-muted">{stat.label}</div>
