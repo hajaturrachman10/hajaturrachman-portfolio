@@ -1,125 +1,84 @@
-# Hajaturrachman Portfolio
+# Hajaturrachman Portfolio (v2.3.0)
 
-Final publish candidate: personal story portfolio, project archive, achievement gallery, protected CV viewer, private vault, and testimonial section.
+A modern, high-performance personal portfolio, project archive, media showcase, and protected credential platform built with Next.js App Router, Tailwind CSS, Framer Motion, and TypeScript.
 
-## Main Features
+---
 
-- Next.js 14 App Router
-- TypeScript
-- Tailwind CSS
-- next-themes
-- framer-motion
-- lucide-react
-- Supabase-ready testimonials
-- Password-gated CV preview and download
-- Password-gated private vault
-- Project detail modal with carousel galleries
-- Main gallery modal with multiple media placeholders
-- Responsive layout for mobile, tablet, laptop, and desktop
+## 🌟 Project Overview
 
-## Run Locally
+This repository houses the personal portfolio website of **Hajaturrachman (Hajat)**, highlighting:
+- German ECL B2 Language Certification & Nursing Ausbildung preparation journey.
+- Web & Software Development Projects Showcase.
+- Media Gallery & Video Documentation.
+- Gated CV & Private Document Vault with configurable password protection strategies.
+- Isolated Admin Control Center for live site operational management.
 
-```bash
-npm install
-npm run dev
-```
+---
 
-Open:
+## ✨ Key Features
 
-```txt
-http://localhost:3000
-```
+- **Multilingual Support**: Real-time switching between Indonesian (ID 🇮🇩) and German (DE 🇩🇪).
+- **Floating Toast System**: Non-intrusive glassmorphic toast notifications with independent timers.
+- **Pixel-Perfect Micro-Tooltips**: Centered UI tooltips with auto-dismiss on interaction.
+- **Header Scroll Progress Indicator**: 60/120fps glowing reading progress bar.
+- **Mobile Touch UX**: Touch tap feedback and auto-reset on scroll.
+- **Bilingual Contact Templates**: Dynamic WhatsApp & Email message templates with localized placeholders.
+- **Protected Resources**: Multi-strategy password protection for CV and Private Vault.
+- **Admin Control Center**: Hidden `/admin` dashboard for feature toggles, security management, and configuration versioning.
 
-## Build
+---
 
-```bash
-npm run build
-npm run start
-```
+## 🛠️ Tech Stack Overview
 
-## Passwords
+- **Core Framework**: Next.js (App Router), React, TypeScript
+- **Styling & Motion**: Tailwind CSS, Vanilla CSS Tokens, Framer Motion, Lucide React Icons
+- **State & Storage**: Local Server JSON State, Supabase Client SDK
+- **Optimization**: SWC Minification, AVIF/WebP Image Formats, Static Pre-Rendering
 
-Edit passwords in:
+> For complete details, see [TECH_STACK.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/reference/TECH_STACK.md).
 
-```txt
-data/site.ts
-```
+---
 
-Default:
+## 💻 Installation & Local Development
 
-```txt
-CV: cvhajat2026
-Private Vault: hajatprivat2026
-```
+### Prerequisites
+- Node.js >= 18.0.0
+- npm / pnpm / yarn
 
-## Real CV
+### Getting Started
 
-The current CV file is:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/hajaturrachman10/hajaturrachman-portfolio.git
+   cd hajaturrachman-portfolio
+   ```
 
-```txt
-public/assets/Hajaturrachman-CV.pdf
-```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Supabase Setup for Testimonials
+3. Run local development server:
+   ```bash
+   npm run dev
+   ```
 
-Testimonials work with localStorage if Supabase is not configured. For public persistence across visitors, use Supabase.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 1. Create Supabase Project
+---
 
-Create a free Supabase project.
+## 📖 System Documentation
 
-### 2. Create Table
+Complete enterprise engineering documentation is available in the [`docs/`](file:///d:/Hajat/hajaturrachman-portfolio/docs/) directory:
 
-Run this SQL in Supabase SQL Editor:
+- 📐 **Architecture**: [ARCHITECTURE.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/architecture/ARCHITECTURE.md) | [DIRECTORY_STRUCTURE.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/architecture/DIRECTORY_STRUCTURE.md) | [SYSTEM_OVERVIEW.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/architecture/SYSTEM_OVERVIEW.md)
+- 📚 **Reference**: [ROUTES.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/reference/ROUTES.md) | [API_REFERENCE.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/reference/API_REFERENCE.md) | [FEATURE_REFERENCE.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/reference/FEATURE_REFERENCE.md) | [SECURITY.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/reference/SECURITY.md) | [PERFORMANCE.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/reference/PERFORMANCE.md) | [TECH_STACK.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/reference/TECH_STACK.md)
+- 📜 **ADRs**: [ADR 001 - 010](file:///d:/Hajat/hajaturrachman-portfolio/docs/adr/)
+- 🚀 **Release**: [CHANGELOG.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/release/CHANGELOG.md) | [RELEASE_CHECKLIST.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/release/RELEASE_CHECKLIST.md) | [RELEASE_NOTES.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/release/RELEASE_NOTES.md)
+- 🧪 **Testing**: [MANUAL_TESTING.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/testing/MANUAL_TESTING.md) | [REGRESSION_TEST.md](file:///d:/Hajat/hajaturrachman-portfolio/docs/testing/REGRESSION_TEST.md)
 
-```sql
-create table testimonials (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  email text not null,
-  message text not null,
-  created_at timestamptz not null default now()
-);
+---
 
-alter table testimonials enable row level security;
+## 📄 License
 
-create policy "Public can read testimonials"
-on testimonials for select
-using (true);
-
-create policy "Public can insert testimonials"
-on testimonials for insert
-with check (
-  length(name) between 1 and 80
-  and length(email) between 3 and 160
-  and length(message) between 1 and 600
-);
-```
-
-### 3. Environment Variables
-
-Create `.env.local`:
-
-```txt
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-On Vercel, add the same variables in:
-
-```txt
-Project Settings > Environment Variables
-```
-
-## Deploy to Vercel
-
-1. Push project to GitHub.
-2. Open Vercel.
-3. Add New Project.
-4. Import GitHub repo.
-5. Add Supabase environment variables if testimonials should be public.
-6. Deploy.
-
-## Important Security Note
-
-The current password gate is frontend UI protection. It is useful for presentation, but not suitable for highly sensitive data. True private content requires backend authentication and protected storage.
+This project is proprietary personal portfolio software of Hajaturrachman. All rights reserved.

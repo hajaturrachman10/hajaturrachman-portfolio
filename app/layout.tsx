@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     address: false,
   },
   verification: {
-    google: "google-site-verification-placeholder",
+    google: "googled2a36b14141fb43d",
   },
   openGraph: {
     title: `${siteConfig.name} — Personal Portofolio`,
