@@ -264,16 +264,16 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
       <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-accent/8 rounded-full blur-3xl pointer-events-none -z-10" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center w-full">
         {/* LEFT COLUMN: Facebook-Style Concept Hero Showcase */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="lg:col-span-6 flex flex-col gap-6 text-left"
+          className="md:col-span-6 flex flex-col gap-6 text-left"
         >
           {/* Main Title */}
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.15]">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.15]">
             Kelola Portofolio, Catatan, & Cerita dalam{" "}
             <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
               Satu Tempat.
@@ -338,7 +338,7 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
         </motion.div>
 
         {/* RIGHT COLUMN: Admin Login Card */}
-        <div className="lg:col-span-6 flex justify-center lg:justify-end w-full">
+        <div className="md:col-span-6 flex justify-center md:justify-end w-full">
           <Reveal className="w-full max-w-lg">
             <motion.div className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden">
           {/* Header Icon Orbit */}

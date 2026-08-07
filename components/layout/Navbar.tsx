@@ -282,7 +282,7 @@ export function Navbar() {
         </motion.div>
 
         <motion.div 
-          className="hidden items-center gap-1 lg:flex"
+          className="hidden items-center gap-1 md:flex"
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 180, damping: 15, delay: 0.05 }}
@@ -424,7 +424,7 @@ export function Navbar() {
               onClick={() => setMenuOpen((value) => !value)}
               whileTap={{ scale: 0.94 }}
               className={cn(
-                "focus-ring grid h-11 w-11 place-items-center rounded-full border shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 lg:hidden cursor-pointer select-none",
+                "focus-ring grid h-11 w-11 place-items-center rounded-full border shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 md:hidden cursor-pointer select-none",
                 menuOpen
                   ? "border-rose-600 bg-rose-600 text-white hover:bg-rose-500"
                   : "border-line bg-surface/90 text-text hover:border-primary/60"

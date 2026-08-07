@@ -413,7 +413,7 @@ export function ECLMaterialSection() {
         ) : checkingAuth ? (
           /* CHECKING AUTH SKELETON (MOBILE OPTIMIZED) */
           <div className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 sm:p-8 animate-pulse">
-            <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
               <div>
                 <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl sm:rounded-3xl skeleton-shimmer" />
                 <div className="mt-4 sm:mt-6 h-7 sm:h-8 w-40 sm:w-48 rounded skeleton-shimmer" />
@@ -439,7 +439,7 @@ export function ECLMaterialSection() {
         ) : !unlocked ? (
           /* LOCKED MATERIALS VIEW (MOBILE OPTIMIZED) */
           <div className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 sm:p-8 select-none">
-            <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
               <div>
                 <motion.div
                   whileHover="hover"

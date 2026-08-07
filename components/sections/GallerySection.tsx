@@ -40,7 +40,7 @@ export function GallerySection() {
             ? "Enam galeri utama disiapkan sebagai arsip foto dan video perjalanan, karya, literasi, sekolah, dan mimpi masa depan."
             : "Sechs Hauptgalerien stehen als Foto- und Videoarchiv für Deutschvorbereitung, Projekte, Schule und Zukunftsträume bereit."}
         />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {publicGallery.map((item, index) => (
             <motion.div
               key={item.title}
@@ -189,7 +189,7 @@ function GalleryModal({ item, onClose }: { item: GalleryItem | null; onClose: ()
               </motion.button>
             </MagneticButton>
           </div>
-          <div className="grid gap-5 p-4 lg:grid-cols-[1fr_18rem]">
+          <div className="grid gap-5 p-4 md:grid-cols-[1fr_18rem]">
             <div className="relative aspect-video overflow-hidden rounded-4xl border border-line bg-surface">
               {active.type === "image" ? (
                  <ImageWithShimmer src={active.src} alt={active.title} fill sizes="100vw" className="object-cover" />
@@ -236,14 +236,14 @@ function GalleryModal({ item, onClose }: { item: GalleryItem | null; onClose: ()
                 </motion.button>
               </MagneticButton>
             </div>
-            <div className="flex flex-row overflow-x-auto lg:grid lg:max-h-[32rem] lg:overflow-y-auto lg:pr-1 gap-2.5 sm:gap-3 scrollbar-none pb-2 lg:pb-0 max-w-full">
+            <div className="flex flex-row overflow-x-auto md:grid md:max-h-[32rem] md:overflow-y-auto md:pr-1 gap-2.5 sm:gap-3 scrollbar-none pb-2 md:pb-0 max-w-full">
               {item.media.map((media, index) => (
                 <motion.button
                   key={`${media.src}-${index}`}
                   type="button"
                   onClick={() => setActiveIndex(index)}
                   whileTap={{ scale: 0.97 }}
-                  className={`flex items-center gap-3 rounded-3xl border p-2 text-left transition cursor-pointer select-none shrink-0 w-[180px] lg:w-auto ${
+                  className={`flex items-center gap-3 rounded-3xl border p-2 text-left transition cursor-pointer select-none shrink-0 w-[180px] md:w-auto ${
                     index === activeIndex 
                       ? "border-primary bg-primary/10" 
                       : "border-line bg-surface/80 hover:border-primary/60"

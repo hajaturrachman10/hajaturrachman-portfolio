@@ -28,7 +28,7 @@ export function HeroSection() {
 
       <div className="container-page flex flex-col justify-center gap-8">
         {/* Top Columns Grid */}
-        <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] w-full">
+        <div className="grid items-center gap-12 md:grid-cols-[1.08fr_0.92fr] w-full">
           <motion.div
             initial={{ opacity: 0, y: 34 }}
             animate={{ opacity: 1, y: 0 }}

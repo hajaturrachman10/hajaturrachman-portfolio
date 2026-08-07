@@ -88,7 +88,7 @@ export function ContactSection() {
             : "Senden Sie mir gerne Feedback, berufliche Angebote oder andere Nachrichten. Ihre Nachricht wird verschlüsselt übertragen."}
         />
 
-        <div className="grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
+        <div className="grid gap-6 md:grid-cols-[0.86fr_1.14fr]">
           <div className="premium-card rounded-4xl p-5 sm:p-8">
             <h3 className="font-display text-2xl font-black">
               {language === "id" ? "Informasi Kontak" : "Kontaktdaten"}

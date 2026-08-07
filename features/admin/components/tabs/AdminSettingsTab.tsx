@@ -341,7 +341,7 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Standar Top Header Card */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative overflow-hidden">
+      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}

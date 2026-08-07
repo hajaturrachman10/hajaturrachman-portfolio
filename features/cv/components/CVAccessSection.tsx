@@ -375,7 +375,7 @@ export function CVAccessSection() {
           </motion.div>
         ) : checkingAuth ? (
           /* CHECKING AUTH SKELETON (MOBILE OPTIMIZED) */
-          <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between animate-pulse">
+          <div className="flex flex-col gap-5 sm:gap-6 md:flex-row md:items-center md:justify-between animate-pulse">
             <div className="flex gap-3 sm:gap-4 w-full">
               <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl sm:rounded-3xl skeleton-shimmer shrink-0" />
               <div className="w-full space-y-2.5">
@@ -386,7 +386,7 @@ export function CVAccessSection() {
                 </div>
               </div>
             </div>
-            <div className="h-10 sm:h-12 w-full lg:w-44 rounded-full skeleton-shimmer shrink-0 mt-2 lg:mt-0" />
+            <div className="h-10 sm:h-12 w-full md:w-44 rounded-full skeleton-shimmer shrink-0 mt-2 md:mt-0" />
           </div>
         ) : (
           <>

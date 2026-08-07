@@ -143,7 +143,7 @@ export function AdminStatisticsTab({ stats, onRefresh }: AdminStatisticsTabProps
       </div>
 
       {/* 5 Primary Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-6">
         {metrics.map((item, idx) => {
           const Icon = item.icon;
           return (
@@ -183,9 +183,9 @@ export function AdminStatisticsTab({ stats, onRefresh }: AdminStatisticsTabProps
       </div>
 
       {/* Visual Analytics & Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* 7-Day Activity Trend Bar Chart (2 Columns) */}
-        <div className="premium-card p-6 rounded-3xl border border-line bg-surface lg:col-span-2 flex flex-col justify-between relative overflow-hidden">
+        <div className="premium-card p-6 rounded-3xl border border-line bg-surface md:col-span-2 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between border-b border-line pb-4 mb-4 relative z-10">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-blue-500" />

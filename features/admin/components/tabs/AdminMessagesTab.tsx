@@ -227,7 +227,7 @@ export function AdminMessagesTab() {
   return (
     <div className="flex flex-col gap-6">
       {/* Standar Top Header Card dengan Terintegrasi Interactive Metric Filter Pills */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative overflow-hidden">
+      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -287,9 +287,9 @@ export function AdminMessagesTab() {
       </div>
 
       {/* Main Master-Detail Layout (Grid Sejajar 100% dari Atas) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
         {/* Left Column: Search Bar + Inbox List Card (5 cols - Responsive Height & 675px Desktop) */}
-        <div className="lg:col-span-5 premium-card p-4 sm:p-5 rounded-3xl border border-line bg-surface shadow-card flex flex-col gap-3.5 relative overflow-hidden h-[540px] sm:h-[600px] lg:h-[675px]">
+        <div className="md:col-span-5 premium-card p-4 sm:p-5 rounded-3xl border border-line bg-surface shadow-card flex flex-col gap-3.5 relative overflow-hidden h-[540px] sm:h-[600px] md:h-[675px]">
           {/* Search Input Bar (Fixed at Top) */}
           <div className="relative w-full shrink-0">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none" />
@@ -414,14 +414,14 @@ export function AdminMessagesTab() {
         </div>
 
         {/* Right Column: Full-Height Reader Panel (7 cols - Sejajar 100% dari Paling Atas Grid) */}
-        <div className="lg:col-span-7">
+        <div className="md:col-span-7">
           {selectedMessage ? (
             <motion.div
               key={selectedMessage.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.18 }}
-              className="premium-card p-5 sm:p-7 rounded-3xl border border-line bg-surface flex flex-col justify-between gap-6 relative overflow-hidden shadow-card min-h-[500px] lg:min-h-[675px]"
+              className="premium-card p-5 sm:p-7 rounded-3xl border border-line bg-surface flex flex-col justify-between gap-6 relative overflow-hidden shadow-card min-h-[500px] md:min-h-[675px]"
             >
               {/* Header Information + Tombol Tutup (Merah Rose) */}
               <div className="flex flex-col gap-4 border-b border-line pb-5 relative z-10">

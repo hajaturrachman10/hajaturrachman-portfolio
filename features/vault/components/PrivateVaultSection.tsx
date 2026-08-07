@@ -45,7 +45,7 @@ function VaultSkeleton() {
         </div>
       </div>
       <div className="h-[180px] sm:h-[220px] w-full rounded-2xl sm:rounded-3xl skeleton-shimmer" />
-      <div className="grid gap-3.5 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-6">
+      <div className="grid gap-3.5 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-6">
         {[1, 2, 3].map((n) => (
           <div key={n} className="overflow-hidden rounded-3xl sm:rounded-4xl border border-line bg-surface/50 p-4 sm:p-5 space-y-3.5">
             <div className="aspect-[4/3] w-full rounded-xl sm:rounded-2xl skeleton-shimmer" />
@@ -428,7 +428,7 @@ export function PrivateVaultSection() {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 sm:p-8 select-none relative"
             >
-              <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+              <div className="grid gap-6 sm:gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
                 <div>
                     <motion.div
                       onClick={() => setModalOpen(true)}
@@ -686,7 +686,7 @@ export function PrivateVaultSection() {
                             transition: { staggerChildren: 0.09 }
                           }
                         }}
-                        className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                        className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
                       >
                         {active.people.map((person: any) => (
                           <motion.article
