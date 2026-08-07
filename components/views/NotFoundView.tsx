@@ -28,7 +28,7 @@ export function NotFoundView() {
         <SectionHeader
           eyebrow="404 — Page Not Found"
           title="Halaman Tidak Ditemukan"
-          description="Alamat URL yang Anda tuju mungkin salah, telah dipindahkan, atau telah diperbarui dalam arsitektur portofolio v2.3."
+          description="Alamat URL yang Anda tuju mungkin salah, telah dipindahkan, atau telah diperbarui dalam arsitektur portofolio v2.4."
           centered
         />
 
