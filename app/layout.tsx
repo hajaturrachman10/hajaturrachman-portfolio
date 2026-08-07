@@ -137,6 +137,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://api.qrserver.com" />
+        <meta name="thumbnail" content="https://hajat.vercel.app/assets/profile.jpg" />
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         <script
