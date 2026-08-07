@@ -82,7 +82,9 @@ export function HeroSection() {
                   alt={`Foto profil ${siteConfig.name}`}
                   fill
                   priority
-                  sizes="(max-width: 768px) 88vw, 24rem"
+                  fetchPriority="high"
+                  quality={85}
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 360px, 400px"
                   className="object-cover"
                 />
               </div>
