@@ -91,11 +91,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/assets/icon.jpg" },
-      { url: "/icon.jpg" }
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.svg", type: "image/svg+xml" }
     ],
-    shortcut: "/assets/icon.jpg",
-    apple: "/assets/icon.jpg",
+    shortcut: "/icon.svg",
+    apple: "/apple-icon.svg",
   },
   openGraph: {
     title: `${siteConfig.name} — Personal Portofolio`,
@@ -145,8 +145,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://api.qrserver.com" />
-        <link rel="icon" href="/assets/icon.jpg" type="image/jpeg" />
-        <link rel="apple-touch-icon" href="/assets/icon.jpg" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-icon.svg" />
         <meta name="thumbnail" content="https://hajat.vercel.app/assets/profile.jpg" />
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
