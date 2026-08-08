@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function EclB2Page() {
   return (
-    <main className="pt-28 sm:pt-[7rem] pb-16">
+    <main className="pt-28 sm:pt-[7.5rem] pb-16">
       <ECLMaterialSection />
     </main>
   );

@@ -6,6 +6,7 @@ export const sharedConfig = {
   name: "Hajaturrachman",
   preferredName: "Hajaturrachman",
   shortName: "Hajat",
+  siteUrl: (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_SITE_URL) || "https://hajat.vercel.app",
   role: "Future Nursing Ausbildung Candidate",
   email: "Hajaturrachman2006@gmail.com",
   phone: "0851-5851-8090",

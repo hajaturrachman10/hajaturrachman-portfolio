@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Download, Eye, LockKeyhole, ShieldCheck, Sparkles, X, RefreshCw } from "lucide-react";
+import { Download, Eye, LockKeyhole, ShieldCheck, Sparkles, X, RefreshCw, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { MagneticButton } from "@/components/ui/MagneticButton";
@@ -45,34 +45,26 @@ export function CVAccessSection() {
   const [isAdminOverride, setIsAdminOverride] = useState(false);
   const [adminTransition, setAdminTransition] = useState<{ active: boolean; isEnabling: boolean } | null>(null);
   const isAdminOverrideRef = useRef(false);
+  const isSyncingRef = useRef(false);
+  const lastAnimTimeRef = useRef(0);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("hajat_toggles_state");
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          const toggles = parsed.toggles || parsed;
-          const cvToggle = toggles.cv;
-          if (cvToggle !== undefined) {
-            const isCvProtected = cvToggle.protected !== undefined ? cvToggle.protected : cvToggle;
-            if (!isCvProtected) {
-              setIsAdminOverride(true);
-              setUnlocked(true);
-            }
-          }
-        } catch {
-          // Ignore
-        }
-      }
-    }
-  }, []);
+    let isMounted = true;
 
-  useEffect(() => {
     async function checkAuth(isInitial = false) {
       try {
+        // Fast-path sessionStorage cache for returning sub-navigations (0ms zero flicker)
+        if (isInitial && typeof window !== "undefined") {
+          const cachedVerified = sessionStorage.getItem("cv_verified_override");
+          if (cachedVerified === "true") {
+            setIsAdminOverride(true);
+            setUnlocked(true);
+            isAdminOverrideRef.current = true;
+          }
+        }
+
         const response = await fetch("/api/auth/status", { cache: "no-store" });
-        if (response.ok) {
+        if (response.ok && isMounted) {
           const data = await response.json();
           if (data.toggles) {
             syncLocalToggles(data.toggles, data.globalEpoch);
@@ -82,24 +74,29 @@ export function CVAccessSection() {
           const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
 
           if (hasOverrideChanged) {
-            const isEnabling = !nextOverride;
-            setAdminTransition({ active: true, isEnabling });
-            await new Promise((r) => setTimeout(r, 1200));
+            const now = Date.now();
+            if (now - lastAnimTimeRef.current > 1500) {
+              lastAnimTimeRef.current = now;
+              const isEnabling = !nextOverride;
+              setAdminTransition({ active: true, isEnabling });
+              await new Promise((r) => setTimeout(r, 1200));
+            }
           }
 
           isAdminOverrideRef.current = nextOverride;
-          if (data.overrides?.cv) {
-            // Admin Override Active: Instant transition, no restore session animation!
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("cv_verified_override", nextOverride ? "true" : "false");
+          }
+
+          if (nextOverride) {
             setIsAdminOverride(true);
             setUnlocked(true);
             setCheckingAuth(false);
           } else if (data.cvUnlocked) {
             setIsAdminOverride(false);
             if (isInitial) {
-              // On initial load: check if user opted in to remember this session
               const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_cv") !== "false";
               if (!remember) {
-                // Not remembered: show locking animation and kick out
                 setIsLocking(true);
                 setCheckingAuth(false);
                 try {
@@ -112,19 +109,20 @@ export function CVAccessSection() {
                   console.error(e);
                 }
                 await new Promise((resolve) => setTimeout(resolve, 1800));
-                setUnlocked(false);
-                setIsLocking(false);
+                if (isMounted) {
+                  setUnlocked(false);
+                  setIsLocking(false);
+                }
               } else {
-                // Remembered: restore session with unlock animation
                 setIsUnlocking(true);
                 setCheckingAuth(false);
                 await new Promise((resolve) => setTimeout(resolve, 1500));
-                setUnlocked(true);
-                setIsUnlocking(false);
+                if (isMounted) {
+                  setUnlocked(true);
+                  setIsUnlocking(false);
+                }
               }
             } else {
-              // On subsequent polls: server says session valid → KEEP unlocked.
-              // Never auto-kick during an active session.
               setUnlocked(true);
               setCheckingAuth(false);
             }
@@ -135,76 +133,59 @@ export function CVAccessSection() {
             setCheckingAuth(false);
           }
 
-          setAdminTransition(null);
+          if (isMounted) setAdminTransition(null);
         }
       } catch (err) {
         console.error("Gagal memeriksa status login:", err);
-        setCheckingAuth(false);
-        setAdminTransition(null);
+        if (isMounted) {
+          setCheckingAuth(false);
+          setAdminTransition(null);
+        }
       }
     }
+
     checkAuth(true);
 
     const unsubscribe = subscribeCrossTabSync(async (msg) => {
       if (msg.event === "TOGGLE_CHANGED") {
         const feat = msg.data?.feature || msg.payload?.feature;
-        if (feat === "cv") {
+        if (feat === "cv" && !isSyncingRef.current) {
+          const now = Date.now();
+          if (now - lastAnimTimeRef.current < 1500) return; // 1500ms cooldown guard
+          lastAnimTimeRef.current = now;
+          isSyncingRef.current = true;
+
           const isEnabling = msg.data?.protected !== undefined ? !!msg.data.protected : !!msg.payload?.protected;
+
+          // ATOMIC REF UPDATE BEFORE TRANSITION: prevents checkAuth from triggering a 2nd transition!
+          isAdminOverrideRef.current = !isEnabling;
+
           setAdminTransition({ active: true, isEnabling });
           await new Promise((r) => setTimeout(r, 1200));
 
-          const res = await fetch("/api/auth/status", { cache: "no-store" });
-          let hasSession = false;
-          let override = false;
-          if (res.ok) {
-            const data = await res.json();
-            override = !!data.overrides?.cv;
-            hasSession = !!data.cvUnlocked;
-          }
-
-          if (override) {
-            setIsAdminOverride(true);
-            setUnlocked(true);
-          } else if (hasSession) {
-            setIsAdminOverride(false);
-            setUnlocked(true); // Persist unlocked session!
-          } else {
-            setIsAdminOverride(false);
-            setUnlocked(false);
-            setViewerOpen(false);
-          }
-          setAdminTransition(null);
-          checkAuth(false);
+          await checkAuth(false);
+          isSyncingRef.current = false;
         }
       } else if (
         msg.event === "SESSION_REVOKED" ||
         msg.event === "CONFIG_RESTORED" ||
         msg.event === "PUBLIC_SESSION_INVALID"
       ) {
-        try {
-          const res = await fetch("/api/auth/status", { cache: "no-store" });
-          if (res.ok) {
-            const data = await res.json();
-            if (!data.cvUnlocked) {
-              setUnlocked(false);
-              setViewerOpen(false);
-            }
-          }
-        } catch {
-          // Handled
-        }
+        await checkAuth(false);
       }
     });
-    // Add cross-device polling interval (every 4 seconds) to support multi-device real-time sync
-    const interval = setInterval(() => {
-      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
         checkAuth(false);
       }
-    }, 4000);
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      isMounted = false;
       unsubscribe();
-      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -283,7 +264,13 @@ export function CVAccessSection() {
                 ? "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
                 : "border-blue-500/30 bg-blue-500/10 text-blue-500 shadow-blue-500/20"
             )}>
-              <RefreshCw className="h-6 w-6 animate-spin" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                className="inline-flex shrink-0"
+              >
+                <Loader2 className="h-6 w-6" />
+              </motion.div>
             </div>
 
             <div>
@@ -328,7 +315,13 @@ export function CVAccessSection() {
             className="min-h-[220px] py-8 px-6 flex flex-col items-center justify-center text-center gap-3.5 w-full"
           >
             <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
-              <RefreshCw className="h-6 w-6 animate-spin" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                className="inline-flex shrink-0"
+              >
+                <Loader2 className="h-6 w-6" />
+              </motion.div>
             </div>
 
             <div>
@@ -360,7 +353,13 @@ export function CVAccessSection() {
             className="min-h-[220px] py-8 px-6 flex flex-col items-center justify-center text-center gap-3.5 w-full"
           >
             <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20">
-              <RefreshCw className="h-6 w-6 animate-spin" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                className="inline-flex shrink-0"
+              >
+                <Loader2 className="h-6 w-6" />
+              </motion.div>
             </div>
 
             <div>

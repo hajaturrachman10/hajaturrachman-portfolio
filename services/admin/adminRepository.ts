@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 import { AdminState, LoginHistoryStats, LastLoginMetadata } from "./adminTypes";
+import { supabase } from "@/lib/supabase";
 
 const DEV_STORAGE_PATH = path.join(process.cwd(), "data", "adminState.json");
 const TMP_STORAGE_PATH = path.join(os.tmpdir(), "hajat_adminState.json");
@@ -218,6 +219,15 @@ export const adminRepository = {
       (globalThis as any).__adminStateMtime = lastFileMtimeMs;
     } catch (err) {
       console.error("Gagal menyimpan adminState ke serverless tmp:", err);
+    }
+
+    if (supabase) {
+      supabase
+        .from("admin_config")
+        .upsert({ id: "config_root", state, updated_at: new Date().toISOString() })
+        .then(({ error }) => {
+          if (error) console.error("Supabase admin_config write error:", error.message);
+        });
     }
   },
 

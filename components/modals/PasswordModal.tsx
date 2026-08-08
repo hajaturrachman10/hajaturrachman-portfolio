@@ -14,7 +14,8 @@ import {
   ShieldAlert,
   Sparkles,
   Timer,
-  UnlockKeyhole
+  UnlockKeyhole,
+  Loader2
 } from "lucide-react";
 import { FormEvent, useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/components/providers/LanguageContext";
@@ -49,6 +50,7 @@ export function PasswordModal({
   
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -285,12 +287,10 @@ export function PasswordModal({
           setLockoutUntilTimestamp(type, 600);
           setAttempts(5);
           setBlockCountdown(600);
-          setError(
-            data.error ||
-              (language === "id"
-                ? "Batas 5 kali percobaan tercapai. Akses dibekukan selama 10 menit."
-                : "Versuchslimit (5) erreicht. Zugriff für 10 Minuten gesperrt.")
-          );
+          const errMsg = data.error || (language === "id"
+            ? "Batas 5 kali percobaan tercapai. Akses dibekukan selama 10 menit."
+            : "Versuchslimit (5) erreicht. Zugriff für 10 Minuten gesperrt.");
+          setError(errMsg);
         } else {
           const nextAttempts = attempts + 1;
           setAttempts(nextAttempts);
@@ -301,18 +301,15 @@ export function PasswordModal({
             inputRef.current?.blur();
             setLockoutUntilTimestamp(type, 600);
             setBlockCountdown(600);
-            setError(
-              language === "id"
-                ? "Batas 5 kali percobaan salah tercapai. Akses dibekukan selama 10 menit."
-                : "Versuchslimit (5) erreicht. Zugriff für 10 Minuten gesperrt."
-            );
+            const errMsg = language === "id"
+              ? "Batas 5 kali percobaan salah tercapai. Akses dibekukan selama 10 menit."
+              : "Versuchslimit (5) erreicht. Zugriff für 10 Minuten gesperrt.";
+            setError(errMsg);
           } else {
-            setError(
-              data.error ||
-                (language === "id"
-                  ? "Kata sandi salah. Silakan coba lagi."
-                  : "Falsches Passwort. Bitte versuchen Sie es erneut.")
-            );
+            const errMsg = data.error || (language === "id"
+              ? "Kata sandi salah. Silakan coba lagi."
+              : "Falsches Passwort. Bitte versuchen Sie es erneut.");
+            setError(errMsg);
             setShakeTrigger((prev) => prev + 1);
             setIsShakeError(true);
             shakeControls.start({
@@ -669,7 +666,8 @@ export function PasswordModal({
                                   style={{
                                     WebkitTextSecurity: showPassword ? "none" : "disc"
                                   } as React.CSSProperties}
-                                  autoComplete="new-password"
+                                  readOnly={isReadOnly}
+                                  autoComplete="off"
                                   aria-autocomplete="none"
                                   data-lpignore="true"
                                   data-1p-ignore="true"
@@ -679,7 +677,7 @@ export function PasswordModal({
                                   id="secure_vault_pin"
                                   autoCapitalize="off"
                                   autoCorrect="off"
-                                  spellCheck="false"
+                                  spellCheck={false}
                                   className={cn(
                                     "input pl-11 pr-12 text-left transition-all duration-300 w-full",
                                     (isShakeError || Boolean(error)) &&
@@ -691,6 +689,7 @@ export function PasswordModal({
                                   value={password}
                                   onChange={handlePasswordChange}
                                   onFocus={(e) => {
+                                    setIsReadOnly(false);
                                     if (error) setError("");
                                     if (isEmptyWarning) setIsEmptyWarning(false);
                                     if (isShakeError) setIsShakeError(false);
@@ -793,10 +792,13 @@ export function PasswordModal({
                             >
                               {loading ? (
                                 <>
-                                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
+                                  <motion.span
+                                    animate={{ rotate: 360 }}
+                                    transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                                    className="inline-flex shrink-0"
+                                  >
+                                    <Loader2 className="h-5 w-5 text-white" />
+                                  </motion.span>
                                   <span>{language === "id" ? "Memverifikasi..." : "Überprüfen..."}</span>
                                 </>
                               ) : (

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { Instagram, Mail, MapPin, Phone, Send } from "lucide-react";
+import { Instagram, Mail, MapPin, Phone, Send, Loader2 } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import dynamic from "next/dynamic";
@@ -93,7 +93,7 @@ export function ContactSection() {
             : "Senden Sie mir gerne Feedback, berufliche Angebote oder andere Nachrichten. Ihre Nachricht wird verschlüsselt übertragen."}
         />
 
-        <div className="grid gap-6 md:grid-cols-[0.86fr_1.14fr]">
+        <div className="grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
           <div className="premium-card rounded-4xl p-5 sm:p-8">
             <h3 className="font-display text-2xl font-black">
               {language === "id" ? "Informasi Kontak" : "Kontaktdaten"}
@@ -153,7 +153,7 @@ export function ContactSection() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="premium-card rounded-4xl p-5 sm:p-8">
+          <form onSubmit={handleSubmit} className="premium-card rounded-4xl p-5 sm:p-8" autoComplete="off">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="grid gap-2">
                 <span className="text-sm font-black">{language === "id" ? "Nama" : "Name"}</span>
@@ -161,7 +161,10 @@ export function ContactSection() {
                   name="name"
                   className="input"
                   placeholder={language === "id" ? "Nama" : "Name"}
-                  autoComplete="name"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="words"
+                  spellCheck={false}
                   disabled={sending}
                   required
                 />
@@ -174,7 +177,10 @@ export function ContactSection() {
                   name="email"
                   className="input"
                   placeholder={language === "id" ? "Email" : "E-Mail"}
-                  autoComplete="email"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
                   disabled={sending}
                   required
                 />
@@ -187,6 +193,9 @@ export function ContactSection() {
                 name="message"
                 className="input min-h-36 resize-none leading-7"
                 placeholder={language === "id" ? "Tulis pesan Anda di sini..." : "Schreiben Sie Ihre Nachricht hier..."}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
                 disabled={sending}
                 required
               />
@@ -222,11 +231,14 @@ export function ContactSection() {
               >
                 {sending ? (
                   <>
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    {language === "id" ? "Mengirim..." : "Wird gesendet..."}
+                    <motion.span
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                      className="inline-flex shrink-0"
+                    >
+                      <Loader2 className="h-5 w-5 text-white" />
+                    </motion.span>
+                    <span>{language === "id" ? "Mengirim..." : "Wird gesendet..."}</span>
                   </>
                 ) : (
                   <>

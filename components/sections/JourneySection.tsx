@@ -21,7 +21,7 @@ export function JourneySection() {
         description={language === "id" ? "Bagian ini menampilkan sisi personal yang tetap aman untuk publik: asal perjalanan, arah Jerman, mimpi keliling dunia, dan nilai yang sedang dibangun." : "Dieser Bereich zeigt persönliche Aspekte: meine Herkunft, den Weg nach Deutschland, Träume von Weltreisen und erlernte Werte."}
       />
 
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-[1.05fr_0.95fr]">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 xs:p-5 sm:p-7 lg:p-8">
           <div className="relative">
             <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/14 blur-3xl" />

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ProjectsPage() {
   return (
-    <main className="pt-28 sm:pt-[7rem] pb-16 space-y-6">
+    <main className="pt-28 sm:pt-[7.5rem] pb-16 space-y-6">
       <ProjectsSection />
       <AchievementsSection />
     </main>

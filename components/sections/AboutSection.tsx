@@ -18,7 +18,7 @@ export function AboutSection() {
         description={siteConfig.longBio}
       />
 
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-[0.92fr_1.08fr]">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-[0.92fr_1.08fr]">
         <div className="premium-card rounded-3xl sm:rounded-4xl p-4 xs:p-5 sm:p-7 lg:p-8">
           <h3 className="font-display text-2xl font-black">
             {language === "id" ? "Fokus utama sekarang" : "Aktueller Hauptfokus"}

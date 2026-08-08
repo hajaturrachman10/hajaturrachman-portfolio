@@ -22,13 +22,13 @@ export function NotFoundView() {
   }, [language]);
 
   return (
-    <main className="pt-24 sm:pt-32 pb-16 px-4 container-page min-h-[75vh] flex flex-col items-center justify-center relative">
+    <main className="pt-28 sm:pt-[7.5rem] pb-16 px-4 container-page min-h-[75vh] flex flex-col items-center justify-center relative">
       <Reveal className="w-full max-w-xl mx-auto flex flex-col items-center text-center gap-6">
         {/* Header Eyebrow & Title */}
         <SectionHeader
           eyebrow="404 — Page Not Found"
           title="Halaman Tidak Ditemukan"
-          description="Alamat URL yang Anda tuju mungkin salah, telah dipindahkan, atau telah diperbarui dalam arsitektur portofolio v2.4."
+          description="Alamat URL yang Anda tuju mungkin salah, telah dipindahkan, atau telah diperbarui dalam arsitektur portofolio v2.4.5."
           centered
         />
 

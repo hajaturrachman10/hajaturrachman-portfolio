@@ -11,6 +11,7 @@ const ConfirmModal = dynamic(
   { ssr: false }
 );
 import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
+import { toast } from "@/components/ui/Toast";
 
 type AdminSecurityTabProps = {
   onLogout: () => void;
@@ -19,7 +20,9 @@ type AdminSecurityTabProps = {
 export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
   const [securityData, setSecurityData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const notify = (type: "success" | "error", text: string) => {
+    toast({ message: text, type: type === "error" ? "error" : "success" });
+  };
 
   // Level 2 Confirm Modal State
   const [modalConfig, setModalConfig] = useState<{
@@ -82,9 +85,9 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
       a.remove();
       window.URL.revokeObjectURL(url);
 
-      setFeedback({ type: "success", text: "File ekspor konfigurasi (.json) berhasil diunduh." });
+      notify("success", "File ekspor konfigurasi (.json) berhasil diunduh.");
     } catch {
-      setFeedback({ type: "error", text: "Terjadi kesalahan saat mengunduh konfigurasi." });
+      notify("error", "Terjadi kesalahan saat mengunduh konfigurasi.");
     }
   };
 
@@ -104,14 +107,14 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
           const res = await fetch("/api/admin/lockout/reset", { method: "POST" });
           const data = await res.json();
           if (data.success) {
-            setFeedback({ type: "success", text: "Seluruh pembekuan IP rate-limit berhasil di-reset." });
+            notify("success", "Seluruh pembekuan IP rate-limit berhasil di-reset.");
             broadcastCrossTabEvent("LOCKOUT_RESET");
             fetchSecurityOverview();
           } else {
-            setFeedback({ type: "error", text: data.error || "Gagal mereset lockout." });
+            notify("error", data.error || "Gagal mereset lockout.");
           }
         } catch {
-          setFeedback({ type: "error", text: "Terjadi kesalahan jaringan." });
+          notify("error", "Terjadi kesalahan jaringan.");
         } finally {
           setLoading(false);
         }
@@ -135,14 +138,14 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
           const res = await fetch("/api/admin/session/revoke", { method: "POST" });
           const data = await res.json();
           if (data.success) {
-            setFeedback({ type: "success", text: "Seluruh sesi publik pengunjung telah dibatalkan secara global." });
+            notify("success", "Seluruh sesi publik pengunjung telah dibatalkan secara global.");
             broadcastCrossTabEvent("SESSION_REVOKED");
             fetchSecurityOverview();
           } else {
-            setFeedback({ type: "error", text: data.error || "Gagal membatalkan sesi publik." });
+            notify("error", data.error || "Gagal membatalkan sesi publik.");
           }
         } catch {
-          setFeedback({ type: "error", text: "Terjadi kesalahan jaringan." });
+          notify("error", "Terjadi kesalahan jaringan.");
         } finally {
           setLoading(false);
         }
@@ -191,25 +194,6 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
           </motion.button>
         </MagneticButton>
       </div>
-
-      {feedback ? (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`flex items-center gap-2.5 rounded-2xl p-4 text-xs font-bold ${
-            feedback.type === "success"
-              ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-500"
-              : "bg-rose-500/10 border border-rose-500/20 text-rose-500"
-          }`}
-        >
-          {feedback.type === "success" ? (
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-          ) : (
-            <AlertCircle className="h-4 w-4 shrink-0" />
-          )}
-          <span>{feedback.text}</span>
-        </motion.div>
-      ) : null}
 
       {/* Security Overview Dashboard */}
       <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface">

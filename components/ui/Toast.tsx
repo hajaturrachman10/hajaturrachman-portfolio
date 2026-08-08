@@ -1,10 +1,18 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, Info, AlertTriangle, XCircle, X } from "lucide-react";
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
+import { CheckCircle2, Info, AlertTriangle, XCircle, X, Share2, Globe, Moon, Sun } from "lucide-react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
-export type ToastType = "success" | "info" | "warning" | "error";
+export type ToastType =
+  | "success"
+  | "info"
+  | "warning"
+  | "error"
+  | "purple"
+  | "cyan"
+  | "indigo"
+  | "amber";
 
 export type ToastMessage = {
   id: string;
@@ -97,25 +105,37 @@ function SingleToast({ item, removeToast }: { item: ToastMessage; removeToast: (
     return () => clearTimeout(timer);
   }, [id, duration, removeToast]);
 
-  const icons = {
+  const icons: Record<ToastType, React.ReactNode> = {
     success: <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />,
     info: <Info className="h-5 w-5 text-sky-500 shrink-0" />,
     warning: <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />,
-    error: <XCircle className="h-5 w-5 text-rose-500 shrink-0" />
+    error: <XCircle className="h-5 w-5 text-rose-500 shrink-0" />,
+    purple: <Share2 className="h-5 w-5 text-purple-500 shrink-0" />,
+    cyan: <Globe className="h-5 w-5 text-cyan-500 shrink-0" />,
+    indigo: <Moon className="h-5 w-5 text-indigo-400 shrink-0" />,
+    amber: <Sun className="h-5 w-5 text-amber-500 shrink-0" />,
   };
 
-  const borderColors = {
+  const borderColors: Record<ToastType, string> = {
     success: "border-emerald-500/40 bg-surface/95 text-emerald-950 dark:text-emerald-100 shadow-emerald-500/10",
     info: "border-sky-500/40 bg-surface/95 text-sky-950 dark:text-sky-100 shadow-sky-500/10",
     warning: "border-amber-500/40 bg-surface/95 text-amber-950 dark:text-amber-100 shadow-amber-500/10",
-    error: "border-rose-500/40 bg-surface/95 text-rose-950 dark:text-rose-100 shadow-rose-500/10"
+    error: "border-rose-500/40 bg-surface/95 text-rose-950 dark:text-rose-100 shadow-rose-500/10",
+    purple: "border-purple-500/40 bg-surface/95 text-purple-950 dark:text-purple-100 shadow-purple-500/10",
+    cyan: "border-cyan-500/40 bg-surface/95 text-cyan-950 dark:text-cyan-100 shadow-cyan-500/10",
+    indigo: "border-indigo-500/40 bg-surface/95 text-indigo-950 dark:text-indigo-100 shadow-indigo-500/10",
+    amber: "border-amber-500/40 bg-surface/95 text-amber-950 dark:text-amber-100 shadow-amber-500/10",
   };
 
-  const progressBg = {
+  const progressBg: Record<ToastType, string> = {
     success: "bg-emerald-500",
     info: "bg-sky-500",
     warning: "bg-amber-500",
-    error: "bg-rose-500"
+    error: "bg-rose-500",
+    purple: "bg-purple-500",
+    cyan: "bg-cyan-500",
+    indigo: "bg-indigo-500",
+    amber: "bg-amber-500",
   };
 
   return (

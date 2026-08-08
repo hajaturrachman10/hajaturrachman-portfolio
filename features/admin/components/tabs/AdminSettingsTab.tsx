@@ -14,6 +14,7 @@ import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
 import { FeatureType, AdminAccount } from "@/services/admin/adminTypes";
 import { StrategyType, PasswordStrategyConfig } from "@/services/admin/passwordEngine";
 import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/Toast";
 
 type AdminSettingsTabProps = {
   currentUsername: string;
@@ -31,7 +32,9 @@ const STRATEGY_OPTIONS: Array<{ key: StrategyType; label: string; desc: string }
 
 export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTabProps) {
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const notify = ({ type, text }: { type: "success" | "error"; text: string }) => {
+    toast({ message: text, type: type === "error" ? "error" : "success" });
+  };
 
   // Accounts Management State
   const [accounts, setAccounts] = useState<AdminAccount[]>([]);
@@ -136,7 +139,7 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAccUser || !newAccPass || newAccUser.length < 3 || newAccPass.length < 6) {
-      setFeedback({ type: "error", text: "Username minimal 3 karakter dan Kata sandi minimal 6 karakter." });
+      notify({ type: "error", text: "Username minimal 3 karakter dan Kata sandi minimal 6 karakter." });
       return;
     }
 
@@ -149,17 +152,17 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
       });
       const data = await res.json();
       if (data.success) {
-        setFeedback({ type: "success", text: `Akun admin baru "${newAccUser}" berhasil ditambahkan!` });
+        notify({ type: "success", text: `Akun admin baru "${newAccUser}" berhasil ditambahkan!` });
         setNewAccUser("");
         setNewAccPass("");
         setShowAddAccountForm(false);
         fetchAccounts();
         onRefresh();
       } else {
-        setFeedback({ type: "error", text: data.error || "Gagal menambahkan akun admin." });
+        notify({ type: "error", text: data.error || "Gagal menambahkan akun admin." });
       }
     } catch {
-      setFeedback({ type: "error", text: "Terjadi kesalahan koneksi." });
+      notify({ type: "error", text: "Terjadi kesalahan koneksi." });
     } finally {
       setLoading(false);
     }
@@ -167,7 +170,7 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
 
   const handleAddPasswordToAccount = async (accountId: string) => {
     if (!additionalPasswordInput || additionalPasswordInput.trim().length < 6) {
-      setFeedback({ type: "error", text: "Kata sandi tambahan minimal 6 karakter." });
+      notify({ type: "error", text: "Kata sandi tambahan minimal 6 karakter." });
       return;
     }
 
@@ -180,16 +183,16 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
       });
       const data = await res.json();
       if (data.success) {
-        setFeedback({ type: "success", text: "Kata sandi tambahan berhasil ditambahkan!" });
+        notify({ type: "success", text: "Kata sandi tambahan berhasil ditambahkan!" });
         setAdditionalPasswordInput("");
         setActiveAddPassAccId(null);
         fetchAccounts();
         onRefresh();
       } else {
-        setFeedback({ type: "error", text: data.error || "Gagal menambahkan password." });
+        notify({ type: "error", text: data.error || "Gagal menambahkan password." });
       }
     } catch {
-      setFeedback({ type: "error", text: "Terjadi kesalahan koneksi." });
+      notify({ type: "error", text: "Terjadi kesalahan koneksi." });
     } finally {
       setLoading(false);
     }
@@ -214,14 +217,14 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
           });
           const data = await res.json();
           if (data.success) {
-            setFeedback({ type: "success", text: "Kata sandi berhasil dihapus!" });
+            notify({ type: "success", text: "Kata sandi berhasil dihapus!" });
             fetchAccounts();
             onRefresh();
           } else {
-            setFeedback({ type: "error", text: data.error || "Gagal menghapus password." });
+            notify({ type: "error", text: data.error || "Gagal menghapus password." });
           }
         } catch {
-          setFeedback({ type: "error", text: "Terjadi kesalahan koneksi." });
+          notify({ type: "error", text: "Terjadi kesalahan koneksi." });
         } finally {
           setLoading(false);
           setModalConfig((prev) => ({ ...prev, open: false }));
@@ -247,14 +250,14 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
           });
           const data = await res.json();
           if (data.success) {
-            setFeedback({ type: "success", text: `Akun admin "${acc.username}" berhasil dihapus!` });
+            notify({ type: "success", text: `Akun admin "${acc.username}" berhasil dihapus!` });
             fetchAccounts();
             onRefresh();
           } else {
-            setFeedback({ type: "error", text: data.error || "Gagal menghapus akun." });
+            notify({ type: "error", text: data.error || "Gagal menghapus akun." });
           }
         } catch {
-          setFeedback({ type: "error", text: "Terjadi kesalahan koneksi." });
+          notify({ type: "error", text: "Terjadi kesalahan koneksi." });
         } finally {
           setLoading(false);
           setModalConfig((prev) => ({ ...prev, open: false }));
@@ -298,10 +301,10 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
       if (res.ok && data.success) {
         setTestResult({ evaluated: true, valid: data.valid });
       } else {
-        setFeedback({ type: "error", text: data.error || "Gagal menguji strategi password." });
+        notify({ type: "error", text: data.error || "Gagal menguji strategi password." });
       }
     } catch {
-      setFeedback({ type: "error", text: "Terjadi kesalahan koneksi jaringan." });
+      notify({ type: "error", text: "Terjadi kesalahan koneksi jaringan." });
     }
   };
 
@@ -327,14 +330,14 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
           });
           const data = await res.json();
           if (data.success) {
-            setFeedback({ type: "success", text: `Strategi password untuk ${selectedResource.toUpperCase()} berhasil disimpan.` });
+            notify({ type: "success", text: `Strategi password untuk ${selectedResource.toUpperCase()} berhasil disimpan.` });
             broadcastCrossTabEvent("STRATEGY_UPDATED", { feature: selectedResource });
             onRefresh();
           } else {
-            setFeedback({ type: "error", text: data.error || "Gagal menyimpan strategi." });
+            notify({ type: "error", text: data.error || "Gagal menyimpan strategi." });
           }
         } catch {
-          setFeedback({ type: "error", text: "Terjadi kesalahan koneksi." });
+          notify({ type: "error", text: "Terjadi kesalahan koneksi." });
         } finally {
           setLoading(false);
           setModalConfig((prev) => ({ ...prev, open: false }));
@@ -374,27 +377,6 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
           </div>
         </div>
       </div>
-
-      {/* Alert Feedback Banner */}
-      {feedback ? (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={cn(
-            "flex items-center gap-2.5 rounded-2xl p-4 text-xs font-bold border shadow-xs",
-            feedback.type === "success"
-              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-              : "bg-rose-500/10 text-rose-500 border-rose-500/20"
-          )}
-        >
-          {feedback.type === "success" ? (
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-          ) : (
-            <AlertCircle className="h-4 w-4 shrink-0" />
-          )}
-          <span>{feedback.text}</span>
-        </motion.div>
-      ) : null}
 
       {/* Section 1: Multi-Admin Accounts & Multi-Password Management Hub */}
       <div className="premium-card p-6 sm:p-7 rounded-3xl border border-line bg-surface flex flex-col gap-6 relative overflow-hidden shadow-card">
@@ -467,6 +449,10 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
                   <input
                     type="text"
                     required
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
                     value={newAccUser}
                     onChange={(e) => setNewAccUser(e.target.value)}
                     placeholder="Contoh: AdminDua"
@@ -479,6 +465,10 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
                   <input
                     type="password"
                     required
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
                     value={newAccPass}
                     onChange={(e) => setNewAccPass(e.target.value)}
                     placeholder="Minimal 6 karakter"
@@ -942,6 +932,10 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
             <div className="flex flex-col sm:flex-row items-center gap-3">
               <input
                 type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
                 value={testPasswordInput}
                 onChange={(e) => {
                   setTestPasswordInput(e.target.value);

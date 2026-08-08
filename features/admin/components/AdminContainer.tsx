@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { RefreshCw } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { AdminLoginView } from "@/features/admin/components/AdminLoginView";
 import { AdminDashboardView } from "@/features/admin/components/AdminDashboardView";
 import { cn } from "@/lib/utils";
@@ -75,7 +75,13 @@ export function AdminContainer() {
               ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20"
               : "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20"
           )}>
-            <RefreshCw className="h-6 w-6 animate-spin" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+              className="inline-flex shrink-0"
+            >
+              <Loader2 className="h-6 w-6" />
+            </motion.div>
           </div>
 
           <div>

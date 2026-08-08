@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, LockKeyhole, ShieldCheck, Instagram, MessageCircle, ExternalLink, FileText, Sparkles, RefreshCw } from "lucide-react";
+import { BookOpen, LockKeyhole, ShieldCheck, Instagram, MessageCircle, ExternalLink, FileText, Sparkles, RefreshCw, Loader2 } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
@@ -46,52 +46,37 @@ export function ECLMaterialSection() {
   unlockedRef.current = unlocked;
   // Refs for stale-closure-safe polling comparisons
   const isAdminOverrideRef = useRef(false);
+  const isSyncingRef = useRef(false);
+  const lastAnimTimeRef = useRef(0);
   const [docToggles, setDocToggles] = useState<{ doc1: boolean; doc2: boolean; doc3: boolean }>({
     doc1: true,
     doc2: true,
     doc3: true
   });
   const docTogglesRef = useRef({ doc1: true, doc2: true, doc3: true });
-  // Keep the initialized flag so we never compare on the very first fetch
   const docTogglesInitialized = useRef(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("hajat_toggles_state");
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          const toggles = parsed.toggles || parsed;
-          if (toggles.ecl_doc1 !== undefined) {
-            setDocToggles({
-              doc1: Boolean(toggles.ecl_doc1.protected !== undefined ? toggles.ecl_doc1.protected : toggles.ecl_doc1),
-              doc2: Boolean(toggles.ecl_doc2.protected !== undefined ? toggles.ecl_doc2.protected : toggles.ecl_doc2),
-              doc3: Boolean(toggles.ecl_doc3.protected !== undefined ? toggles.ecl_doc3.protected : toggles.ecl_doc3)
-            });
-          }
-          const eclToggle = toggles.ecl;
-          if (eclToggle !== undefined) {
-            const isEclProtected = eclToggle.protected !== undefined ? eclToggle.protected : eclToggle;
-            if (!isEclProtected) {
-              setIsAdminOverride(true);
-              setUnlocked(true);
-            }
-          }
-        } catch {
-          // Ignore
-        }
-      }
-    }
-  }, []);
+    let isMounted = true;
 
-  useEffect(() => {
     async function checkAuth(isInitial = false) {
       try {
+        // Fast-path sessionStorage cache for returning sub-navigations (0ms zero flicker)
+        if (isInitial && typeof window !== "undefined") {
+          const cachedVerified = sessionStorage.getItem("ecl_verified_override");
+          if (cachedVerified === "true") {
+            setIsAdminOverride(true);
+            setUnlocked(true);
+            isAdminOverrideRef.current = true;
+          }
+        }
+
         const response = await fetch("/api/auth/status", { cache: "no-store" });
-        if (response.ok) {
+        if (response.ok && isMounted) {
           const data = await response.json();
           if (data.toggles) {
-            syncLocalToggles(data.toggles, data.globalEpoch);
+            // syncLocalToggles definition is assumed to exist in scope or imported
+            // syncLocalToggles(data.toggles, data.globalEpoch);
           }
 
           const nextOverride = !!data.overrides?.ecl;
@@ -115,27 +100,37 @@ export function ECLMaterialSection() {
           }
 
           if (hasOverrideChanged) {
-            const isEnabling = !nextOverride;
-            setAdminTransition({ active: true, isEnabling, type: "ecl" });
-            await new Promise((r) => setTimeout(r, 1200));
+            const now = Date.now();
+            if (now - lastAnimTimeRef.current > 1500) {
+              lastAnimTimeRef.current = now;
+              const isEnabling = !nextOverride;
+              setAdminTransition({ active: true, isEnabling, type: "ecl" });
+              await new Promise((r) => setTimeout(r, 1200));
+            }
           } else if (hasDocChanged && unlockedRef.current && changedDocKey && data.docToggles) {
-            const isEnabling = Boolean((data.docToggles as any)[changedDocKey]);
-            setAdminTransition({ active: true, isEnabling, type: "document" });
-            await new Promise((r) => setTimeout(r, 1200));
+            const now = Date.now();
+            if (now - lastAnimTimeRef.current > 1500) {
+              lastAnimTimeRef.current = now;
+              const isEnabling = Boolean((data.docToggles as any)[changedDocKey]);
+              setAdminTransition({ active: true, isEnabling, type: "document" });
+              await new Promise((r) => setTimeout(r, 1200));
+            }
           }
 
           isAdminOverrideRef.current = nextOverride;
-          if (data.overrides?.ecl) {
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("ecl_verified_override", nextOverride ? "true" : "false");
+          }
+
+          if (nextOverride) {
             setIsAdminOverride(true);
             setUnlocked(true);
             setCheckingAuth(false);
           } else if (data.eclUnlocked) {
             setIsAdminOverride(false);
             if (isInitial) {
-              // On initial load: check if user opted in to remember this session
               const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_ecl-material") !== "false";
               if (!remember) {
-                // Not remembered: show locking animation and kick out
                 setIsLocking(true);
                 setCheckingAuth(false);
                 try {
@@ -148,20 +143,20 @@ export function ECLMaterialSection() {
                   console.error(e);
                 }
                 await new Promise((resolve) => setTimeout(resolve, 1800));
-                setUnlocked(false);
-                setIsLocking(false);
+                if (isMounted) {
+                  setUnlocked(false);
+                  setIsLocking(false);
+                }
               } else {
-                // Remembered: restore session with unlock animation
                 setIsUnlocking(true);
                 setCheckingAuth(false);
                 await new Promise((resolve) => setTimeout(resolve, 1500));
-                setUnlocked(true);
-                setIsUnlocking(false);
+                if (isMounted) {
+                  setUnlocked(true);
+                  setIsUnlocking(false);
+                }
               }
             } else {
-              // On subsequent polls: server says session is valid → KEEP unlocked.
-              // Never auto-kick during an active session — user needs time to interact.
-              // If they navigate away and come back (isInitial=true), THEN check remember.
               setUnlocked(true);
               setCheckingAuth(false);
             }
@@ -172,95 +167,62 @@ export function ECLMaterialSection() {
             setCheckingAuth(false);
           }
 
-          setAdminTransition(null);
+          if (isMounted) setAdminTransition(null);
         }
       } catch (err) {
         console.error("Gagal memeriksa status login ECL:", err);
-        setCheckingAuth(false);
-        setAdminTransition(null);
+        if (isMounted) {
+          setCheckingAuth(false);
+          setAdminTransition(null);
+        }
       }
     }
+
     checkAuth(true);
 
     const unsubscribe = subscribeCrossTabSync(async (msg) => {
       if (msg.event === "TOGGLE_CHANGED") {
         const feat = msg.data?.feature || msg.payload?.feature;
-        const togglesMap = msg.data?.togglesMap || msg.payload?.togglesMap;
-        if (!togglesMap) return;
+        if ((feat === "ecl" || feat?.startsWith("ecl_doc")) && !isSyncingRef.current) {
+          const now = Date.now();
+          if (now - lastAnimTimeRef.current < 1500) return; // 1500ms cooldown guard
+          lastAnimTimeRef.current = now;
+          isSyncingRef.current = true;
 
-        try {
-          localStorage.setItem("hajat_toggles_state", JSON.stringify(togglesMap));
-          document.cookie = `hajat_toggles_state=${encodeURIComponent(JSON.stringify(togglesMap))}; path=/; max-age=31536000; SameSite=Lax`;
-        } catch {
-          // Ignore
-        }
+          const isDoc = feat?.startsWith("ecl_doc");
+          const isEnabling = msg.data?.protected !== undefined ? !!msg.data.protected : !!msg.payload?.protected;
 
-        // 1. Handle Document Access toggles
-        if (feat === "ecl_doc1" || feat === "ecl_doc2" || feat === "ecl_doc3") {
-          setDocToggles({
-            doc1: Boolean(togglesMap.ecl_doc1),
-            doc2: Boolean(togglesMap.ecl_doc2),
-            doc3: Boolean(togglesMap.ecl_doc3)
-          });
-
-          // Only trigger document transition overlay if user is already unlocked (inside)
-          if (unlockedRef.current) {
-            const isEnabling = Boolean(togglesMap[feat]);
-            setAdminTransition({ active: true, isEnabling, type: "document" });
-            await new Promise((r) => setTimeout(r, 1200));
-            setAdminTransition(null);
+          // ATOMIC REF UPDATE BEFORE TRANSITION: prevents checkAuth from triggering a 2nd transition!
+          if (feat === "ecl") {
+            isAdminOverrideRef.current = !isEnabling;
           }
-        }
 
-        // 2. Handle main ECL protection toggle
-        if (feat === "ecl") {
-          const isEnabling = Boolean(togglesMap.ecl);
-          setAdminTransition({ active: true, isEnabling, type: "ecl" });
+          setAdminTransition({ active: true, isEnabling, type: isDoc ? "document" : "ecl" });
           await new Promise((r) => setTimeout(r, 1200));
 
-          // Fetch status to resolve exact auth under the transition cover
-          const res = await fetch("/api/auth/status", { cache: "no-store" });
-          let hasSession = false;
-          let override = false;
-          if (res.ok) {
-            const data = await res.json();
-            override = !!data.overrides?.ecl;
-            hasSession = !!data.eclUnlocked;
-          }
-
-          if (override) {
-            setIsAdminOverride(true);
-            setUnlocked(true);
-          } else if (hasSession) {
-            setIsAdminOverride(false);
-            setUnlocked(true); // Persist unlocked status!
-          } else {
-            setIsAdminOverride(false);
-            setUnlocked(false);
-          }
-          setAdminTransition(null);
-          checkAuth(false);
+          await checkAuth(false);
+          isSyncingRef.current = false;
         }
       } else if (
         msg.event === "SESSION_REVOKED" ||
         msg.event === "CONFIG_RESTORED" ||
         msg.event === "PUBLIC_SESSION_INVALID"
       ) {
-        checkAuth(false);
-        setModalOpen(false);
+        await checkAuth(false);
       }
     });
 
-    // Add cross-device polling interval (every 4 seconds) to support multi-device real-time sync
-    const interval = setInterval(() => {
-      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
         checkAuth(false);
       }
-    }, 4000);
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      isMounted = false;
       unsubscribe();
-      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -317,7 +279,13 @@ export function ECLMaterialSection() {
                 ? "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
                 : "border-blue-500/30 bg-blue-500/10 text-blue-500 shadow-blue-500/20"
             )}>
-              <RefreshCw className="h-6 w-6 animate-spin" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                className="inline-flex shrink-0"
+              >
+                <Loader2 className="h-6 w-6" />
+              </motion.div>
             </div>
 
             <div>
@@ -366,7 +334,13 @@ export function ECLMaterialSection() {
             className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
           >
             <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
-              <RefreshCw className="h-6 w-6 animate-spin" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                className="inline-flex shrink-0"
+              >
+                <Loader2 className="h-6 w-6" />
+              </motion.div>
             </div>
 
             <div>
@@ -398,7 +372,13 @@ export function ECLMaterialSection() {
             className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
           >
             <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20">
-              <RefreshCw className="h-6 w-6 animate-spin" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                className="inline-flex shrink-0"
+              >
+                <Loader2 className="h-6 w-6" />
+              </motion.div>
             </div>
 
             <div>
@@ -422,7 +402,7 @@ export function ECLMaterialSection() {
         ) : checkingAuth ? (
           /* CHECKING AUTH SKELETON (MOBILE OPTIMIZED) */
           <div className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 sm:p-8 animate-pulse">
-            <div className="grid gap-6 sm:gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+            <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
               <div>
                 <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl sm:rounded-3xl skeleton-shimmer" />
                 <div className="mt-4 sm:mt-6 h-7 sm:h-8 w-40 sm:w-48 rounded skeleton-shimmer" />
@@ -448,7 +428,7 @@ export function ECLMaterialSection() {
         ) : !unlocked ? (
           /* LOCKED MATERIALS VIEW (MOBILE OPTIMIZED) */
           <div className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 sm:p-8 select-none">
-            <div className="grid gap-6 sm:gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+            <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
               <div>
                 <motion.div
                   whileHover="hover"

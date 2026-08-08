@@ -24,9 +24,9 @@ export function SectionHeader({
           : "mb-5 sm:mb-8 lg:mb-10 max-w-3xl flex flex-col items-start"
       }
     >
-      <Tag className="section-title">{title}</Tag>
+      <Tag className="section-title [text-wrap:balance]">{title}</Tag>
       {description ? (
-        <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base sm:leading-8 sm:mt-4">
+        <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base sm:leading-8 sm:mt-4 [text-wrap:pretty]">
           {description}
         </p>
       ) : null}

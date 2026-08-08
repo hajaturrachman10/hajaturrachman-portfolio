@@ -32,11 +32,11 @@ export function Navbar() {
     setLanguage(nextLang);
     toast({
       message: nextLang === "id" ? "Bahasa Indonesia Aktif" : "Deutsch Aktiviert",
-      type: "info",
+      type: "cyan",
       duration: 2000
     });
   };
- 
+
   useEffect(() => {
     setActiveSection(pathname === "/" ? "/" : pathname);
     setMenuOpen(false);
@@ -47,11 +47,11 @@ export function Navbar() {
       document.body.classList.remove("menu-open");
     }
   }, [pathname]);
- 
+
   useEffect(() => {
     if (pathname !== "/") return;
     if (menuOpen) return;
- 
+
     // Delay the observer setup slightly to prevent layout measurement lag during menu close transition
     const timeoutId = setTimeout(() => {
       const sections = ["home", "chapters", "contact"];
@@ -60,7 +60,7 @@ export function Navbar() {
         rootMargin: "-40% 0px -40% 0px",
         threshold: 0,
       };
- 
+
       const observer = new IntersectionObserver((entries) => {
         // If scroll is locked, ignore observer updates
         const isLocked = typeof document !== "undefined" && (document.body.style.position === "fixed" || document.body.classList.contains("modal-open"));
@@ -82,16 +82,16 @@ export function Navbar() {
           }
         });
       }, observerOptions);
- 
+
       sections.forEach((id) => {
         const el = document.getElementById(id);
         if (el) observer.observe(el);
       });
- 
+
       // Store observer reference on window to cleanup properly
       (window as any)._navbarObserver = observer;
     }, 350);
- 
+
     return () => {
       clearTimeout(timeoutId);
       const observer = (window as any)._navbarObserver;
@@ -105,7 +105,7 @@ export function Navbar() {
       }
     };
   }, [pathname, menuOpen]);
- 
+
   useEffect(() => {
     let scrollTimer: NodeJS.Timeout | null = null;
 
@@ -169,7 +169,7 @@ export function Navbar() {
   useEffect(() => {
     if (!menuOpen) return;
     function handleResize() {
-      if (window.innerWidth >= 1024) {
+      if (window.innerWidth >= 1150) {
         setMenuOpen(false);
       }
     }
@@ -216,7 +216,13 @@ export function Navbar() {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
+    <motion.header
+      key={`navbar-header-${pathname}`}
+      initial={{ opacity: 0, y: -24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed inset-x-0 top-0 z-50 px-4 pt-4"
+    >
       <nav
         className={cn(
           "container-page flex items-center justify-between rounded-full border px-3.5 py-2 sm:px-5 sm:py-2.5 transition-all duration-300 relative z-50",
@@ -225,11 +231,7 @@ export function Navbar() {
             : "border-line/40 bg-surface/55 shadow-sm backdrop-blur-xl"
         )}
       >
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 180, damping: 15 }}
-        >
+        <div>
           <Link
             href="/"
             onClick={(e) => {
@@ -278,14 +280,9 @@ export function Navbar() {
               </span>
             </span>
           </Link>
-        </motion.div>
+        </div>
 
-        <motion.div 
-          className="hidden items-center gap-1 md:flex"
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 180, damping: 15, delay: 0.05 }}
-        >
+        <div className="hidden items-center gap-1 min-[1150px]:flex">
           {siteConfig.navItems.map((item, index) => {
             const isActive = item.href === activeSection;
             const isHovered = activeHoverIndex === index;
@@ -326,11 +323,11 @@ export function Navbar() {
                     setActiveSection(item.href);
                   }}
                   className={cn(
-                     "focus-ring relative rounded-full px-4 py-2 text-sm font-black",
-                     isActive
-                       ? "bg-primary/10 text-primary font-black"
-                       : cn("transition-all duration-300", isHovered ? "text-text" : "text-muted")
-                   )}
+                    "focus-ring relative rounded-full px-4 py-2 text-sm font-black",
+                    isActive
+                      ? "bg-primary/10 text-primary font-black"
+                      : cn("transition-all duration-300", isHovered ? "text-text" : "text-muted")
+                  )}
                 >
                   {isHovered && !isActive && (
                     <motion.span
@@ -347,83 +344,75 @@ export function Navbar() {
               </div>
             );
           })}
-        </motion.div>
+        </div>
 
-        <div className="flex items-center gap-2">
-          {/* Language Switcher Toggle */}
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 180, damping: 15, delay: 0.1 }}
-          >
-            <Tooltip content={language === "id" ? "Bahasa" : "Sprache"} position="bottom">
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.94 }}
-                onClick={(e) => {
-                  (e.currentTarget as HTMLElement)?.blur();
-                  if (typeof document !== "undefined") {
-                    (document.activeElement as HTMLElement)?.blur();
-                  }
-                  handleLanguageToggle();
-                }}
-                className="focus-ring flex h-11 px-3.5 items-center justify-center gap-1.5 rounded-full border border-line bg-surface/90 text-xs font-black active:border-primary/60 sm:hover:border-primary/60 cursor-pointer select-none transition group backdrop-blur-xl shadow-sm"
-                aria-label="Switch Language"
-              >
-                <motion.span
-                  animate={{ rotate: language === "id" ? 0 : 180 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 13 }}
-                  className="inline-block"
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Controls: Always visible outside in top navbar row on screens >= 360px. Moved inside drawer ONLY on screens < 360px (e.g. 320px Mobile S) */}
+          <div className="hidden min-[360px]:flex items-center gap-1.5 sm:gap-2">
+            {/* Language Switcher Toggle */}
+            <div>
+              <Tooltip content={language === "id" ? "Bahasa" : "Sprache"} position="bottom">
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={(e) => {
+                    (e.currentTarget as HTMLElement)?.blur();
+                    if (typeof document !== "undefined") {
+                      (document.activeElement as HTMLElement)?.blur();
+                    }
+                    handleLanguageToggle();
+                  }}
+                  className="focus-ring flex h-11 px-3.5 items-center justify-center gap-1.5 rounded-full border border-line bg-surface/90 text-xs font-black active:border-primary/60 sm:hover:border-primary/60 cursor-pointer select-none transition group backdrop-blur-xl shadow-sm"
+                  aria-label="Switch Language"
                 >
-                  <Languages className="h-4 w-4 text-muted group-active:text-primary sm:group-hover:text-primary transition-colors" />
-                </motion.span>
-                <span>{language === "id" ? "ID" : "DE"}</span>
-              </motion.button>
-            </Tooltip>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 180, damping: 15, delay: 0.12 }}
-            className="flex items-center gap-2"
-          >
-            <Tooltip content={language === "id" ? "Bagikan" : "Teilen"} position="bottom">
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.94 }}
-                onClick={(e) => {
-                  (e.currentTarget as HTMLElement)?.blur();
-                  if (typeof document !== "undefined") {
-                    (document.activeElement as HTMLElement)?.blur();
-                  }
-                  setShareOpen(true);
-                }}
-                className="focus-ring group relative grid h-11 w-11 place-items-center overflow-hidden rounded-full border border-line bg-surface/90 text-text shadow-sm backdrop-blur-xl transition-colors duration-300 active:border-primary/60 sm:hover:border-primary/60 cursor-pointer select-none"
-                aria-label="Bagikan Portofolio"
-              >
-                <span className="absolute inset-0 bg-gradient-to-br from-primary/12 via-secondary/10 to-accent/12 opacity-0 transition-opacity duration-300 group-active:opacity-100 sm:group-hover:opacity-100" />
-                <Share2 className="h-5 w-5 relative text-text group-active:text-primary sm:group-hover:text-primary transition-colors" />
-              </motion.button>
-            </Tooltip>
+                  <motion.span
+                    animate={{ rotate: language === "id" ? 0 : 180 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 13 }}
+                    className="inline-block"
+                  >
+                    <Languages className="h-4 w-4 text-muted group-active:text-primary sm:group-hover:text-primary transition-colors" />
+                  </motion.span>
+                  <span>{language === "id" ? "ID" : "DE"}</span>
+                </motion.button>
+              </Tooltip>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Tooltip content={language === "id" ? "Bagikan" : "Teilen"} position="bottom">
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={(e) => {
+                    (e.currentTarget as HTMLElement)?.blur();
+                    if (typeof document !== "undefined") {
+                      (document.activeElement as HTMLElement)?.blur();
+                    }
+                    setShareOpen(true);
+                  }}
+                  className="focus-ring group relative grid h-11 w-11 place-items-center overflow-hidden rounded-full border border-line bg-surface/90 text-text shadow-sm backdrop-blur-xl transition-colors duration-300 active:border-primary/60 sm:hover:border-primary/60 cursor-pointer select-none"
+                  aria-label="Bagikan Portofolio"
+                >
+                  <span className="absolute inset-0 bg-gradient-to-br from-primary/12 via-secondary/10 to-accent/12 opacity-0 transition-opacity duration-300 group-active:opacity-100 sm:group-hover:opacity-100" />
+                  <Share2 className="h-5 w-5 relative text-text group-active:text-primary sm:group-hover:text-primary transition-colors" />
+                </motion.button>
+              </Tooltip>
+            </div>
 
-            <ThemeToggle />
-          </motion.div>
+            <div>
+              <ThemeToggle />
+            </div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 180, damping: 15, delay: 0.14 }}
-          >
+          <div>
             <motion.button
               type="button"
               aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
               onClick={() => setMenuOpen((value) => !value)}
               whileTap={{ scale: 0.94 }}
               className={cn(
-                "focus-ring grid h-11 w-11 place-items-center rounded-full border shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 md:hidden cursor-pointer select-none",
+                "focus-ring grid h-11 w-11 place-items-center rounded-full border shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 min-[1150px]:hidden cursor-pointer select-none",
                 menuOpen
                   ? "border-rose-600 bg-rose-600 text-white hover:bg-rose-500"
                   : "border-line bg-surface/90 text-text hover:border-primary/60"
@@ -438,27 +427,27 @@ export function Navbar() {
                 {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </motion.div>
             </motion.button>
-          </motion.div>
+          </div>
         </div>
       </nav>
 
       <AnimatePresence>
         {menuOpen ? (
           <>
-             <motion.div
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18, ease: "easeInOut" }}
               onClick={() => setMenuOpen(false)}
-              className="fixed inset-0 z-30 bg-slate-950/65 backdrop-blur-sm lg:hidden transform-gpu will-change-[opacity]"
+              className="fixed inset-0 z-30 bg-slate-950/65 backdrop-blur-sm min-[1150px]:hidden transform-gpu will-change-[opacity]"
             />
             <motion.div
               initial={{ opacity: 0, y: -10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="container-page mt-3 overflow-hidden rounded-4xl border border-line bg-surface/95 backdrop-blur-md p-3 shadow-card lg:hidden relative z-50 transform-gpu will-change-[transform,opacity]"
+              className="container-page mt-3 overflow-hidden rounded-4xl border border-line bg-surface/95 backdrop-blur-md p-3 shadow-card min-[1150px]:hidden relative z-50 transform-gpu will-change-[transform,opacity]"
             >
               <div 
                 className="grid gap-1"
@@ -489,7 +478,7 @@ export function Navbar() {
                         data-nav-index={index}
                         onMouseEnter={() => setActiveHoverIndex(index)}
                         onMouseLeave={() => setActiveHoverIndex(null)}
-                         onClick={(e) => {
+                        onClick={(e) => {
                           const isCurrentPage = item.href === pathname || (item.href === "/" && pathname === "/");
                           const isContactScrollOnHome = item.href.startsWith("/#") && pathname === "/";
                           document.body.style.overflow = "";
@@ -524,12 +513,17 @@ export function Navbar() {
                             : "text-muted"
                         )}
                       >
-
                         {item.label}
                       </Link>
                     </div>
                   );
                 })}
+                {/* Quick Controls Row Inside Drawer (ONLY active on screens < 360px, e.g. 320px Mobile S) - Matched Component Lifecycle for Reliable Animation on Every Open */}
+                <div className="min-[360px]:hidden mt-3 pt-3 border-t border-line/65 flex items-center justify-center gap-4">
+                  <DrawerLanguageButton onToggle={handleLanguageToggle} />
+                  <DrawerShareButton onClick={() => { setShareOpen(true); setMenuOpen(false); }} />
+                  <ThemeToggle />
+                </div>
               </div>
             </motion.div>
           </>
@@ -537,6 +531,76 @@ export function Navbar() {
       </AnimatePresence>
 
       <ShareModal open={shareOpen} onClose={() => setShareOpen(false)} />
-    </header>
+    </motion.header>
+  );
+}
+
+function DrawerLanguageButton({ onToggle }: { onToggle: () => void }) {
+  const [mounted, setMounted] = useState(false);
+  const { language } = useLanguageSelector();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="h-11 w-11 rounded-full border border-line bg-surface/90" />;
+  }
+
+  return (
+    <motion.button
+      type="button"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.94 }}
+      onClick={onToggle}
+      className="focus-ring group relative grid h-11 w-11 place-items-center overflow-hidden rounded-full border border-line bg-surface/90 text-text shadow-sm backdrop-blur-xl transition-colors duration-300 active:border-primary/60 cursor-pointer select-none"
+      aria-label="Switch Language"
+    >
+      <span className="absolute inset-0 bg-gradient-to-br from-primary/12 via-secondary/10 to-accent/12 opacity-0 transition-opacity duration-300 group-active:opacity-100 sm:group-hover:opacity-100" />
+      <motion.span
+        key={language}
+        initial={{ opacity: 0, rotate: -180, scale: 0.4 }}
+        animate={{ opacity: 1, rotate: 0, scale: 1 }}
+        exit={{ opacity: 0, rotate: 180, scale: 0.4 }}
+        transition={{ type: "spring", stiffness: 220, damping: 15 }}
+        className="relative"
+      >
+        <Languages className="h-5 w-5 text-text group-active:text-primary transition-colors" />
+      </motion.span>
+    </motion.button>
+  );
+}
+
+function DrawerShareButton({ onClick }: { onClick: () => void }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="h-11 w-11 rounded-full border border-line bg-surface/90" />;
+  }
+
+  return (
+    <motion.button
+      type="button"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.94 }}
+      onClick={onClick}
+      className="focus-ring group relative grid h-11 w-11 place-items-center overflow-hidden rounded-full border border-line bg-surface/90 text-text shadow-sm backdrop-blur-xl transition-colors duration-300 active:border-primary/60 cursor-pointer select-none"
+      aria-label="Bagikan Portofolio"
+    >
+      <span className="absolute inset-0 bg-gradient-to-br from-primary/12 via-secondary/10 to-accent/12 opacity-0 transition-opacity duration-300 group-active:opacity-100 sm:group-hover:opacity-100" />
+      <motion.span
+        initial={{ opacity: 0, rotate: -90, scale: 0.4 }}
+        animate={{ opacity: 1, rotate: 0, scale: 1 }}
+        exit={{ opacity: 0, rotate: 90, scale: 0.4 }}
+        transition={{ type: "spring", stiffness: 220, damping: 15 }}
+        className="relative"
+      >
+        <Share2 className="h-5 w-5 text-text group-active:text-primary transition-colors" />
+      </motion.span>
+    </motion.button>
   );
 }

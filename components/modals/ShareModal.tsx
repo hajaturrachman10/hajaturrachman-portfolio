@@ -43,7 +43,7 @@ export function ShareModal({ open, onClose, title = "Portofolio Hajaturrachman",
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      toast({ message: "Tautan portofolio berhasil disalin ke clipboard!", type: "success", title: "Tautan Tersalin" });
+      toast({ message: "Tautan portofolio berhasil disalin ke clipboard!", type: "purple", title: "Tautan Tersalin" });
       setTimeout(() => setCopied(false), 2500);
     }
   };

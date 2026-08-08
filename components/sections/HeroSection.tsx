@@ -27,19 +27,22 @@ export function HeroSection() {
 
       <div className="container-page flex flex-col justify-center gap-8">
         {/* Top Columns Grid */}
-        <div className="grid items-center gap-12 md:grid-cols-[1.08fr_0.92fr] w-full">
+        <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-[1.08fr_0.92fr] w-full">
           <motion.div
             initial={{ opacity: 0, y: 34 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h1 className="display-title mt-0 max-w-5xl break-words">
-              {language === "id" ? "Halo, saya" : "Hallo, ich bin"}
-              <br className="sm:hidden" />{" "}
-              <span className="gradient-text inline-block">{siteConfig.name}</span>
+            <h1 className="display-title mt-0 max-w-5xl">
+              <span className="block">
+                {language === "id" ? "Halo, saya" : "Hallo, ich bin"}
+              </span>
+              <span className="gradient-text inline-block whitespace-nowrap">
+                {siteConfig.name}
+              </span>
             </h1>
 
-            <div className="mt-3 text-base font-black tracking-tight text-text sm:text-2xl min-h-[48px] xs:min-h-[44px] sm:min-h-[40px] flex items-center">
+            <div className="mt-3 text-xs xs:text-sm sm:text-xl md:text-2xl font-black tracking-tight text-text h-8 sm:h-9 flex items-center whitespace-nowrap overflow-hidden text-ellipsis">
               <Typewriter
                 words={[
                   ...siteConfig.headline.split(" | "),
@@ -109,7 +112,7 @@ export function HeroSection() {
                 className="premium-card absolute hidden rounded-full px-4 py-2 text-xs font-black text-text sm:block"
                 style={{
                   top: `${12 + index * 20}%`,
-                  left: index % 2 === 0 ? "-8%" : "76%"
+                  left: index % 2 === 0 ? "-3%" : "70%"
                 }}
               >
                 {label}

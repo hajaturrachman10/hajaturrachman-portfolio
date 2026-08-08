@@ -275,7 +275,7 @@ function ProjectModal({ project, onClose }: { project: PortofolioProject | null;
                 <h4 className="font-display text-lg sm:text-xl font-black">{language === "id" ? "Cerita Proyek" : "Projektbeschreibung"}</h4>
                 <p className="mt-3 text-xs sm:text-base leading-6 sm:leading-8 text-muted">{project.detail.story}</p>
               </div>
-              <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-5 md:grid-cols-3">
+              <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 <DetailList title={language === "id" ? "Proses" : "Prozess"} items={project.detail.process} />
                 <DetailList title={language === "id" ? "Pembelajaran" : "Erkenntnisse"} items={project.detail.learnings} />
                 <div className="rounded-2xl sm:rounded-4xl border border-line bg-surface/82 p-4 sm:p-5">

@@ -10,10 +10,12 @@ const config: Config = {
   ],
   theme: {
     screens: {
+      xxs: "320px",
+      xs: "360px",
       sm: "640px",
       md: "768px",
-      lg: "800px",
-      xl: "1200px",
+      lg: "1024px",
+      xl: "1280px",
       "2xl": "1440px",
     },
     extend: {

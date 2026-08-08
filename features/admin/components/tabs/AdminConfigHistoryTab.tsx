@@ -12,11 +12,14 @@ const ConfirmModal = dynamic(
 );
 import { ConfigSnapshot } from "@/services/admin/adminTypes";
 import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
+import { toast } from "@/components/ui/Toast";
 
 export function AdminConfigHistoryTab() {
   const [snapshots, setSnapshots] = useState<ConfigSnapshot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const notify = (type: "success" | "error", text: string) => {
+    toast({ message: text, type: type === "error" ? "error" : "success" });
+  };
 
   const [previewModal, setPreviewModal] = useState<ConfigSnapshot | null>(null);
   const [restoreModalConfig, setRestoreModalConfig] = useState<{
@@ -40,7 +43,7 @@ export function AdminConfigHistoryTab() {
         }
       }
     } catch {
-      setFeedback({ type: "error", text: "Gagal memuat histori konfigurasi." });
+      notify("error", "Gagal memuat histori konfigurasi.");
     } finally {
       setLoading(false);
     }
@@ -63,17 +66,14 @@ export function AdminConfigHistoryTab() {
           });
           const data = await res.json();
           if (res.ok && data.success) {
-            setFeedback({
-              type: "success",
-              text: `Konfigurasi berhasil dipulihkan ke Snapshot v${snapshot.version}. Seluruh sesi publik telah dibatalkan secara otomatis.`
-            });
+            notify("success", `Konfigurasi berhasil dipulihkan ke Snapshot v${snapshot.version}. Seluruh sesi publik telah dibatalkan secara otomatis.`);
             broadcastCrossTabEvent("CONFIG_RESTORED", { version: snapshot.version });
             fetchHistory();
           } else {
-            setFeedback({ type: "error", text: data.error || "Gagal melakukan restore snapshot." });
+            notify("error", data.error || "Gagal melakukan restore snapshot.");
           }
         } catch {
-          setFeedback({ type: "error", text: "Terjadi kesalahan jaringan." });
+          notify("error", "Terjadi kesalahan jaringan.");
         } finally {
           setRestoreModalConfig((prev) => ({ ...prev, open: false }));
         }
@@ -104,25 +104,6 @@ export function AdminConfigHistoryTab() {
           </div>
         </div>
       </div>
-
-      {feedback ? (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`flex items-center gap-2.5 rounded-2xl p-4 text-xs font-bold ${
-            feedback.type === "success"
-              ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-500"
-              : "bg-rose-500/10 border border-rose-500/20 text-rose-500"
-          }`}
-        >
-          {feedback.type === "success" ? (
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-          ) : (
-            <AlertCircle className="h-4 w-4 shrink-0" />
-          )}
-          <span>{feedback.text}</span>
-        </motion.div>
-      ) : null}
 
       <div className="premium-card p-6 rounded-3xl border border-line bg-surface">
         <div className="flex items-center justify-between border-b border-line pb-4 mb-6">

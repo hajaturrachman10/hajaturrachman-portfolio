@@ -20,7 +20,8 @@ import {
   CheckCircle2,
   FolderLock,
   BookOpen,
-  Activity
+  Activity,
+  Loader2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { MagneticButton } from "@/components/ui/MagneticButton";
@@ -411,7 +412,7 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                   <p className="mt-2 text-sm font-bold leading-6 text-muted">
                     {isBlocked
                       ? "Batas 5 kali percobaan salah tercapai. Akses dikunci sementara demi keamanan."
-                      : "Portfolio v2.4 — Ruang Kendali Internal Terisolasi"}
+                      : "Portfolio v2.4.5 — Ruang Kendali Internal Terisolasi"}
                   </p>
                 </motion.div>
               </AnimatePresence>
@@ -574,6 +575,9 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                           data-1p-ignore="true"
                           data-bwignore="true"
                           data-form-type="other"
+                          autoCapitalize="off"
+                          autoCorrect="off"
+                          spellCheck={false}
                           name="admin_usr_key"
                           id="admin_usr_key"
                           onChange={(e) => {
@@ -610,7 +614,7 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                         <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted pointer-events-none" />
                         <input
                           type={showPassword ? "text" : "password"}
-                          autoComplete="new-password"
+                          autoComplete="off"
                           aria-autocomplete="none"
                           data-lpignore="true"
                           data-1p-ignore="true"
@@ -620,7 +624,7 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                           id="admin_pwd_key"
                           autoCapitalize="off"
                           autoCorrect="off"
-                          spellCheck="false"
+                          spellCheck={false}
                           className={cn(
                             "input pl-11 pr-12 text-left transition-all duration-300 w-full",
                             (isShakeError || isPasswordError) &&
@@ -715,26 +719,13 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                     >
                       {loading ? (
                         <>
-                          <svg
-                            className="animate-spin h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                            className="inline-flex shrink-0"
                           >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
+                            <Loader2 className="h-5 w-5 text-white" />
+                          </motion.span>
                           <span>Memverifikasi...</span>
                         </>
                       ) : (

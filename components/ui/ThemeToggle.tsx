@@ -41,7 +41,7 @@ export function ThemeToggle() {
           : language === "id"
           ? "Mode Terang Berhasil Diaktifkan"
           : "Heller Modus Aktiviert",
-      type: "info",
+      type: nextTheme === "dark" ? "indigo" : "amber",
       duration: 2000
     });
 

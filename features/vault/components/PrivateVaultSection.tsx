@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  Loader2
 } from "lucide-react";
 import { ImageWithShimmer } from "@/components/ui/ImageWithShimmer";
 import { useEffect, useRef, useState } from "react";
@@ -109,34 +110,26 @@ export function PrivateVaultSection() {
   const [isAdminOverride, setIsAdminOverride] = useState(false);
   const [adminTransition, setAdminTransition] = useState<{ active: boolean; isEnabling: boolean } | null>(null);
   const isAdminOverrideRef = useRef(false);
+  const isSyncingRef = useRef(false);
+  const lastAnimTimeRef = useRef(0);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("hajat_toggles_state");
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          const toggles = parsed.toggles || parsed;
-          const vaultToggle = toggles.vault;
-          if (vaultToggle !== undefined) {
-            const isVaultProtected = vaultToggle.protected !== undefined ? vaultToggle.protected : vaultToggle;
-            if (!isVaultProtected) {
-              setIsAdminOverride(true);
-              setUnlocked(true);
-            }
-          }
-        } catch {
-          // Ignore
-        }
-      }
-    }
-  }, []);
+    let isMounted = true;
 
-  useEffect(() => {
     async function checkAuth(isInitial = false) {
       try {
+        // Fast-path sessionStorage cache for returning sub-navigations (0ms zero flicker)
+        if (isInitial && typeof window !== "undefined") {
+          const cachedVerified = sessionStorage.getItem("vault_verified_override");
+          if (cachedVerified === "true") {
+            setIsAdminOverride(true);
+            setUnlocked(true);
+            isAdminOverrideRef.current = true;
+          }
+        }
+
         const response = await fetch("/api/auth/status", { cache: "no-store" });
-        if (response.ok) {
+        if (response.ok && isMounted) {
           const data = await response.json();
           if (data.toggles) {
             syncLocalToggles(data.toggles, data.globalEpoch);
@@ -146,13 +139,21 @@ export function PrivateVaultSection() {
           const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
 
           if (hasOverrideChanged) {
-            const isEnabling = !nextOverride;
-            setAdminTransition({ active: true, isEnabling });
-            await new Promise((r) => setTimeout(r, 1200));
+            const now = Date.now();
+            if (now - lastAnimTimeRef.current > 1500) {
+              lastAnimTimeRef.current = now;
+              const isEnabling = !nextOverride;
+              setAdminTransition({ active: true, isEnabling });
+              await new Promise((r) => setTimeout(r, 1200));
+            }
           }
 
           isAdminOverrideRef.current = nextOverride;
-          if (data.overrides?.vault) {
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("vault_verified_override", nextOverride ? "true" : "false");
+          }
+
+          if (nextOverride) {
             setIsAdminOverride(true);
             await fetchVaultData();
             setUnlocked(true);
@@ -160,10 +161,8 @@ export function PrivateVaultSection() {
           } else if (data.vaultUnlocked) {
             setIsAdminOverride(false);
             if (isInitial) {
-              // On initial load: check if user opted in to remember this session
               const remember = typeof window !== "undefined" && localStorage.getItem("remember_session_private-vault") !== "false";
               if (!remember) {
-                // Not remembered: show locking animation and kick out
                 setIsLocking(true);
                 setCheckingAuth(false);
                 try {
@@ -176,20 +175,21 @@ export function PrivateVaultSection() {
                   console.error(e);
                 }
                 await new Promise((resolve) => setTimeout(resolve, 1800));
-                setUnlocked(false);
-                setIsLocking(false);
+                if (isMounted) {
+                  setUnlocked(false);
+                  setIsLocking(false);
+                }
               } else {
-                // Remembered: restore session with unlock animation
                 setIsUnlocking(true);
                 setCheckingAuth(false);
                 await fetchVaultData();
                 await new Promise((resolve) => setTimeout(resolve, 1500));
-                setUnlocked(true);
-                setIsUnlocking(false);
+                if (isMounted) {
+                  setUnlocked(true);
+                  setIsUnlocking(false);
+                }
               }
             } else {
-              // On subsequent polls: server says session valid → KEEP unlocked.
-              // Never auto-kick during an active session.
               setUnlocked(true);
               setCheckingAuth(false);
               await fetchVaultData();
@@ -201,79 +201,61 @@ export function PrivateVaultSection() {
             setCheckingAuth(false);
           }
 
-          setAdminTransition(null);
+          if (isMounted) setAdminTransition(null);
         }
       } catch (err) {
         console.error("Gagal memeriksa status login:", err);
-        setCheckingAuth(false);
-        setAdminTransition(null);
+        if (isMounted) {
+          setCheckingAuth(false);
+          setAdminTransition(null);
+        }
       }
     }
+
     checkAuth(true);
 
+    // Debounced real-time cross-tab sync with atomic ref update and Strict Feature Filtering
     const unsubscribe = subscribeCrossTabSync(async (msg) => {
       if (msg.event === "TOGGLE_CHANGED") {
         const feat = msg.data?.feature || msg.payload?.feature;
-        if (feat === "vault") {
+        if (feat === "vault" && !isSyncingRef.current) {
+          const now = Date.now();
+          if (now - lastAnimTimeRef.current < 1500) return; // 1500ms cooldown guard
+          lastAnimTimeRef.current = now;
+          isSyncingRef.current = true;
+
           const isEnabling = msg.data?.protected !== undefined ? !!msg.data.protected : !!msg.payload?.protected;
+          
+          // ATOMIC REF UPDATE BEFORE TRANSITION: prevents checkAuth from triggering a 2nd transition!
+          isAdminOverrideRef.current = !isEnabling;
+
           setAdminTransition({ active: true, isEnabling });
           await new Promise((r) => setTimeout(r, 1200));
 
-          const res = await fetch("/api/auth/status", { cache: "no-store" });
-          let hasSession = false;
-          let override = false;
-          if (res.ok) {
-            const data = await res.json();
-            override = !!data.overrides?.vault;
-            hasSession = !!data.vaultUnlocked;
-          }
-
-          if (override) {
-            setIsAdminOverride(true);
-            await fetchVaultData();
-            setUnlocked(true);
-          } else if (hasSession) {
-            setIsAdminOverride(false);
-            await fetchVaultData();
-            setUnlocked(true); // Persist unlocked session!
-          } else {
-            setIsAdminOverride(false);
-            setUnlocked(false);
-            setVaultData(null);
-            setModalOpen(false);
-          }
-          setAdminTransition(null);
-          checkAuth(false);
+          await checkAuth(false);
+          isSyncingRef.current = false;
         }
       } else if (
         msg.event === "SESSION_REVOKED" ||
         msg.event === "CONFIG_RESTORED" ||
         msg.event === "PUBLIC_SESSION_INVALID"
       ) {
-        try {
-          const res = await fetch("/api/auth/status", { cache: "no-store" });
-          if (res.ok) {
-            const data = await res.json();
-            if (!data.vaultUnlocked) {
-              setUnlocked(false);
-              setModalOpen(false);
-            }
-          }
-        } catch {
-          // Handled
-        }
+        await checkAuth(false);
       }
     });
-    // Add cross-device polling interval (every 4 seconds) to support multi-device real-time sync
-    const interval = setInterval(() => {
-      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+
+    // Auto re-sync when user returns to portfolio tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
         checkAuth(false);
       }
-    }, 4000);
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      isMounted = false;
       unsubscribe();
-      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -328,7 +310,13 @@ export function PrivateVaultSection() {
                   ? "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
                   : "border-blue-500/30 bg-blue-500/10 text-blue-500 shadow-blue-500/20"
               )}>
-                <RefreshCw className="h-6 w-6 animate-spin" />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                  className="inline-flex shrink-0"
+                >
+                  <Loader2 className="h-6 w-6" />
+                </motion.div>
               </div>
 
               <div>
@@ -373,7 +361,13 @@ export function PrivateVaultSection() {
               className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[380px] sm:min-h-[420px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
             >
               <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
-                <RefreshCw className="h-6 w-6 animate-spin" />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                  className="inline-flex shrink-0"
+                >
+                  <Loader2 className="h-6 w-6" />
+                </motion.div>
               </div>
 
               <div>
@@ -405,7 +399,13 @@ export function PrivateVaultSection() {
               className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[380px] sm:min-h-[420px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
             >
               <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20">
-                <RefreshCw className="h-6 w-6 animate-spin" />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                  className="inline-flex shrink-0"
+                >
+                  <Loader2 className="h-6 w-6" />
+                </motion.div>
               </div>
 
               <div>
@@ -436,7 +436,7 @@ export function PrivateVaultSection() {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="premium-card overflow-hidden rounded-3xl sm:rounded-4xl p-4 sm:p-8 select-none relative"
             >
-              <div className="grid gap-6 sm:gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+              <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
                 <div>
                     <motion.div
                       onClick={() => setModalOpen(true)}
@@ -694,7 +694,7 @@ export function PrivateVaultSection() {
                             transition: { staggerChildren: 0.09 }
                           }
                         }}
-                        className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+                        className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                       >
                         {active.people.map((person: any) => (
                           <motion.article

@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, RefreshCw, Sparkles, ToggleLeft, ToggleRight, FileText } from "lucide-react";
+import { ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, RefreshCw, Sparkles, ToggleLeft, ToggleRight, FileText, Loader2 } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { FeatureType, FeatureToggleState } from "@/services/admin/adminTypes";
 import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
 import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/Toast";
 
 type AdminFeaturesTabProps = {
   toggles: Record<FeatureType, FeatureToggleState> | null;
@@ -18,19 +19,7 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
   const [transitioningAction, setTransitioningAction] = useState<"enabling" | "disabling" | null>(null);
   const [localOverrides, setLocalOverrides] = useState<Partial<Record<FeatureType, boolean>>>({});
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("hajat_toggles_state");
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          setLocalOverrides((prev) => ({ ...parsed, ...prev }));
-        } catch {
-          // Ignore
-        }
-      }
-    }
-  }, []);
+  // Clean synchronous rendering driven purely by server props (zero toggle jumps)
 
   const featuresList: Array<{ type: FeatureType; name: string; description: string; isDoc?: boolean }> = [
     {
@@ -99,6 +88,11 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
           }
         }
 
+        toast({
+          message: `Fitur ${feature.toUpperCase()} berhasil ${!currentStatus ? "DIPROTEKSI DENGAN SANDI" : "DIBUKA UNTUK PUBLIK"}`,
+          type: !currentStatus ? "indigo" : "cyan"
+        });
+
         // 3. Broadcast event & trigger server refresh
         broadcastCrossTabEvent("TOGGLE_CHANGED", { feature, protected: !currentStatus, togglesMap: data.togglesMap });
         onRefresh();
@@ -147,7 +141,13 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
                     : "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20"
                 }`}
               >
-                <RefreshCw className="h-5 w-5 sm:h-6 sm:w-6 animate-spin" />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+                  className="inline-flex shrink-0"
+                >
+                  <Loader2 className="h-5 w-5 sm:h-6 sm:w-6" />
+                </motion.div>
               </div>
 
               <div>

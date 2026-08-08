@@ -2,17 +2,19 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, LogOut, LayoutDashboard, ToggleLeft, Shield, BarChart3, Settings, Activity, ListFilter, History, AlertTriangle, Sparkles, RefreshCw, ArrowLeft, Mail } from "lucide-react";
+import { ShieldCheck, LogOut, LayoutDashboard, ToggleLeft, Shield, BarChart3, Settings, Activity, ListFilter, History, AlertTriangle, Sparkles, RefreshCw, ArrowLeft, Mail, Loader2 } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { AdminOverviewTab } from "./tabs/AdminOverviewTab";
-import { AdminFeaturesTab } from "./tabs/AdminFeaturesTab";
-import { AdminSecurityTab } from "./tabs/AdminSecurityTab";
-import { AdminStatisticsTab } from "./tabs/AdminStatisticsTab";
-import { AdminMessagesTab } from "./tabs/AdminMessagesTab";
-import { AdminSettingsTab } from "./tabs/AdminSettingsTab";
-import { AdminHealthTab } from "./tabs/AdminHealthTab";
-import { AdminAuditTab } from "./tabs/AdminAuditTab";
-import { AdminConfigHistoryTab } from "./tabs/AdminConfigHistoryTab";
+import dynamic from "next/dynamic";
+
+const AdminOverviewTab = dynamic(() => import("./tabs/AdminOverviewTab").then((m) => m.AdminOverviewTab));
+const AdminFeaturesTab = dynamic(() => import("./tabs/AdminFeaturesTab").then((m) => m.AdminFeaturesTab));
+const AdminSecurityTab = dynamic(() => import("./tabs/AdminSecurityTab").then((m) => m.AdminSecurityTab));
+const AdminStatisticsTab = dynamic(() => import("./tabs/AdminStatisticsTab").then((m) => m.AdminStatisticsTab));
+const AdminMessagesTab = dynamic(() => import("./tabs/AdminMessagesTab").then((m) => m.AdminMessagesTab));
+const AdminSettingsTab = dynamic(() => import("./tabs/AdminSettingsTab").then((m) => m.AdminSettingsTab));
+const AdminHealthTab = dynamic(() => import("./tabs/AdminHealthTab").then((m) => m.AdminHealthTab));
+const AdminAuditTab = dynamic(() => import("./tabs/AdminAuditTab").then((m) => m.AdminAuditTab));
+const AdminConfigHistoryTab = dynamic(() => import("./tabs/AdminConfigHistoryTab").then((m) => m.AdminConfigHistoryTab));
 import { AdminStats, FeatureType, FeatureToggleState } from "@/services/admin/adminTypes";
 import { SystemHealthReport } from "@/services/admin/adminHealthService";
 import { subscribeCrossTabSync } from "@/lib/crossTabSync";
@@ -207,7 +209,13 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
           className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[260px] sm:min-h-[300px] flex flex-col items-center justify-center text-center gap-4 max-w-md w-full border border-line bg-surface select-none shadow-2xl"
         >
           <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
-            <RefreshCw className="h-6 w-6 animate-spin" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 0.85, ease: "linear" }}
+              className="inline-flex shrink-0"
+            >
+              <Loader2 className="h-6 w-6" />
+            </motion.div>
           </div>
 
           <div>
@@ -249,7 +257,7 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <h1 className="font-display text-lg sm:text-xl font-black text-primary truncate flex items-center gap-2">
                 <span>{language === "de" ? "Admin-Kontrollzentrum" : "Pusat Kendali Admin"}</span>
-                <span className="text-xs sm:text-sm font-bold text-muted/70 font-mono">v2.4</span>
+                <span className="text-xs sm:text-sm font-bold text-muted/70 font-mono">v2.4.5</span>
               </h1>
             </div>
             <p className="text-[11px] sm:text-xs font-bold text-muted mt-0.5 truncate">

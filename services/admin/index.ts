@@ -3,7 +3,6 @@ export * from "./adminConfig";
 export * from "./adminErrors";
 export * from "./adminValidator";
 export * from "./adminRepository";
-export * from "./adminService";
 export * from "./adminSecurity";
 export * from "./adminAuthService";
 export * from "./adminAuditLogger";

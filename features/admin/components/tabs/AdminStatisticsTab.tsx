@@ -148,7 +148,7 @@ export function AdminStatisticsTab({ stats, onRefresh }: AdminStatisticsTabProps
       </div>
 
       {/* 5 Primary Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
         {metrics.map((item, idx) => {
           const Icon = item.icon;
           return (

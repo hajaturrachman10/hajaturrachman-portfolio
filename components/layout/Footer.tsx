@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, Mail, Phone, Check } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSiteData } from "@/data/site";
 import { useLanguage } from "@/components/providers/LanguageContext";
+import { Tooltip } from "@/components/ui/Tooltip";
+import { toast } from "@/components/ui/Toast";
 
 export function Footer() {
   const { siteConfig } = useSiteData();
@@ -15,14 +17,40 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
+  const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCopy = (text: string, label: string) => {
     if (typeof navigator !== "undefined") {
       navigator.clipboard.writeText(text);
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
       setCopiedItem(label);
-      setTimeout(() => setCopiedItem(null), 2000);
+      toast({
+        message:
+          label === "email"
+            ? language === "id"
+              ? "Email Hajaturrachman tersalin!"
+              : "E-Mail von Hajaturrachman kopiert!"
+            : language === "id"
+            ? "Nomor WhatsApp tersalin!"
+            : "WhatsApp-Nummer kopiert!",
+        type: label === "email" ? "info" : "success",
+        duration: 2000,
+      });
+      copyTimerRef.current = setTimeout(() => {
+        setCopiedItem(null);
+      }, 2000);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <footer className="border-t border-line bg-surface/45 px-4 py-10">
@@ -34,44 +62,53 @@ export function Footer() {
           <p className="mt-1.5 text-xs sm:text-sm font-bold text-muted select-none">
             © {year} {siteConfig.name}. {language === "id" ? "Portofolio perjalanan personal." : "Persönliches Reiseportfolio."}
           </p>
-
           {/* Quick Copy Contact Links */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => handleCopy("hajaturrachman10@gmail.com", "email")}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-line bg-surface/80 hover:bg-canvas text-[11px] font-bold text-muted hover:text-primary transition-all cursor-pointer select-none"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-line bg-surface/80 hover:bg-canvas text-[11px] font-bold text-muted hover:text-primary transition-all cursor-pointer select-none active:scale-95"
               title={language === "id" ? "Salin Email Hajaturrachman" : "E-Mail von Hajaturrachman kopieren"}
             >
               {copiedItem === "email" ? (
-                <>
-                  <Check className="h-3 w-3 text-emerald-500" />
-                  <span className="text-emerald-500">{language === "id" ? "Email Tersalin!" : "E-Mail kopiert!"}</span>
-                </>
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 450, damping: 20 }}
+                  className="inline-flex items-center gap-1.5 text-primary font-extrabold"
+                >
+                  <Check className="h-3 w-3 text-primary shrink-0" />
+                  <span>{language === "id" ? "Email Tersalin!" : "E-Mail kopiert!"}</span>
+                </motion.span>
               ) : (
-                <>
+                <span className="inline-flex items-center gap-1.5">
                   <Mail className="h-3 w-3 text-primary shrink-0" />
                   <span>Email</span>
-                </>
+                </span>
               )}
             </button>
 
             <button
               type="button"
               onClick={() => handleCopy("+6285158518090", "phone")}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-line bg-surface/80 hover:bg-canvas text-[11px] font-bold text-muted hover:text-emerald-500 transition-all cursor-pointer select-none"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-line bg-surface/80 hover:bg-canvas text-[11px] font-bold text-muted hover:text-emerald-500 transition-all cursor-pointer select-none active:scale-95"
               title={language === "id" ? "Salin WhatsApp Hajaturrachman" : "WhatsApp-Nummer kopieren"}
             >
               {copiedItem === "phone" ? (
-                <>
-                  <Check className="h-3 w-3 text-emerald-500" />
-                  <span className="text-emerald-500">{language === "id" ? "WhatsApp Tersalin!" : "WhatsApp kopiert!"}</span>
-                </>
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 450, damping: 20 }}
+                  className="inline-flex items-center gap-1.5 text-emerald-500 font-extrabold"
+                >
+                  <Check className="h-3 w-3 text-emerald-500 shrink-0" />
+                  <span>{language === "id" ? "WhatsApp Tersalin!" : "WhatsApp kopiert!"}</span>
+                </motion.span>
               ) : (
-                <>
+                <span className="inline-flex items-center gap-1.5">
                   <Phone className="h-3 w-3 text-emerald-500 shrink-0" />
                   <span>WhatsApp</span>
-                </>
+                </span>
               )}
             </button>
           </div>
@@ -92,41 +129,27 @@ export function Footer() {
               ))}
           </div>
 
-          <motion.button
-            onClick={() => {
-              if (typeof window !== "undefined") {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
-                document.body.scrollTo({ top: 0, behavior: "smooth" });
-              }
-            }}
-            aria-label="Kembali ke atas"
-            initial="initial"
-            whileHover="hover"
-            whileTap={{ scale: 0.95 }}
-            animate={{ y: [0, -2, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="flex h-10 w-full sm:w-10 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary text-white cursor-pointer select-none shadow-lg shadow-primary/25 hover:shadow-primary/45 transition-all duration-300 shrink-0 border-0 focus-ring"
-          >
-            <motion.div
-              variants={{
-                initial: { y: 0 },
-                hover: {
-                  y: [0, -4, 0],
-                  transition: {
-                    repeat: Infinity,
-                    duration: 0.5,
-                    ease: "easeInOut"
-                  }
+          <Tooltip content={language === "id" ? "Kembali ke Atas" : "Nach oben"} position="top">
+            <motion.button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+                  document.body.scrollTo({ top: 0, behavior: "smooth" });
                 }
               }}
+              aria-label={language === "id" ? "Kembali ke atas" : "Nach oben"}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="focus-ring group relative flex h-11 w-full sm:h-10 sm:w-10 items-center justify-center gap-2 rounded-full border border-line bg-surface/80 text-xs sm:text-sm font-black text-muted shadow-sm backdrop-blur-md transition-colors duration-300 active:border-primary/60 active:text-primary sm:hover:border-primary/60 sm:hover:text-primary hover:bg-surface cursor-pointer select-none shrink-0"
             >
-              <ArrowUp className="h-5 w-5" />
-            </motion.div>
-            <span className="text-sm font-black sm:hidden">
-              {language === "id" ? "Kembali ke Atas" : "Nach oben"}
-            </span>
-          </motion.button>
+              <ArrowUp className="h-4 w-4 relative text-muted group-active:text-primary sm:group-hover:text-primary transition-colors shrink-0" />
+              <span className="sm:hidden font-black">
+                {language === "id" ? "Kembali ke Atas" : "Nach oben"}
+              </span>
+            </motion.button>
+          </Tooltip>
         </div>
       </div>
     </footer>

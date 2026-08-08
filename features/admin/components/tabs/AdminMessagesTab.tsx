@@ -11,6 +11,7 @@ const ConfirmModal = dynamic(
   { ssr: false }
 );
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/data/site";
 
 export type ContactMessage = {
   id: string;
@@ -301,6 +302,10 @@ export function AdminMessagesTab() {
             <input
               type="text"
               placeholder="Cari pengirim, email, subjek..."
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="input-field pl-10 pr-4 h-[42px] text-xs font-medium w-full rounded-2xl"
@@ -553,7 +558,7 @@ export function AdminMessagesTab() {
                           whileTap={{ scale: 0.98 }}
                           onClick={() =>
                             setQuickReplyBody(
-                              `Halo ${selectedMessage.name},\n\nTerima kasih banyak telah menghubungi saya melalui situs portofolio resmi saya.\n\nSaya telah membaca dan mempelajari pesan Anda mengenai "${selectedMessage.subject}". Saya sangat menghargai ketertarikan dan waktu yang Anda luangkan untuk menghubungi saya.\n\nPesan Anda telah saya catat dan saya akan dengan senang hati menindaklanjuti serta memberikan tanggapan lebih detail segera setelah jadwal aktivitas saya memungkinkan.\n\nJika ada informasi tambahan atau dokumen pendukung yang ingin Anda sampaikan, Anda juga dapat mengirimkannya langsung ke email ini atau melalui WhatsApp resmi saya di 0851-5851-8090.\n\nTerima kasih sekali lagi atas perhatian dan apresiasi Anda.\n\nSalam hangat dan hormat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: https://hajat.vercel.app`
+                              `Halo ${selectedMessage.name},\n\nTerima kasih banyak telah menghubungi saya melalui situs portofolio resmi saya.\n\nSaya telah membaca dan mempelajari pesan Anda mengenai "${selectedMessage.subject}". Saya sangat menghargai ketertarikan dan waktu yang Anda luangkan untuk menghubungi saya.\n\nPesan Anda telah saya catat dan saya akan dengan senang hati menindaklanjuti serta memberikan tanggapan lebih detail segera setelah jadwal aktivitas saya memungkinkan.\n\nJika ada informasi tambahan atau dokumen pendukung yang ingin Anda sampaikan, Anda juga dapat mengirimkannya langsung ke email ini atau melalui WhatsApp resmi saya di 0851-5851-8090.\n\nTerima kasih sekali lagi atas perhatian dan apresiasi Anda.\n\nSalam hangat dan hormat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: ${siteConfig.siteUrl}`
                             )
                           }
                           className="px-3 py-1.5 rounded-xl border border-line bg-surface hover:border-primary/40 hover:bg-primary/10 text-xs font-bold text-muted hover:text-primary transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5"
@@ -567,7 +572,7 @@ export function AdminMessagesTab() {
                           whileTap={{ scale: 0.98 }}
                           onClick={() =>
                             setQuickReplyBody(
-                              `Halo ${selectedMessage.name},\n\nTerima kasih yang sebesar-besarnya atas apresiasi, tawaran peluang karir, serta tawaran kolaborasi profesional yang Anda sampaikan melalui portofolio saya.\n\nMengenai hal yang Anda sampaikan perihal "${selectedMessage.subject}", saya sangat tertarik dan menyambut baik potensi kerjasama ini. Saya selalu terbuka untuk mengeksplorasi ide-ide baru, proyek inovatif, serta peluang pengembangan diri dan kontribusi bersama.\n\nUntuk mendiskusikan rencana kolaborasi ini secara lebih komprehensif, saya menyarankan agar kita dapat menjadwalkan sesi diskusi singkat (baik via Google Meet/Zoom maupun WhatsApp Call).\n\nMohon beri tahu saya ketersediaan waktu Anda, atau Anda dapat menghubungi saya langsung melalui WhatsApp di 0851-5851-8090 agar dapat kita cocokkan dengan jadwal bersama.\n\nTerima kasih atas kepercayaan dan tawaran luar biasa ini. Saya sangat menantikan diskusi hangat kita selanjutnya.\n\nSalam hangat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: https://hajat.vercel.app`
+                              `Halo ${selectedMessage.name},\n\nTerima kasih yang sebesar-besarnya atas apresiasi, tawaran peluang karir, serta tawaran kolaborasi profesional yang Anda sampaikan melalui portofolio saya.\n\nMengenai hal yang Anda sampaikan perihal "${selectedMessage.subject}", saya sangat tertarik dan menyambut baik potensi kerjasama ini. Saya selalu terbuka untuk mengeksplorasi ide-ide baru, proyek inovatif, serta peluang pengembangan diri dan kontribusi bersama.\n\nUntuk mendiskusikan rencana kolaborasi ini secara lebih komprehensif, saya menyarankan agar kita dapat menjadwalkan sesi diskusi singkat (baik via Google Meet/Zoom maupun WhatsApp Call).\n\nMohon beri tahu saya ketersediaan waktu Anda, atau Anda dapat menghubungi saya langsung melalui WhatsApp di 0851-5851-8090 agar dapat kita cocokkan dengan jadwal bersama.\n\nTerima kasih atas kepercayaan dan tawaran luar biasa ini. Saya sangat menantikan diskusi hangat kita selanjutnya.\n\nSalam hangat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: ${siteConfig.siteUrl}`
                             )
                           }
                           className="px-3 py-1.5 rounded-xl border border-line bg-surface hover:border-primary/40 hover:bg-primary/10 text-xs font-bold text-muted hover:text-primary transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5"
@@ -581,7 +586,7 @@ export function AdminMessagesTab() {
                           whileTap={{ scale: 0.98 }}
                           onClick={() =>
                             setQuickReplyBody(
-                              `Halo ${selectedMessage.name},\n\nTerima kasih banyak atas pesan dan inisiatif komunikasi Anda perihal "${selectedMessage.subject}".\n\nSaya sangat senang bisa terhubung dengan Anda. Agar diskusi kita dapat berlangsung dengan lebih efisien, terarah, dan fokus, saya menyambut baik rencana untuk mengatur jadwal pertemuan online atau wawancara singkat.\n\nBerikut adalah beberapa opsi slot waktu yang fleksibel bagi saya:\n• Senin – Jumat: 16.00 – 20.00 WIB\n• Sabtu – Minggu: 10.00 – 17.00 WIB (Dengan konfirmasi H-1)\n\nSilakan tentukan waktu dan platform komunikasi yang paling nyaman bagi Anda (WhatsApp Call / Google Meet / Zoom). Anda juga dapat langsung mengonfirmasi jadwal melalui kontak WhatsApp resmi saya di 0851-5851-8090.\n\nTerima kasih atas fleksibilitas Anda. Saya menantikan pertemuan dan perkenalan diskusi kita.\n\nSalam hangat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: https://hajat.vercel.app`
+                              `Halo ${selectedMessage.name},\n\nTerima kasih banyak atas pesan dan inisiatif komunikasi Anda perihal "${selectedMessage.subject}".\n\nSaya sangat senang bisa terhubung dengan Anda. Agar diskusi kita dapat berlangsung dengan lebih efisien, terarah, dan fokus, saya menyambut baik rencana untuk mengatur jadwal pertemuan online atau wawancara singkat.\n\nBerikut adalah beberapa opsi slot waktu yang fleksibel bagi saya:\n• Senin – Jumat: 16.00 – 20.00 WIB\n• Sabtu – Minggu: 10.00 – 17.00 WIB (Dengan konfirmasi H-1)\n\nSilakan tentukan waktu dan platform komunikasi yang paling nyaman bagi Anda (WhatsApp Call / Google Meet / Zoom). Anda juga dapat langsung mengonfirmasi jadwal melalui kontak WhatsApp resmi saya di 0851-5851-8090.\n\nTerima kasih atas fleksibilitas Anda. Saya menantikan pertemuan dan perkenalan diskusi kita.\n\nSalam hangat,\nHajaturrachman\nKandidat Ausbildung Keperawatan Jerman\nWebsite: ${siteConfig.siteUrl}`
                             )
                           }
                           className="px-3 py-1.5 rounded-xl border border-line bg-surface hover:border-primary/40 hover:bg-primary/10 text-xs font-bold text-muted hover:text-primary transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5"

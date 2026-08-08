@@ -23,25 +23,30 @@ const poppins = Poppins({
   display: "swap",
 });
 
+const currentSiteUrl = (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_SITE_URL) || "https://hajat.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hajat.vercel.app"),
+  metadataBase: new URL(currentSiteUrl),
   alternates: {
-    canonical: "https://hajat.vercel.app",
+    canonical: currentSiteUrl,
     languages: {
-      "id-ID": "https://hajat.vercel.app",
-      "de-DE": "https://hajat.vercel.app/?lang=de",
+      "id-ID": currentSiteUrl,
+      "de-DE": `${currentSiteUrl}/?lang=de`,
     },
   },
   title: {
     default: `${siteConfig.name} — Personal Portofolio Resmi | Hajat ECL B2`,
     template: `%s | ${siteConfig.name}`
   },
-  manifest: "/manifest.json",
+  manifest: "/site.webmanifest",
   description:
     "Website portofolio pribadi Hajaturrachman: perjalanan bahasa Jerman ECL B2, Ausbildung perawat di Jerman, karya kreatif, dan proyek web.",
   keywords: [
     "Hajaturrachman",
     "Hajat",
+    "Hajatur",
+    "Hajatur Rachman",
+    "Hajaturrahman",
     "Hajat ECL",
     "Hajat ECL B2",
     "Hajaturrachman ECL B2",
@@ -54,11 +59,12 @@ export const metadata: Metadata = {
     "Krankenpflege Ausbildung Germany",
     "Ausbildung Pflegefachmann Deutschland",
     "Hajaturrachman Resume",
-    "Portofolio Perawat Jerman"
+    "Portofolio Perawat Jerman",
+    "Hajat Cirebon Jakarta"
   ],
-  authors: [{ name: siteConfig.name, url: "https://hajat.vercel.app" }],
+  authors: [{ name: siteConfig.name, url: currentSiteUrl }],
   creator: siteConfig.name,
-  publisher: siteConfig.name,
+  publisher: `${siteConfig.name} Official Portfolio`,
   category: "Personal Portfolio",
   classification: "Portfolio & Resume",
   applicationName: "Hajaturrachman Portfolio",
@@ -78,7 +84,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "Hajaturrachman Portfolio",
+    title: "Hajaturrachman",
     statusBarStyle: "black-translucent"
   },
   formatDetection: {
@@ -91,23 +97,27 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
       { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/favicon.svg", type: "image/svg+xml" }
     ],
-    shortcut: "/icon.svg",
-    apple: "/apple-icon.svg",
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/apple-icon.svg", type: "image/svg+xml" },
+      { url: "/apple-touch-icon.png", sizes: "180x180" }
+    ],
   },
   openGraph: {
-    title: `${siteConfig.name} — Personal Portofolio`,
+    title: `${siteConfig.name} — Personal Portofolio Resmi`,
     description:
       "Portofolio personal Hajaturrachman: perjalanan bahasa Jerman ECL B2, pengalaman organisasi, proyek kreatif, target Ausbildung perawat di Jerman, dan mimpi berkeliling dunia.",
     type: "website",
     locale: "id_ID",
-    url: "https://hajat.vercel.app",
+    url: currentSiteUrl,
     siteName: "Hajaturrachman Portofolio",
     images: [
       {
-        url: "/assets/profile.jpg",
+        url: `${currentSiteUrl}/assets/profile.jpg`,
         width: 800,
         height: 1066,
         alt: "Hajaturrachman - Calon Ausbildung Perawat di Jerman"
@@ -116,10 +126,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} — Personal Portofolio`,
+    title: `${siteConfig.name} — Personal Portofolio Resmi`,
     description:
       "Website portofolio pribadi Hajaturrachman: perjalanan, karya, Ausbildung Jerman, dan mimpi berkeliling dunia.",
-    images: ["/assets/profile.jpg"]
+    images: [`${currentSiteUrl}/assets/profile.jpg`]
   }
 };
 
@@ -142,10 +152,14 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://api.qrserver.com" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-icon.svg" />
-        <meta name="thumbnail" content="https://hajat.vercel.app/assets/profile.jpg" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="thumbnail" content={`${currentSiteUrl}/assets/profile.jpg`} />
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         <script
@@ -155,11 +169,11 @@ export default function RootLayout({
               {
                 "@context": "https://schema.org",
                 "@type": "Person",
-                "@id": "https://hajat.vercel.app/#person",
+                "@id": `${currentSiteUrl}/#person`,
                 "name": "Hajaturrachman",
-                "alternateName": ["Hajat", "Hajaturrachman ECL B2", "Hajat Portfolio"],
-                "url": "https://hajat.vercel.app",
-                "image": "https://hajat.vercel.app/assets/profile.jpg",
+                "alternateName": ["Hajat", "Hajatur", "Hajatur Rachman", "Hajaturrahman", "Hajaturrachman ECL B2", "Hajat Portfolio"],
+                "url": currentSiteUrl,
+                "image": `${currentSiteUrl}/assets/profile.jpg`,
                 "jobTitle": "Calon Peserta Ausbildung Perawat di Jerman",
                 "nationality": "ID",
                 "knowsLanguage": [
@@ -195,26 +209,48 @@ export default function RootLayout({
               {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "@id": "https://hajat.vercel.app/#website",
-                "url": "https://hajat.vercel.app",
+                "@id": `${currentSiteUrl}/#website`,
+                "url": currentSiteUrl,
                 "name": "Hajaturrachman",
-                "alternateName": ["Hajaturrachman", "Hajaturrachman Portofolio", "Hajat"],
+                "alternateName": ["Hajaturrachman", "Hajaturrachman Portofolio", "Hajat", "Hajatur"],
                 "description":
                   "Website portofolio pribadi Hajaturrachman: perjalanan bahasa Jerman ECL B2, Ausbildung perawat di Jerman, dan proyek kreatif.",
                 "inLanguage": ["id-ID", "de-DE"],
                 "publisher": {
-                  "@id": "https://hajat.vercel.app/#person"
+                  "@id": `${currentSiteUrl}/#person`
                 }
               },
               {
                 "@context": "https://schema.org",
                 "@type": "ProfilePage",
-                "@id": "https://hajat.vercel.app/#webpage",
-                "url": "https://hajat.vercel.app",
-                "name": "Hajaturrachman — Personal Portofolio",
+                "@id": `${currentSiteUrl}/#webpage`,
+                "url": currentSiteUrl,
+                "name": "Hajaturrachman — Personal Portofolio Resmi",
                 "mainEntity": {
-                  "@id": "https://hajat.vercel.app/#person"
+                  "@id": `${currentSiteUrl}/#person`
                 }
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "Siapa Hajaturrachman?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Hajaturrachman adalah seorang kandidat program Ausbildung Keperawatan di Jerman, penggiat literasi, mantan Duta Baca Kabupaten Cirebon, dan pengembang proyek-proyek kreatif."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Apa target kualifikasi bahasa Jerman Hajaturrachman?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Hajaturrachman sedang menargetkan kelulusan sertifikasi bahasa Jerman tingkat ECL Deutsch B2 pada Agustus 2026 sebagai syarat utama keberangkatan Ausbildung keperawatan."
+                    }
+                  }
+                ]
               }
             ])
           }}

@@ -69,9 +69,12 @@ export function subscribeCrossTabSync(callback: (msg: SyncMessage) => void): () 
 
   if (broadcastChannel) {
     broadcastChannel.addEventListener("message", handleBroadcast);
+    return () => {
+      broadcastChannel?.removeEventListener("message", handleBroadcast);
+    };
   }
 
-  // Storage Event Listener Fallback
+  // Storage Event Listener Fallback ONLY if BroadcastChannel is unavailable
   const handleStorage = (e: StorageEvent) => {
     if (e.key === "hajat_sync_event" && e.newValue) {
       try {
@@ -86,9 +89,6 @@ export function subscribeCrossTabSync(callback: (msg: SyncMessage) => void): () 
   window.addEventListener("storage", handleStorage);
 
   return () => {
-    if (broadcastChannel) {
-      broadcastChannel.removeEventListener("message", handleBroadcast);
-    }
     window.removeEventListener("storage", handleStorage);
   };
 }
