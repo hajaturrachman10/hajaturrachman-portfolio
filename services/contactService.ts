@@ -40,11 +40,23 @@ export const contactService = {
     let sentToResend = false;
     let savedToLocal = false;
 
-    // 1. Supabase Storage
+    // 1. Supabase Storage (with automatic schema fallback)
     if (supabase) {
       try {
         const { error } = await supabase.from("contacts").insert([dataPayload]);
-        if (!error) savedToSupabase = true;
+        if (!error) {
+          savedToSupabase = true;
+        } else {
+          // Schema fallback for standard Supabase contacts table
+          const minimalPayload = {
+            name: payload.name,
+            email: payload.email,
+            message: payload.message,
+            created_at: nowIso
+          };
+          const { error: minError } = await supabase.from("contacts").insert([minimalPayload]);
+          if (!minError) savedToSupabase = true;
+        }
       } catch (err) {
         console.error("Gagal menyimpan ke Supabase:", err);
       }
