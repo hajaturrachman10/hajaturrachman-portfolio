@@ -94,7 +94,16 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
         });
 
         // 3. Broadcast event & trigger server refresh
-        broadcastCrossTabEvent("TOGGLE_CHANGED", { feature, protected: !currentStatus, togglesMap: data.togglesMap });
+        const isDocFeature = feature.startsWith("ecl_doc");
+        const isUnlockedForPublic = isDocFeature ? !currentStatus : currentStatus;
+
+        broadcastCrossTabEvent("TOGGLE_CHANGED", {
+          feature,
+          unlocked: isUnlockedForPublic,
+          protected: !isUnlockedForPublic,
+          togglesMap: data.togglesMap,
+          timestamp: Date.now()
+        });
         onRefresh();
 
         // 4. Comfortable grace delay (1100ms) so progress bar reaches 100% before overlay fades out

@@ -43,19 +43,19 @@
     },
     "ecl": {
       "protected": true,
-      "updatedAt": 1786186141975
+      "updatedAt": 1786302524712
     },
     "ecl_doc1": {
-      "protected": true,
-      "updatedAt": 1786101092090
+      "protected": false,
+      "updatedAt": 1786303257747
     },
     "ecl_doc2": {
-      "protected": true,
-      "updatedAt": 1785752722914
+      "protected": false,
+      "updatedAt": 1786303267784
     },
     "ecl_doc3": {
-      "protected": true,
-      "updatedAt": 1786186117989
+      "protected": false,
+      "updatedAt": 1786303275741
     }
   },
   "stats": {
@@ -63,7 +63,7 @@
     "cvUnlocks": 0,
     "vaultUnlocks": 0,
     "eclUnlocks": 0,
-    "contactSubmissions": 1
+    "contactSubmissions": 2
   },
   "lastLogin": {
     "time": 1785448800773,

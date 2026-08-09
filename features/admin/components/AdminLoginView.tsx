@@ -412,7 +412,7 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                   <p className="mt-2 text-sm font-bold leading-6 text-muted">
                     {isBlocked
                       ? "Batas 5 kali percobaan salah tercapai. Akses dikunci sementara demi keamanan."
-                      : "Portfolio v2.4.5 — Ruang Kendali Internal Terisolasi"}
+                      : "Portfolio v2.4.6 — Ruang Kendali Internal Terisolasi"}
                   </p>
                 </motion.div>
               </AnimatePresence>

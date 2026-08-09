@@ -22,9 +22,17 @@ export const contactService = {
   },
 
   async processContactMessage(payload: ContactPayload) {
+    const msgId = `msg-${Date.now()}`;
+    const nowIso = new Date().toISOString();
     const dataPayload = {
-      ...payload,
-      created_at: new Date().toISOString()
+      id: msgId,
+      name: payload.name,
+      email: payload.email,
+      subject: `Pesan Kontak dari ${payload.name}`,
+      message: payload.message,
+      timestamp: nowIso,
+      created_at: nowIso,
+      status: "unread"
     };
 
     let savedToSupabase = false;

@@ -39,17 +39,23 @@ export function ScrollRestoration() {
     const savedScrollPos = sessionStorage.getItem(storageKey);
     const wasAtBottom = sessionStorage.getItem(bottomKey) === "true";
 
-    // Track user manual scrolling interaction after paint delay
+    // Track user manual scrolling interaction and instantly release scroll locks
     let userInteracted = false;
-    const mountTime = Date.now();
+    const timeouts: NodeJS.Timeout[] = [];
+    let resizeObserver: ResizeObserver | null = null;
 
-    const handleInteraction = () => {
-      if (Date.now() - mountTime < 180) return;
+    const cancelRestorationLocks = () => {
       userInteracted = true;
+      timeouts.forEach(clearTimeout);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+        resizeObserver = null;
+      }
     };
 
-    window.addEventListener("wheel", handleInteraction, { passive: true });
-    window.addEventListener("touchmove", handleInteraction, { passive: true });
+    window.addEventListener("wheel", cancelRestorationLocks, { passive: true });
+    window.addEventListener("touchmove", cancelRestorationLocks, { passive: true });
+    window.addEventListener("pointerdown", cancelRestorationLocks, { passive: true });
 
     const getDocHeight = () => Math.max(
       document.body.scrollHeight,
@@ -102,11 +108,7 @@ export function ScrollRestoration() {
     performRestore();
     requestAnimationFrame(performRestore);
 
-    // Staggered restorations only for F5 refresh or hash target
     const hasSavedState = !!savedScrollPos || wasAtBottom || !!targetHash;
-    const timeouts: NodeJS.Timeout[] = [];
-    let resizeObserver: ResizeObserver | null = null;
-
     if (hasSavedState) {
       const delays = [30, 80, 150, 300, 600, 1000, 1800, 2500];
       delays.forEach((delay) => {
@@ -141,8 +143,9 @@ export function ScrollRestoration() {
     return () => {
       timeouts.forEach(clearTimeout);
       if (resizeObserver) resizeObserver.disconnect();
-      window.removeEventListener("wheel", handleInteraction);
-      window.removeEventListener("touchmove", handleInteraction);
+      window.removeEventListener("wheel", cancelRestorationLocks);
+      window.removeEventListener("touchmove", cancelRestorationLocks);
+      window.removeEventListener("pointerdown", cancelRestorationLocks);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleScroll);
     };

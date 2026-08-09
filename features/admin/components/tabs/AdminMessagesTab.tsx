@@ -23,6 +23,8 @@ export type ContactMessage = {
   status: "unread" | "read" | "replied";
 };
 
+import { subscribeCrossTabSync } from "@/lib/crossTabSync";
+
 export function AdminMessagesTab() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
 
@@ -77,10 +79,16 @@ export function AdminMessagesTab() {
     }
     fetchRealtimeMessages();
 
-    // Listen to real-time custom events from ContactSection
+    // Listen to real-time custom events from ContactSection & cross-tab sync broadcast
     const handleNewMessage = () => fetchRealtimeMessages();
     window.addEventListener("contact_message_submitted", handleNewMessage);
     window.addEventListener("storage", handleNewMessage);
+
+    const unsubscribeSync = subscribeCrossTabSync((msg) => {
+      if (msg.event === ("PUBLIC_MESSAGE_SUBMITTED" as any) || msg.event === "CONFIG_RESTORED") {
+        fetchRealtimeMessages();
+      }
+    });
 
     // Periodic heartbeat sync every 4 seconds (runs ONLY when tab is visible)
     const interval = setInterval(() => {
@@ -92,6 +100,7 @@ export function AdminMessagesTab() {
     return () => {
       window.removeEventListener("contact_message_submitted", handleNewMessage);
       window.removeEventListener("storage", handleNewMessage);
+      unsubscribeSync();
       clearInterval(interval);
     };
   }, []);

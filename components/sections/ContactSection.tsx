@@ -18,13 +18,12 @@ import { useLanguage } from "@/components/providers/LanguageContext";
 import { cn } from "@/lib/utils";
 
 import { toast } from "@/components/ui/Toast";
+import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
 
 export function ContactSection() {
   const { siteConfig } = useSiteData();
   const { language } = useLanguage();
-  const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   
   // Location Confirmation Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -33,12 +32,22 @@ export function ContactSection() {
     event.preventDefault();
     if (sending) return;
 
-    setStatus("");
-    setIsSuccess(false);
     setSending(true);
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    
+    // Honeypot bot protection check
+    const honeypot = String(formData.get("website_url") || "").trim();
+    if (honeypot.length > 0) {
+      // Drop bot submission silently with fake success toast
+      const msg = language === "id" ? "Pesan Anda berhasil dikirim secara aman!" : "Ihre Nachricht wurde erfolgreich gesendet!";
+      toast({ message: msg, type: "success", title: language === "id" ? "Pesan Terkirim!" : "Nachricht Gesendet!" });
+      setSending(false);
+      form.reset();
+      return;
+    }
+
     const name = String(formData.get("name") || "").trim();
     const email = String(formData.get("email") || "").trim();
     const message = String(formData.get("message") || "").trim();
@@ -56,22 +65,21 @@ export function ContactSection() {
 
       if (response.ok && data.success) {
         const msg = language === "id" ? "Pesan Anda berhasil dikirim secara aman!" : "Ihre Nachricht wurde erfolgreich gesendet!";
-        setStatus(msg);
-        setIsSuccess(true);
         toast({ message: msg, type: "success", title: language === "id" ? "Pesan Terkirim!" : "Nachricht Gesendet!" });
         form.reset();
 
-        // Dispatch real-time event so Admin Dashboard Messages tab updates instantly
+        // Dispatch real-time cross-tab event so Admin Dashboard Messages tab updates instantly across tabs/devices
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("contact_message_submitted"));
+          broadcastCrossTabEvent("PUBLIC_MESSAGE_SUBMITTED" as any, { name, timestamp: Date.now() });
         }
       } else {
-        setStatus(data.error || (language === "id" ? "Gagal mengirim pesan. Silakan coba lagi." : "Senden fehlgeschlagen. Bitte erneut versuchen."));
-        setIsSuccess(false);
+        const errMsg = data.error || (language === "id" ? "Gagal mengirim pesan. Silakan coba lagi." : "Senden fehlgeschlagen. Bitte erneut versuchen.");
+        toast({ message: errMsg, type: "error", title: language === "id" ? "Pengiriman Gagal" : "Fehler beim Senden" });
       }
     } catch (err) {
-      setStatus(language === "id" ? "Gagal terhubung ke server. Periksa koneksi internet Anda." : "Verbindung fehlgeschlagen. Prüfen Sie das Internet.");
-      setIsSuccess(false);
+      const connErr = language === "id" ? "Gagal terhubung ke server. Periksa koneksi internet Anda." : "Verbindung fehlgeschlagen. Prüfen Sie das Internet.";
+      toast({ message: connErr, type: "error", title: language === "id" ? "Koneksi Terputus" : "Verbindungsfehler" });
     } finally {
       setSending(false);
     }
@@ -200,21 +208,6 @@ export function ContactSection() {
                 required
               />
             </label>
-
-            {status ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cn(
-                  "mt-4 rounded-2xl p-4 text-sm font-bold leading-6",
-                  isSuccess
-                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                    : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                )}
-              >
-                {status}
-              </motion.div>
-            ) : null}
 
             <MagneticButton className="w-full">
               <motion.button

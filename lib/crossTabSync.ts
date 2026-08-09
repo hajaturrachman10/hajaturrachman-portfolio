@@ -12,6 +12,12 @@ type CrossTabEvent =
   | "RESOURCE_LOCKED"
   | "RESOURCE_UNLOCKED";
 
+export type ToggleChangedPayload = {
+  feature: "vault" | "ecl" | "cv" | string;
+  unlocked: boolean;
+  timestamp: number;
+};
+
 type SyncMessage = {
   event: CrossTabEvent;
   payload?: any;
@@ -21,6 +27,7 @@ type SyncMessage = {
 
 const CHANNEL_NAME = "hajat_portfolio_cross_tab_sync";
 let broadcastChannel: BroadcastChannel | null = null;
+let lastProcessedTimestamp = 0;
 
 if (typeof window !== "undefined" && "BroadcastChannel" in window) {
   try {
@@ -60,10 +67,24 @@ export function broadcastCrossTabEvent(event: CrossTabEvent, payload?: any): voi
 export function subscribeCrossTabSync(callback: (msg: SyncMessage) => void): () => void {
   if (typeof window === "undefined") return () => {};
 
+  const processMessage = (msg: SyncMessage) => {
+    if (!msg || !msg.event) return;
+    
+    // Deduplicate identical events arriving within 100ms
+    if (msg.timestamp && msg.timestamp === lastProcessedTimestamp) {
+      return;
+    }
+    if (msg.timestamp) {
+      lastProcessedTimestamp = msg.timestamp;
+    }
+
+    callback(msg);
+  };
+
   // BroadcastChannel Listener
   const handleBroadcast = (e: MessageEvent<SyncMessage>) => {
-    if (e.data && e.data.event) {
-      callback(e.data);
+    if (e.data) {
+      processMessage(e.data);
     }
   };
 
@@ -79,7 +100,7 @@ export function subscribeCrossTabSync(callback: (msg: SyncMessage) => void): () 
     if (e.key === "hajat_sync_event" && e.newValue) {
       try {
         const msg = JSON.parse(e.newValue) as SyncMessage;
-        callback(msg);
+        processMessage(msg);
       } catch {
         // Parse error handled
       }

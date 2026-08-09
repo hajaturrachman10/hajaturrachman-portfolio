@@ -136,18 +136,6 @@ export function PrivateVaultSection() {
           }
 
           const nextOverride = !!data.overrides?.vault;
-          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
-
-          if (hasOverrideChanged) {
-            const now = Date.now();
-            if (now - lastAnimTimeRef.current > 1500) {
-              lastAnimTimeRef.current = now;
-              const isEnabling = !nextOverride;
-              setAdminTransition({ active: true, isEnabling });
-              await new Promise((r) => setTimeout(r, 1200));
-            }
-          }
-
           isAdminOverrideRef.current = nextOverride;
           if (typeof window !== "undefined") {
             sessionStorage.setItem("vault_verified_override", nextOverride ? "true" : "false");
@@ -200,38 +188,47 @@ export function PrivateVaultSection() {
             setUnlocked(false);
             setCheckingAuth(false);
           }
-
-          if (isMounted) setAdminTransition(null);
         }
       } catch (err) {
         console.error("Gagal memeriksa status login:", err);
         if (isMounted) {
           setCheckingAuth(false);
-          setAdminTransition(null);
         }
       }
     }
 
     checkAuth(true);
 
-    // Debounced real-time cross-tab sync with atomic ref update and Strict Feature Filtering
+    // Single-source real-time cross-tab sync with 0ms atomic state updates
     const unsubscribe = subscribeCrossTabSync(async (msg) => {
       if (msg.event === "TOGGLE_CHANGED") {
-        const feat = msg.data?.feature || msg.payload?.feature;
+        const feat = msg.payload?.feature || msg.data?.feature;
         if (feat === "vault" && !isSyncingRef.current) {
-          const now = Date.now();
-          if (now - lastAnimTimeRef.current < 1500) return; // 1500ms cooldown guard
-          lastAnimTimeRef.current = now;
           isSyncingRef.current = true;
 
-          const isEnabling = msg.data?.protected !== undefined ? !!msg.data.protected : !!msg.payload?.protected;
-          
-          // ATOMIC REF UPDATE BEFORE TRANSITION: prevents checkAuth from triggering a 2nd transition!
-          isAdminOverrideRef.current = !isEnabling;
+          const isUnlocked = msg.payload?.unlocked !== undefined 
+            ? !!msg.payload.unlocked 
+            : (msg.payload?.protected !== undefined ? !msg.payload.protected : !msg.data?.protected);
 
+          isAdminOverrideRef.current = isUnlocked;
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("vault_verified_override", isUnlocked ? "true" : "false");
+          }
+
+          const isEnabling = !isUnlocked;
           setAdminTransition({ active: true, isEnabling });
-          await new Promise((r) => setTimeout(r, 1200));
 
+          if (isUnlocked) {
+            setIsAdminOverride(true);
+            setUnlocked(true);
+            await fetchVaultData();
+          } else {
+            setIsAdminOverride(false);
+            setUnlocked(false);
+          }
+
+          await new Promise((r) => setTimeout(r, 1200));
+          setAdminTransition(null);
           await checkAuth(false);
           isSyncingRef.current = false;
         }

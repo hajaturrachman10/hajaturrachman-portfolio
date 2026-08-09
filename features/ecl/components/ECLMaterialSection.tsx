@@ -80,41 +80,10 @@ export function ECLMaterialSection() {
           }
 
           const nextOverride = !!data.overrides?.ecl;
-          const hasOverrideChanged = !isInitial && (isAdminOverrideRef.current !== nextOverride);
-
-          // Detect document toggle changes from polling (cross-device)
-          let hasDocChanged = false;
-          let changedDocKey: string | null = null;
-          if (!isInitial && docTogglesInitialized.current && docTogglesRef.current && data.docToggles) {
-            const prev = docTogglesRef.current;
-            const next = data.docToggles;
-            if (prev.doc1 !== next.doc1) { hasDocChanged = true; changedDocKey = "doc1"; }
-            else if (prev.doc2 !== next.doc2) { hasDocChanged = true; changedDocKey = "doc2"; }
-            else if (prev.doc3 !== next.doc3) { hasDocChanged = true; changedDocKey = "doc3"; }
-          }
-
           if (data.docToggles) {
             docTogglesRef.current = data.docToggles;
             docTogglesInitialized.current = true;
             setDocToggles(data.docToggles);
-          }
-
-          if (hasOverrideChanged) {
-            const now = Date.now();
-            if (now - lastAnimTimeRef.current > 1500) {
-              lastAnimTimeRef.current = now;
-              const isEnabling = !nextOverride;
-              setAdminTransition({ active: true, isEnabling, type: "ecl" });
-              await new Promise((r) => setTimeout(r, 1200));
-            }
-          } else if (hasDocChanged && unlockedRef.current && changedDocKey && data.docToggles) {
-            const now = Date.now();
-            if (now - lastAnimTimeRef.current > 1500) {
-              lastAnimTimeRef.current = now;
-              const isEnabling = Boolean((data.docToggles as any)[changedDocKey]);
-              setAdminTransition({ active: true, isEnabling, type: "document" });
-              await new Promise((r) => setTimeout(r, 1200));
-            }
           }
 
           isAdminOverrideRef.current = nextOverride;
@@ -166,14 +135,11 @@ export function ECLMaterialSection() {
             setUnlocked(false);
             setCheckingAuth(false);
           }
-
-          if (isMounted) setAdminTransition(null);
         }
       } catch (err) {
         console.error("Gagal memeriksa status login ECL:", err);
         if (isMounted) {
           setCheckingAuth(false);
-          setAdminTransition(null);
         }
       }
     }
@@ -182,23 +148,41 @@ export function ECLMaterialSection() {
 
     const unsubscribe = subscribeCrossTabSync(async (msg) => {
       if (msg.event === "TOGGLE_CHANGED") {
-        const feat = msg.data?.feature || msg.payload?.feature;
+        const feat = msg.payload?.feature || msg.data?.feature;
         if ((feat === "ecl" || feat?.startsWith("ecl_doc")) && !isSyncingRef.current) {
-          const now = Date.now();
-          if (now - lastAnimTimeRef.current < 1500) return; // 1500ms cooldown guard
-          lastAnimTimeRef.current = now;
           isSyncingRef.current = true;
 
           const isDoc = feat?.startsWith("ecl_doc");
-          const isEnabling = msg.data?.protected !== undefined ? !!msg.data.protected : !!msg.payload?.protected;
+          const isUnlocked = msg.payload?.unlocked !== undefined 
+            ? !!msg.payload.unlocked 
+            : (msg.payload?.protected !== undefined ? !msg.payload.protected : !msg.data?.protected);
 
-          // ATOMIC REF UPDATE BEFORE TRANSITION: prevents checkAuth from triggering a 2nd transition!
           if (feat === "ecl") {
-            isAdminOverrideRef.current = !isEnabling;
-          }
+            isAdminOverrideRef.current = isUnlocked;
+            if (typeof window !== "undefined") {
+              sessionStorage.setItem("ecl_verified_override", isUnlocked ? "true" : "false");
+            }
 
-          setAdminTransition({ active: true, isEnabling, type: isDoc ? "document" : "ecl" });
-          await new Promise((r) => setTimeout(r, 1200));
+            const isEnabling = !isUnlocked;
+            setAdminTransition({ active: true, isEnabling, type: "ecl" });
+            setIsAdminOverride(isUnlocked);
+            setUnlocked(isUnlocked);
+
+            await new Promise((r) => setTimeout(r, 1200));
+            setAdminTransition(null);
+          } else if (isDoc && feat) {
+            const docKey = feat.replace("ecl_", ""); // e.g. "doc1"
+            const isEnabling = !isUnlocked;
+            setDocToggles((prev) => ({ ...prev, [docKey]: isUnlocked }));
+
+            const isSectionCurrentlyUnlocked = unlockedRef.current || isAdminOverrideRef.current || (typeof window !== "undefined" && sessionStorage.getItem("ecl_verified_override") === "true");
+
+            if (isSectionCurrentlyUnlocked) {
+              setAdminTransition({ active: true, isEnabling, type: "document" });
+              await new Promise((r) => setTimeout(r, 1200));
+              setAdminTransition(null);
+            }
+          }
 
           await checkAuth(false);
           isSyncingRef.current = false;

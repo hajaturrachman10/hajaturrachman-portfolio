@@ -26,7 +26,7 @@ export function PageRestoreOverlay() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.38, ease: "easeInOut" }}
-          className="fixed inset-0 z-[9999] grid place-items-center bg-canvas backdrop-blur-3xl select-none pointer-events-auto"
+          className="fixed inset-0 z-[9999] grid place-items-center bg-canvas backdrop-blur-3xl select-none pointer-events-none"
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
