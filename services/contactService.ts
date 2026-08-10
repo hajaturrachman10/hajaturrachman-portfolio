@@ -52,7 +52,7 @@ export const contactService = {
     // canonicalId: prefer Supabase's own returned id (integer/UUID) so DELETE works correctly
     let canonicalId = msgId;
 
-    // 1. Supabase Storage (with automatic schema fallback, capturing returned id)
+    // 1. Supabase Storage (with 3-level progressive schema fallback, capturing returned id)
     if (supabase) {
       try {
         const { data: insertedFull, error: fullErr } = await supabase
@@ -63,9 +63,9 @@ export const contactService = {
 
         if (!fullErr && insertedFull?.id) {
           savedToSupabase = true;
-          canonicalId = String(insertedFull.id); // Use Supabase's own id as canonical
+          canonicalId = String(insertedFull.id);
         } else {
-          // Schema fallback: insert minimal fields, Supabase assigns its own id
+          // Schema fallback 1: insert standard fields without string id
           const { data: insertedMin, error: minErr } = await supabase
             .from("contacts")
             .insert([{
@@ -79,16 +79,35 @@ export const contactService = {
             .select("id")
             .single();
 
-
-          if (!minErr && insertedMin?.id) {
+          if (!minErr) {
             savedToSupabase = true;
-            canonicalId = String(insertedMin.id); // Use Supabase-assigned id
+            if (insertedMin?.id) canonicalId = String(insertedMin.id);
+          } else {
+            // Schema fallback 2: Ultra-minimal insert containing only standard core columns (name, email, message, created_at)
+            const { data: insertedUltra, error: ultraErr } = await supabase
+              .from("contacts")
+              .insert([{
+                name: payload.name,
+                email: payload.email,
+                message: payload.message,
+                created_at: nowIso
+              }])
+              .select("id")
+              .single();
+
+            if (!ultraErr) {
+              savedToSupabase = true;
+              if (insertedUltra?.id) canonicalId = String(insertedUltra.id);
+            } else {
+              console.error("Gagal menyimpan ke Supabase (seluruh 3 fallback gagal):", { fullErr, minErr, ultraErr });
+            }
           }
         }
       } catch (err) {
         console.error("Gagal menyimpan ke Supabase:", err);
       }
     }
+
 
     // 2. Telegram Bot
     const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -151,39 +170,37 @@ export const contactService = {
     }
 
 
-    // 4. Local File Fallback Storage (LOCAL DEV ONLY — Vercel data/ is read-only)
+    // 4. Local File & Serverless /tmp Fallback Storage
     const IS_PRODUCTION = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
-    if (!IS_PRODUCTION) {
-      try {
-        const dataDir = path.join(process.cwd(), "data");
-        if (!fs.existsSync(dataDir)) {
-          fs.mkdirSync(dataDir, { recursive: true });
-        }
-        const filePath = path.join(dataDir, "messages.json");
-        let messages: any[] = [];
-        if (fs.existsSync(filePath)) {
-          try {
-            messages = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-          } catch {
-            messages = [];
-          }
-        }
-        // Use the same canonicalId so local and Supabase are in sync
-        messages.unshift({
-          id: canonicalId,
-          name: payload.name,
-          email: payload.email,
-          subject: `Pesan Kontak Baru dari ${payload.name}`,
-          message: payload.message,
-          timestamp: nowIso,
-          status: "unread"
-        });
-        fs.writeFileSync(filePath, JSON.stringify(messages, null, 2), "utf-8");
-        savedToLocal = true;
-      } catch (err) {
-        console.error("Gagal menyimpan ke arsip lokal:", err);
+    const targetDir = IS_PRODUCTION ? "/tmp" : path.join(process.cwd(), "data");
+    try {
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
       }
+      const filePath = path.join(targetDir, "messages.json");
+      let messages: any[] = [];
+      if (fs.existsSync(filePath)) {
+        try {
+          messages = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+        } catch {
+          messages = [];
+        }
+      }
+      messages.unshift({
+        id: canonicalId,
+        name: payload.name,
+        email: payload.email,
+        subject: `Pesan Kontak Baru dari ${payload.name}`,
+        message: payload.message,
+        timestamp: nowIso,
+        status: "unread"
+      });
+      fs.writeFileSync(filePath, JSON.stringify(messages, null, 2), "utf-8");
+      savedToLocal = true;
+    } catch (err) {
+      console.error("Gagal menyimpan ke file cache fallback:", err);
     }
+
 
     return {
       success: true,

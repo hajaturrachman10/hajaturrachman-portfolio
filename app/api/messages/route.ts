@@ -83,13 +83,14 @@ function saveStatusOverride(key: string, status: string) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Local file helpers — local dev only
+// Local / Fallback file helpers (supports /tmp on Vercel production and data/ in dev)
 // ─────────────────────────────────────────────────────────────────────────────
 function readLocalMessages(): any[] {
-  if (IS_PRODUCTION) return [];
+
+  const targetFile = IS_PRODUCTION ? "/tmp/messages.json" : MESSAGES_FILE;
   try {
-    if (fs.existsSync(DATA_DIR) && fs.existsSync(MESSAGES_FILE)) {
-      const raw = fs.readFileSync(MESSAGES_FILE, "utf-8");
+    if (fs.existsSync(targetFile)) {
+      const raw = fs.readFileSync(targetFile, "utf-8");
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
         return parsed.map((m: any) => ({
@@ -104,18 +105,19 @@ function readLocalMessages(): any[] {
       }
     }
   } catch (err) {
-    console.error("Error reading messages file:", err);
+    console.error("Error reading fallback messages file:", err);
   }
   return [];
 }
 
 function writeLocalMessages(messages: any[]) {
-  if (IS_PRODUCTION) return; // No-op in production — Vercel data/ is read-only
+  const targetDir = IS_PRODUCTION ? "/tmp" : DATA_DIR;
+  const targetFile = IS_PRODUCTION ? "/tmp/messages.json" : MESSAGES_FILE;
   try {
-    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2), "utf-8");
+    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+    fs.writeFileSync(targetFile, JSON.stringify(messages, null, 2), "utf-8");
   } catch (err) {
-    console.error("Error writing messages file:", err);
+    console.error("Error writing fallback messages file:", err);
   }
 }
 
@@ -136,7 +138,7 @@ function mapSupabaseRow(m: any): any {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET — fetch all messages
-// Production: Supabase only | Local dev: merge Supabase + local file
+// Merges Supabase primary database messages + serverless /tmp or local file messages
 // ─────────────────────────────────────────────────────────────────────────────
 export async function GET() {
   const deletedSigs = readDeletedSigs();
@@ -159,7 +161,6 @@ export async function GET() {
         .order("created_at", { ascending: false })
         .limit(100);
 
-
       if (!error && Array.isArray(data)) {
         remoteMsgs = data.map(mapSupabaseRow);
       }
@@ -178,21 +179,14 @@ export async function GET() {
     }
   }
 
-  // Merge local file messages (local dev only — adds messages saved before Supabase was available)
-  if (!IS_PRODUCTION) {
-    const localMsgs = readLocalMessages();
-    for (const m of localMsgs) {
-      if (m && m.id && !isMsgDeleted(m) && !map.has(m.id)) {
-        const fp = getFingerprint(m);
-        const statusOverride = statusOverrides[m.id] || statusOverrides[fp];
-        map.set(m.id, statusOverride ? { ...m, status: statusOverride } : m);
-      }
+  // Merge fallback file messages (from /tmp in production or data/ in dev)
+  const localMsgs = readLocalMessages();
+  for (const m of localMsgs) {
+    if (m && m.id && !isMsgDeleted(m) && !map.has(m.id)) {
+      const fp = getFingerprint(m);
+      const statusOverride = statusOverrides[m.id] || statusOverrides[fp];
+      map.set(m.id, statusOverride ? { ...m, status: statusOverride } : m);
     }
-    // Persist merged result back to local file
-    const merged = Array.from(map.values()).sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
-    writeLocalMessages(merged);
   }
 
   const messages = Array.from(map.values()).sort(
@@ -201,6 +195,7 @@ export async function GET() {
 
   return NextResponse.json({ success: true, messages });
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST — save new message (admin UI only; public form uses /api/contact)
