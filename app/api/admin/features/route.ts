@@ -6,6 +6,7 @@ import { adminRepository } from "@/services/admin/adminRepository";
 import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
 
 export async function GET() {
+  await adminRepository.readAsync();
   const result = adminToggleService.getAllFeatureStates();
   if (!result.success) {
     return NextResponse.json(
@@ -31,6 +32,9 @@ export async function PATCH(request: Request) {
       { status: authCheck.error.status }
     );
   }
+
+  await adminRepository.readAsync();
+
 
   try {
     const body = await request.json();

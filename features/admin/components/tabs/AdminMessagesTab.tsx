@@ -27,6 +27,9 @@ import { subscribeCrossTabSync } from "@/lib/crossTabSync";
 
 export function AdminMessagesTab() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [fetchError, setFetchError] = useState(false);
+  // isDeleting: pause polling for 5s after delete to prevent race condition
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "unread" | "read" | "replied">("all");
@@ -58,18 +61,55 @@ export function AdminMessagesTab() {
     }
   };
 
+  const getClientDeletedSigs = (): string[] => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("admin_deleted_msg_sigs");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const addClientDeletedSig = (sig: string) => {
+    if (typeof window === "undefined") return;
+    try {
+      const current = getClientDeletedSigs();
+      if (!current.includes(sig)) {
+        current.push(sig);
+        localStorage.setItem("admin_deleted_msg_sigs", JSON.stringify(current));
+      }
+    } catch {
+      // Ignore
+    }
+  };
+
   // Real-time synchronization with server API & homepage contact submissions
-  const fetchRealtimeMessages = async () => {
+  const fetchRealtimeMessages = async (force = false) => {
+    // Do not fetch while a deletion is in progress (prevent race condition)
+    if (!force && isDeleting) return;
     try {
       const res = await fetch("/api/messages");
       if (res.ok) {
+        setFetchError(false);
         const data = await res.json();
         if (data.success && Array.isArray(data.messages)) {
-          setMessages(data.messages);
+          const deletedSigs = new Set(getClientDeletedSigs());
+          const filtered = data.messages.filter((m: any) => {
+            if (!m || !m.id) return false;
+            if (deletedSigs.has(m.id)) return false;
+            const fp = `${(m.email || "").toLowerCase().trim()}::${(m.message || "").toLowerCase().trim().substring(0, 150)}`;
+            if (deletedSigs.has(fp)) return false;
+            return true;
+          });
+          setMessages(filtered);
         }
+      } else {
+        setFetchError(true);
       }
     } catch (err) {
       console.error("Gagal sinkronisasi pesan real-time:", err);
+      setFetchError(true);
     }
   };
 
@@ -85,7 +125,7 @@ export function AdminMessagesTab() {
     window.addEventListener("storage", handleNewMessage);
 
     const unsubscribeSync = subscribeCrossTabSync((msg) => {
-      if (msg.event === ("PUBLIC_MESSAGE_SUBMITTED" as any) || msg.event === "CONFIG_RESTORED") {
+      if (msg.event === "PUBLIC_MESSAGE_SUBMITTED" || msg.event === "CONFIG_RESTORED") {
         fetchRealtimeMessages();
       }
     });
@@ -146,19 +186,34 @@ export function AdminMessagesTab() {
     setMessageToDelete(null);
 
     if (id) {
-      // 2. Optimistically remove message from local list
+      // 2. Client guard recording (stores id + fingerprint in localStorage)
+      const targetMsg = messages.find((m) => m.id === id);
+      if (targetMsg) {
+        addClientDeletedSig(id);
+        const fp = `${(targetMsg.email || "").toLowerCase().trim()}::${(targetMsg.message || "").toLowerCase().trim().substring(0, 150)}`;
+        addClientDeletedSig(fp);
+      }
+
+      // 3. Optimistically remove message from local list
       setMessages((prev) => prev.filter((m) => m.id !== id));
       if (selectedMessageId === id) {
         setSelectedMessageId("");
       }
 
-      // 3. Perform network delete request
+      // 4. Pause heartbeat polling to prevent race condition
+      //    (polling could re-fetch the message before Supabase DELETE finishes)
+      setIsDeleting(true);
+
+      // 5. Perform network delete request
       try {
         await fetch(`/api/messages?id=${encodeURIComponent(id)}`, {
           method: "DELETE"
         });
       } catch (err) {
         console.error("Gagal menghapus pesan:", err);
+      } finally {
+        // 6. Resume polling after 5 seconds (Supabase propagation buffer)
+        setTimeout(() => setIsDeleting(false), 5000);
       }
     }
   };
@@ -337,7 +392,25 @@ export function AdminMessagesTab() {
           </div>
 
           {/* Render Kosong atau List Inbox Scrollable */}
-          {filteredMessages.length === 0 ? (
+          {fetchError ? (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex-1 flex flex-col items-center justify-center p-6 text-center rounded-2xl border border-dashed border-red-500/30 bg-red-500/5"
+            >
+              <AlertCircle className="h-8 w-8 text-red-400 mb-2" />
+              <h4 className="font-display text-sm font-black text-red-300">Gagal Memuat Pesan</h4>
+              <p className="text-[11px] font-bold text-muted mt-1 leading-relaxed">
+                Koneksi ke server bermasalah. Pesan tetap ada di database.
+              </p>
+              <button
+                onClick={() => fetchRealtimeMessages(true)}
+                className="mt-3 text-[11px] font-bold text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+              >
+                Coba lagi
+              </button>
+            </motion.div>
+          ) : filteredMessages.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -349,6 +422,7 @@ export function AdminMessagesTab() {
                 {searchQuery ? "Tidak ada pesan yang cocok dengan pencarian." : "Belum ada pesan kontak dalam kategori ini."}
               </p>
             </motion.div>
+
           ) : (
             <div className="flex-1 overflow-y-auto flex flex-col gap-2.5 p-1 pr-1.5 scrollbar-thin scrollbar-thumb-line/50 hover:scrollbar-thumb-primary/30">
               {filteredMessages.map((msg) => {

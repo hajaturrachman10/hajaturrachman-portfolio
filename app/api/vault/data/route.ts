@@ -6,7 +6,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const token = cookies().get("vault_unlocked")?.value;
-  const result = vaultService.getVaultContent(token);
+  const result = await vaultService.getVaultContentAsync(token);
+
 
   if (!result.success) {
     return NextResponse.json({ success: false, error: result.error }, { status: 401 });

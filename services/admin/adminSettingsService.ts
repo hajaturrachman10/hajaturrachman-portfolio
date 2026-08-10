@@ -40,8 +40,12 @@ export const adminSettingsService = {
       };
     }
 
+    const cleanUser = newUsername.trim();
     const updatedState = adminRepository.update((draft) => {
-      draft.auth.username = newUsername.trim();
+      draft.auth.username = cleanUser;
+      if (draft.accounts && draft.accounts.length > 0) {
+        draft.accounts[0].username = cleanUser;
+      }
       return draft;
     });
 
@@ -61,11 +65,15 @@ export const adminSettingsService = {
       };
     }
 
+    const cleanPass = newPassword.trim();
     const now = Date.now();
     adminRepository.update((draft) => {
-      draft.auth.passwordHash = newPassword;
+      draft.auth.passwordHash = cleanPass;
       draft.auth.lastPasswordChange = now;
       draft.globalEpoch = now; // Revoke sessions on password change
+      if (draft.accounts && draft.accounts.length > 0) {
+        draft.accounts[0].passwords = [cleanPass];
+      }
       return draft;
     });
 
@@ -76,4 +84,5 @@ export const adminSettingsService = {
       data: { updated: true }
     };
   }
+
 };

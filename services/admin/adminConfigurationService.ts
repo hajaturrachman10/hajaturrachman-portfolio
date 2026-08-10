@@ -58,7 +58,16 @@ export const adminConfigurationService = {
     };
   },
 
+  async restoreSnapshotAsync(version: number, restoredBy = "Hajaturrachman10"): Promise<ServiceResult<{ restoredVersion: number; globalEpoch: number }>> {
+    const result = this.restoreSnapshot(version, restoredBy);
+    if (result.success) {
+      await adminRepository.readAsync();
+    }
+    return result;
+  },
+
   restoreSnapshot(version: number, restoredBy = "Hajaturrachman10"): ServiceResult<{ restoredVersion: number; globalEpoch: number }> {
+
     const targetSnapshot = adminSnapshotRepository.getSnapshotByVersion(version);
 
     if (!targetSnapshot) {

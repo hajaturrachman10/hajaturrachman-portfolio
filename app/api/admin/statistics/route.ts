@@ -16,7 +16,7 @@ export async function GET() {
     );
   }
 
-  const result = adminStatsService.getStatistics();
+  const result = await adminStatsService.getStatisticsAsync();
 
   return NextResponse.json({
     success: true,
@@ -36,7 +36,8 @@ export async function DELETE() {
     );
   }
 
-  const result = adminStatsService.resetAll();
+  const result = await adminStatsService.resetAllAsync();
+
 
   return NextResponse.json({
     success: true,

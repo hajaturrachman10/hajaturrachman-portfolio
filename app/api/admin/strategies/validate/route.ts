@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminAuthService } from "@/services/admin/adminAuthService";
 import { adminStrategyService } from "@/services/admin/adminStrategyService";
+import { adminRepository } from "@/services/admin/adminRepository";
 import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
+
 
 export async function POST(request: Request) {
   const cookieStore = cookies();
@@ -16,8 +18,10 @@ export async function POST(request: Request) {
     );
   }
 
+  await adminRepository.readAsync();
   try {
     const body = await request.json();
+
     const { inputPassword, strategy } = body || {};
 
     const result = adminStrategyService.testPasswordStrategy(inputPassword || "", strategy);

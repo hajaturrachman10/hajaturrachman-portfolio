@@ -1,18 +1,37 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { authService, type AuthType } from "@/services/authService";
+import { adminAuthService } from "@/services/admin/adminAuthService";
+import { adminSecurityService } from "@/services/admin/adminSecurityService";
+import { adminRepository } from "@/services/admin/adminRepository";
+import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
 
 export async function POST(request: Request) {
   try {
+    await adminRepository.readAsync();
     const ip = authService.getClientIp(request);
     const body = await request.json();
     const { password, type, action } = body || {};
 
-    // Handle emergency reset request
+
+    // Handle emergency reset request (Secured: Requires valid admin session or admin password)
     if (action === "reset") {
-      authService.resetRateLimit(ip);
-      return NextResponse.json({ success: true, message: "Rate limit reset successfully" });
+      const cookieStore = cookies();
+      const adminToken = cookieStore.get(ADMIN_CONFIG.COOKIE_NAME)?.value;
+      const sessionValid = adminAuthService.validateSession(adminToken).success;
+      const passwordValid = password ? adminSecurityService.verifySensitiveAction(password).success : false;
+
+      if (sessionValid || passwordValid) {
+        authService.resetRateLimit(ip);
+        return NextResponse.json({ success: true, message: "Rate limit reset successfully" });
+      }
+
+      return NextResponse.json(
+        { success: false, error: "Otorisasi reset rate limit gagal. Sesi atau kata sandi admin diperlukan." },
+        { status: 401 }
+      );
     }
+
 
     const rateLimit = authService.checkRateLimit(ip);
 
@@ -40,7 +59,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { isValid, cookieName } = authService.verifyPassword(type as AuthType, password);
+    const { isValid, cookieName } = await authService.verifyPasswordAsync(type as AuthType, password);
 
     if (isValid) {
       authService.resetRateLimit(ip);

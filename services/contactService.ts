@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
+
+// Use admin client for server-side contact inserts
+const supabase = supabaseAdmin;
+
 import { getClientIp, checkContactRateLimit } from "@/lib/security";
 
 export type ContactPayload = {
@@ -18,11 +22,17 @@ export const contactService = {
     if (!name || !email || !message || name.length > 100 || email.length > 100 || message.length > 5000) {
       return { valid: false, error: "Nama, email, dan pesan wajib diisi dengan panjang yang wajar." };
     }
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return { valid: false, error: "Format alamat email tidak valid." };
+    }
     return { valid: true };
   },
 
   async processContactMessage(payload: ContactPayload) {
-    const msgId = `msg-${Date.now()}`;
+    // Use a single deterministic ID with random suffix to prevent collisions
+    const msgId = `msg-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const nowIso = new Date().toISOString();
     const dataPayload = {
       id: msgId,
@@ -39,23 +49,41 @@ export const contactService = {
     let sentToTelegram = false;
     let sentToResend = false;
     let savedToLocal = false;
+    // canonicalId: prefer Supabase's own returned id (integer/UUID) so DELETE works correctly
+    let canonicalId = msgId;
 
-    // 1. Supabase Storage (with automatic schema fallback)
+    // 1. Supabase Storage (with automatic schema fallback, capturing returned id)
     if (supabase) {
       try {
-        const { error } = await supabase.from("contacts").insert([dataPayload]);
-        if (!error) {
+        const { data: insertedFull, error: fullErr } = await supabase
+          .from("contacts")
+          .insert([dataPayload])
+          .select("id")
+          .single();
+
+        if (!fullErr && insertedFull?.id) {
           savedToSupabase = true;
+          canonicalId = String(insertedFull.id); // Use Supabase's own id as canonical
         } else {
-          // Schema fallback for standard Supabase contacts table
-          const minimalPayload = {
-            name: payload.name,
-            email: payload.email,
-            message: payload.message,
-            created_at: nowIso
-          };
-          const { error: minError } = await supabase.from("contacts").insert([minimalPayload]);
-          if (!minError) savedToSupabase = true;
+          // Schema fallback: insert minimal fields, Supabase assigns its own id
+          const { data: insertedMin, error: minErr } = await supabase
+            .from("contacts")
+            .insert([{
+              name: payload.name,
+              email: payload.email,
+              subject: `Pesan Kontak dari ${payload.name}`,
+              message: payload.message,
+              created_at: nowIso,
+              status: "unread"
+            }])
+            .select("id")
+            .single();
+
+
+          if (!minErr && insertedMin?.id) {
+            savedToSupabase = true;
+            canonicalId = String(insertedMin.id); // Use Supabase-assigned id
+          }
         }
       } catch (err) {
         console.error("Gagal menyimpan ke Supabase:", err);
@@ -80,10 +108,23 @@ export const contactService = {
       }
     }
 
+    // Helper to sanitize HTML inputs for email template
+    const escapeHtml = (str: string) =>
+      String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
     // 3. Resend Email
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
       try {
+        const safeName = escapeHtml(payload.name);
+        const safeEmail = escapeHtml(payload.email);
+        const safeMsg = escapeHtml(payload.message).replace(/\n/g, "<br>");
+
         const response = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -96,10 +137,10 @@ export const contactService = {
             subject: `Pesan Baru Portofolio: ${payload.name}`,
             html: `
               <h3>Pesan Kontak Baru</h3>
-              <p><strong>Nama:</strong> ${payload.name}</p>
-              <p><strong>Email:</strong> ${payload.email}</p>
+              <p><strong>Nama:</strong> ${safeName}</p>
+              <p><strong>Email:</strong> ${safeEmail}</p>
               <p><strong>Pesan:</strong></p>
-              <p>${payload.message.replace(/\n/g, "<br>")}</p>
+              <p>${safeMsg}</p>
             `
           })
         });
@@ -109,34 +150,39 @@ export const contactService = {
       }
     }
 
-    // 4. Local File Fallback Storage
-    try {
-      const dataDir = path.join(process.cwd(), "data");
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-      }
-      const filePath = path.join(dataDir, "messages.json");
-      let messages = [];
-      if (fs.existsSync(filePath)) {
-        try {
-          messages = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-        } catch {
-          messages = [];
+
+    // 4. Local File Fallback Storage (LOCAL DEV ONLY — Vercel data/ is read-only)
+    const IS_PRODUCTION = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
+    if (!IS_PRODUCTION) {
+      try {
+        const dataDir = path.join(process.cwd(), "data");
+        if (!fs.existsSync(dataDir)) {
+          fs.mkdirSync(dataDir, { recursive: true });
         }
+        const filePath = path.join(dataDir, "messages.json");
+        let messages: any[] = [];
+        if (fs.existsSync(filePath)) {
+          try {
+            messages = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+          } catch {
+            messages = [];
+          }
+        }
+        // Use the same canonicalId so local and Supabase are in sync
+        messages.unshift({
+          id: canonicalId,
+          name: payload.name,
+          email: payload.email,
+          subject: `Pesan Kontak Baru dari ${payload.name}`,
+          message: payload.message,
+          timestamp: nowIso,
+          status: "unread"
+        });
+        fs.writeFileSync(filePath, JSON.stringify(messages, null, 2), "utf-8");
+        savedToLocal = true;
+      } catch (err) {
+        console.error("Gagal menyimpan ke arsip lokal:", err);
       }
-      messages.unshift({
-        id: `msg-${Date.now()}`,
-        name: payload.name,
-        email: payload.email,
-        subject: `Pesan Kontak Baru dari ${payload.name}`,
-        message: payload.message,
-        timestamp: new Date().toISOString(),
-        status: "unread"
-      });
-      fs.writeFileSync(filePath, JSON.stringify(messages, null, 2), "utf-8");
-      savedToLocal = true;
-    } catch (err) {
-      console.error("Gagal menyimpan ke arsip lokal:", err);
     }
 
     return {

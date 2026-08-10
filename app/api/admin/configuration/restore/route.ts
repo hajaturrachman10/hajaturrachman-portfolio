@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminAuthService } from "@/services/admin/adminAuthService";
 import { adminConfigurationService } from "@/services/admin/adminConfigurationService";
+import { adminRepository } from "@/services/admin/adminRepository";
 import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
+
 
 export async function POST(request: Request) {
   const cookieStore = cookies();
@@ -16,8 +18,10 @@ export async function POST(request: Request) {
     );
   }
 
+  await adminRepository.readAsync();
   try {
     const body = await request.json();
+
     const { version } = body || {};
 
     if (typeof version !== "number") {
@@ -28,7 +32,8 @@ export async function POST(request: Request) {
     }
 
     const currentAdminUser = authCheck.data.session.username;
-    const result = adminConfigurationService.restoreSnapshot(version, currentAdminUser);
+    const result = await adminConfigurationService.restoreSnapshotAsync(version, currentAdminUser);
+
 
     if (!result.success) {
       return NextResponse.json(

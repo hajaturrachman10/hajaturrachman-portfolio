@@ -17,8 +17,9 @@ export async function GET() {
     );
   }
 
-  const state = adminRepository.read();
+  const state = await adminRepository.readAsync();
   const accounts = state.accounts || [];
+
 
   return NextResponse.json({
     success: true,
@@ -38,8 +39,10 @@ export async function POST(request: Request) {
     );
   }
 
+  await adminRepository.readAsync();
   try {
     const body = await request.json();
+
     const { username, password, role } = body || {};
 
     if (!username || !password || username.length < 3 || password.length < 6) {
@@ -112,8 +115,10 @@ export async function PATCH(request: Request) {
     );
   }
 
+  await adminRepository.readAsync();
   try {
     const body = await request.json();
+
     const { id, action, value, role, username } = body || {};
 
     if (!id || !action) {
@@ -167,6 +172,14 @@ export async function PATCH(request: Request) {
         }
       }
 
+      // Sync primary account changes to draft.auth
+      if (acc.id === draft.accounts[0]?.id) {
+        draft.auth.username = acc.username;
+        if (acc.passwords.length > 0) {
+          draft.auth.passwordHash = acc.passwords[0];
+        }
+      }
+
       return draft;
     });
 
@@ -199,7 +212,9 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: false, error: "ID Akun wajib disertakan." }, { status: 400 });
   }
 
+  await adminRepository.readAsync();
   let errorMessage: string | null = null;
+  const currentUsername = authCheck.data?.session?.username?.toLowerCase();
 
   adminRepository.update((draft) => {
     if (!draft.accounts) return draft;
@@ -214,9 +229,22 @@ export async function DELETE(request: Request) {
       return draft;
     }
 
+    if (currentUsername && target.username.toLowerCase() === currentUsername) {
+      errorMessage = "Anda tidak dapat menghapus akun yang sedang Anda gunakan saat ini.";
+      return draft;
+    }
+
     draft.accounts = draft.accounts.filter((a) => a.id !== id);
+    // Keep draft.auth in sync if primary account was deleted
+    if (draft.accounts.length > 0) {
+      draft.auth.username = draft.accounts[0].username;
+      if (draft.accounts[0].passwords.length > 0) {
+        draft.auth.passwordHash = draft.accounts[0].passwords[0];
+      }
+    }
     return draft;
   });
+
 
   if (errorMessage) {
     return NextResponse.json({ success: false, error: errorMessage }, { status: 400 });

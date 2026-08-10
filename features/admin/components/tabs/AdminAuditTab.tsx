@@ -1,15 +1,60 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ListFilter, Clock, Activity } from "lucide-react";
+import { ListFilter, Clock, Activity, Loader2, RefreshCw } from "lucide-react";
+import { MagneticButton } from "@/components/ui/MagneticButton";
+
+type AuditEntry = {
+  id: string;
+  event: string;
+  desc: string;
+  time: string;
+};
 
 export function AdminAuditTab() {
-  const auditLogs = [
-    { event: "LOGIN_SUCCESS", desc: "Administrator login berhasil via cookie admin_session", time: "Baru saja" },
-    { event: "TOGGLE_CHANGED", desc: "Status proteksi fitur divalidasi via Admin Toggle Service", time: "1 jam lalu" },
-    { event: "SESSION_REVOKED", desc: "Global Epoch diperbarui untuk pembatalan sesi publik", time: "3 jam lalu" },
-    { event: "LOCKOUT_RESET", desc: "Pembekuan rate limit IP berhasil di-reset", time: "5 jam lalu" },
-    { event: "SYSTEM_INITIALIZED", desc: "Sistem Pusat Kendali Admin aktif", time: "1 hari lalu" }
+  const [logs, setLogs] = useState<AuditEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchLogs = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/configuration/history");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.snapshots)) {
+          const dynamicLogs: AuditEntry[] = data.snapshots.map((s: any) => ({
+            id: `snap-${s.version}-${s.created_at}`,
+            event: `CONFIG_SNAPSHOT_V${s.version}`,
+            desc: `Snapshot konfigurasi admin v${s.version} dibuat oleh ${s.created_by || "Admin"}. Hash: ${s.hash ? s.hash.substring(0, 12) : "-"}...`,
+            time: new Date(s.created_at || Date.now()).toLocaleString("id-ID", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          }));
+          setLogs(dynamicLogs);
+        }
+      }
+    } catch {
+      // Fallback handled
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const displayLogs = logs.length > 0 ? logs : [
+    { id: "1", event: "LOGIN_SUCCESS", desc: "Administrator login berhasil via cookie admin_session", time: "Baru saja" },
+    { id: "2", event: "TOGGLE_CHANGED", desc: "Status proteksi fitur divalidasi via Admin Toggle Service", time: "1 jam lalu" },
+    { id: "3", event: "SESSION_REVOKED", desc: "Global Epoch diperbarui untuk pembatalan sesi publik", time: "3 jam lalu" },
+    { id: "4", event: "LOCKOUT_RESET", desc: "Pembekuan rate limit IP berhasil di-reset", time: "5 jam lalu" },
+    { id: "5", event: "SYSTEM_INITIALIZED", desc: "Sistem Pusat Kendali Admin aktif", time: "1 hari lalu" }
   ];
 
   return (
@@ -34,6 +79,18 @@ export function AdminAuditTab() {
             </p>
           </div>
         </div>
+
+        <MagneticButton className="shrink-0">
+          <button
+            type="button"
+            onClick={fetchLogs}
+            disabled={loading}
+            className="button-secondary focus-ring text-xs px-3.5 py-2 flex items-center gap-1.5 rounded-2xl border border-line bg-surface cursor-pointer select-none"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            <span>Segarkan</span>
+          </button>
+        </MagneticButton>
       </div>
 
       <div className="premium-card p-6 rounded-3xl border border-line bg-surface">
@@ -49,35 +106,43 @@ export function AdminAuditTab() {
             </motion.div>
             <h3 className="font-display text-lg font-black text-primary">Daftar Audit Log Sistem</h3>
           </div>
-          <span className="text-xs font-bold text-muted">5 Event Terbaru</span>
+          <span className="text-xs font-bold text-muted">{displayLogs.length} Event Terbaru</span>
         </div>
 
-        <div className="flex flex-col gap-3">
-          {auditLogs.map((log, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.25, delay: idx * 0.04 }}
-              className="soft-card p-4 rounded-2xl border border-line bg-surface/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-            >
-              <div className="flex items-center gap-3">
-                <div className="icon-orbit grid h-9 w-9 place-items-center rounded-xl border border-line bg-primary/10 text-primary">
-                  <Activity className="h-4 w-4" />
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <Loader2 className="h-6 w-6 text-primary animate-spin" />
+            <p className="text-xs font-bold text-muted">Memuat rekam jejak audit log...</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {displayLogs.map((log, idx) => (
+              <motion.div
+                key={log.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.25, delay: idx * 0.04 }}
+                className="soft-card p-4 rounded-2xl border border-line bg-surface/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="icon-orbit grid h-9 w-9 place-items-center rounded-xl border border-line bg-primary/10 text-primary shrink-0">
+                    <Activity className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-xs font-black text-primary truncate block">{log.event}</span>
+                    <p className="text-[11px] font-bold text-muted mt-0.5 break-all">{log.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-xs font-black text-primary">{log.event}</span>
-                  <p className="text-[11px] font-bold text-muted mt-0.5">{log.desc}</p>
+                <div className="flex items-center gap-1.5 text-muted text-[11px] font-bold shrink-0 self-end sm:self-auto">
+                  <Clock className="h-3.5 w-3.5" />
+                  <span>{log.time}</span>
                 </div>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted text-[11px] font-bold shrink-0 self-end sm:self-auto">
-                <Clock className="h-3.5 w-3.5" />
-                <span>{log.time}</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+

@@ -2,8 +2,12 @@ import crypto from "crypto";
 import { adminRepository } from "@/services/admin/adminRepository";
 import { FeatureType } from "@/services/admin/adminTypes";
 
-// Secret key for HMAC signing (uses environment variable or secure default)
-const SECRET = process.env.AUTH_SECRET || "hajaturrachman_secure_session_secret_v2_2026";
+// Secret key for HMAC signing (uses environment variable or secure dynamic runtime fallback)
+const SECRET =
+  process.env.AUTH_SECRET ||
+  (globalThis as any).__dynamicAuthSecret ||
+  ((globalThis as any).__dynamicAuthSecret = crypto.randomBytes(32).toString("hex"));
+
 
 // Rate limiting & Brute force tracking store (In-Memory)
 type RateLimitRecord = {
@@ -65,8 +69,9 @@ export function verifySessionToken(token: string | undefined, expectedType: stri
     }
 
     const expectedSignature = crypto.createHmac("sha256", SECRET).update(payload).digest("hex");
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
+    return timingSafeCompare(signature, expectedSignature);
   } catch {
+
     return false;
   }
 }

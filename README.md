@@ -1,4 +1,5 @@
-# Hajaturrachman Portfolio (v2.4.6)
+# Hajaturrachman Portfolio (v2.5.0)
+
 
 A modern, high-performance personal portfolio, project archive, media showcase, and protected credential platform built with Next.js App Router, Tailwind CSS, Framer Motion, and TypeScript.
 

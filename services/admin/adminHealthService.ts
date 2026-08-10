@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { adminRepository } from "./adminRepository";
-import { ADMIN_CONFIG } from "./adminConfig";
 import { ServiceResult } from "./adminTypes";
 
 export type SystemHealthReport = {
@@ -30,11 +30,11 @@ export const adminHealthService = {
       isReadable = Boolean(state && state.auth && state.toggles);
       isStateValid = Boolean(state.auth.username && state.globalEpoch > 0);
 
-      // Verify writable
-      const testPath = path.join(process.cwd(), "data", ".health_test");
-      fs.writeFileSync(testPath, "test", "utf-8");
-      if (fs.existsSync(testPath)) {
-        fs.unlinkSync(testPath);
+      // Verify writable in serverless / local environment (/tmp or data/)
+      const tmpTestPath = path.join(os.tmpdir(), "hajat_health_test.tmp");
+      fs.writeFileSync(tmpTestPath, "test", "utf-8");
+      if (fs.existsSync(tmpTestPath)) {
+        fs.unlinkSync(tmpTestPath);
         isWritable = true;
       }
     } catch {
@@ -53,8 +53,9 @@ export const adminHealthService = {
       success: true,
       data: {
         status: isHealthy ? "OK" : "DEGRADED",
-        version: "2.2.0",
-        build: "Production Baseline v2.2",
+        version: "2.5.0",
+        build: "Production Baseline v2.5.0",
+
         runtime: `Node.js ${process.version}`,
         checks: {
           repositoryReadable: isReadable,

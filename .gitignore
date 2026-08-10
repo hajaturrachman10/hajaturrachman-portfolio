@@ -10,3 +10,6 @@ dist
 *.log
 tsconfig.tsbuildinfo
 .cache
+
+# Data files — contain credentials, admin state, and user messages (never commit)
+data/*.json

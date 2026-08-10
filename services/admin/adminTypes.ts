@@ -55,7 +55,9 @@ export type AdminState = {
   stats: AdminStats;
   lastLogin?: LastLoginMetadata;
   loginHistory?: LoginHistoryStats;
+  snapshots?: ConfigSnapshot[];
 };
+
 
 export type ConfigSnapshot = {
   version: number;

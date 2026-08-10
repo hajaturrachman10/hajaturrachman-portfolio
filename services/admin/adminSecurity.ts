@@ -2,7 +2,11 @@ import crypto from "crypto";
 import { AdminSession } from "./adminTypes";
 import { timingSafeCompare } from "@/lib/security";
 
-const SECRET = process.env.ADMIN_SESSION_SECRET || "hajaturrachman_admin_secure_hmac_key_v2_2026";
+const SECRET =
+  process.env.ADMIN_SESSION_SECRET ||
+  (globalThis as any).__dynamicAdminSecret ||
+  ((globalThis as any).__dynamicAdminSecret = crypto.randomBytes(32).toString("hex"));
+
 
 export const adminSecurity = {
   signSession(session: AdminSession): string {

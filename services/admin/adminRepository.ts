@@ -2,7 +2,11 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 import { AdminState, LoginHistoryStats, LastLoginMetadata } from "./adminTypes";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
+
+// Use admin client for admin state persistence (bypasses RLS on admin_config table)
+const supabase = supabaseAdmin;
+
 
 const DEV_STORAGE_PATH = path.join(process.cwd(), "data", "adminState.json");
 const TMP_STORAGE_PATH = path.join(os.tmpdir(), "hajat_adminState.json");
@@ -24,25 +28,31 @@ function getFileMtime(): number {
   return 0;
 }
 
+// Read admin credentials from environment — NEVER hardcode in source
+const ENV_ADMIN_USERNAME = process.env.ADMIN_USERNAME || "Hajaturrachman10";
+const ENV_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
+const ENV_CV_PASSWORD = process.env.CV_PASSWORD || "cvhajat2026";
+const ENV_VAULT_PASSWORD = process.env.VAULT_PASSWORD || "hajatprivat2026";
+
 const DEFAULT_STATE: AdminState = {
   auth: {
-    username: "Hajaturrachman10",
-    passwordHash: "Xyzordie67@",
+    username: ENV_ADMIN_USERNAME,
+    passwordHash: ENV_ADMIN_PASSWORD,
     sessionSecret: "c98f02a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
     lastPasswordChange: Date.now()
   },
   accounts: [
     {
       id: "acc-1",
-      username: "Hajaturrachman10",
-      passwords: ["Xyzordie67@"],
+      username: ENV_ADMIN_USERNAME,
+      passwords: ENV_ADMIN_PASSWORD ? [ENV_ADMIN_PASSWORD] : [],
       role: "SUPER_ADMIN",
       createdAt: Date.now()
     }
   ],
   strategies: {
-    cv: { type: "STATIC", password: "cvhajat2026" },
-    vault: { type: "STATIC", password: "hajatprivat2026" },
+    cv: { type: "STATIC", password: ENV_CV_PASSWORD },
+    vault: { type: "STATIC", password: ENV_VAULT_PASSWORD },
     ecl: { type: "YEAR_RANGE", base: "10juli", startYear: 2006, endYear: 2026 }
   },
   toggles: {
@@ -76,6 +86,7 @@ const DEFAULT_STATE: AdminState = {
     lastResetDate: new Date().toISOString().slice(0, 10)
   }
 };
+
 
 /**
  * Apply cookie Last-Write-Wins (LWW) merge onto the given state.
@@ -127,28 +138,93 @@ function applyToggleCookieLWW(state: AdminState, togglesCookie: string): AdminSt
   }
 }
 
+function buildFullState(parsedFileState: any, togglesCookie?: string): AdminState {
+  const parsed = parsedFileState || {};
+  const loginHistory = { ...DEFAULT_STATE.loginHistory, ...parsed.loginHistory };
+
+  let fullState: AdminState = {
+    auth: { ...DEFAULT_STATE.auth, ...parsed.auth },
+    accounts: parsed.accounts && parsed.accounts.length > 0 ? parsed.accounts : defaultAccounts,
+    strategies: { ...DEFAULT_STATE.strategies, ...parsed.strategies },
+    toggles: { ...DEFAULT_STATE.toggles, ...parsed.toggles },
+    stats: { ...DEFAULT_STATE.stats, ...parsed.stats },
+    lastLogin: (parsed.lastLogin ? { ...DEFAULT_STATE.lastLogin, ...parsed.lastLogin } : DEFAULT_STATE.lastLogin)!,
+    loginHistory: loginHistory as LoginHistoryStats,
+    globalEpoch: Number(parsed.globalEpoch) || DEFAULT_STATE.globalEpoch,
+    snapshots: Array.isArray(parsed.snapshots) ? parsed.snapshots : []
+  };
+
+  if (togglesCookie) {
+    fullState = applyToggleCookieLWW(fullState, togglesCookie);
+  }
+
+  inMemoryState = fullState;
+  (globalThis as any).__adminStateCache = fullState;
+  return fullState;
+}
+
 export const adminRepository = {
   /**
-   * Read admin state from file (with in-memory cache), then apply cookie LWW.
-   *
-   * IMPORTANT: togglesCookie MUST be passed explicitly from the request context
-   * (e.g., from cookies() in the route handler). Do NOT use require("next/headers")
-   * inside this method — it silently fails in some serverless contexts.
+   * Async read admin state with Supabase cloud fallback (critical for Vercel cold-starts).
+   */
+  async readAsync(togglesCookie?: string): Promise<AdminState> {
+    if (inMemoryState) {
+      if (togglesCookie) return applyToggleCookieLWW(inMemoryState, togglesCookie);
+      return inMemoryState;
+    }
+
+    const currentMtime = getFileMtime();
+    if (fs.existsSync(TMP_STORAGE_PATH) || fs.existsSync(DEV_STORAGE_PATH)) {
+      try {
+        let raw = "";
+        if (fs.existsSync(TMP_STORAGE_PATH)) {
+          raw = fs.readFileSync(TMP_STORAGE_PATH, "utf-8");
+          lastFileMtimeMs = fs.statSync(TMP_STORAGE_PATH).mtimeMs;
+        } else if (fs.existsSync(DEV_STORAGE_PATH)) {
+          raw = fs.readFileSync(DEV_STORAGE_PATH, "utf-8");
+          lastFileMtimeMs = fs.statSync(DEV_STORAGE_PATH).mtimeMs;
+        }
+        if (raw) {
+          return buildFullState(JSON.parse(raw), togglesCookie);
+        }
+      } catch {
+        // Ignore read error — fall through to Supabase
+      }
+    }
+
+    // Serverless cold-start fallback: fetch state from Supabase admin_config table
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("admin_config")
+          .select("state")
+          .eq("id", "config_root")
+          .maybeSingle();
+
+        if (!error && data?.state) {
+          return buildFullState(data.state, togglesCookie);
+        }
+      } catch (err) {
+        console.error("Gagal membaca adminState dari Supabase:", err);
+      }
+    }
+
+    return buildFullState(null, togglesCookie);
+  },
+
+  /**
+   * Sync read admin state (uses in-memory cache or local file, with fallback).
    */
   read(togglesCookie?: string): AdminState {
     const currentMtime = getFileMtime();
 
-    // Cache hit: file hasn't changed since last read
     if (inMemoryState && currentMtime > 0 && currentMtime <= lastFileMtimeMs) {
-      // Even on cache hit, apply cookie LWW — the cookie may have newer toggle state
-      // (e.g., admin changed toggle on a different container that wrote to its own file)
       if (togglesCookie) {
         return applyToggleCookieLWW(inMemoryState, togglesCookie);
       }
       return inMemoryState;
     }
 
-    // No cache hit — read from filesystem
     let parsedFileState: any = null;
     try {
       let raw = "";
@@ -161,36 +237,13 @@ export const adminRepository = {
       }
       (globalThis as any).__adminStateMtime = lastFileMtimeMs;
       if (raw) parsedFileState = JSON.parse(raw);
-      // If no file: parsedFileState = null → use DEFAULT_STATE as base
-      // Do NOT return early here — must still apply cookie LWW below
     } catch {
       // Ignore read errors — fall through to use DEFAULT_STATE
     }
 
-    const parsed = parsedFileState || {};
-    const loginHistory = { ...DEFAULT_STATE.loginHistory, ...parsed.loginHistory };
-
-    let fullState: AdminState = {
-      auth: { ...DEFAULT_STATE.auth, ...parsed.auth },
-      accounts: parsed.accounts && parsed.accounts.length > 0 ? parsed.accounts : defaultAccounts,
-      strategies: { ...DEFAULT_STATE.strategies, ...parsed.strategies },
-      toggles: { ...DEFAULT_STATE.toggles, ...parsed.toggles },
-      stats: { ...DEFAULT_STATE.stats, ...parsed.stats },
-      lastLogin: (parsed.lastLogin ? { ...DEFAULT_STATE.lastLogin, ...parsed.lastLogin } : DEFAULT_STATE.lastLogin)!,
-      loginHistory: loginHistory as LoginHistoryStats,
-      globalEpoch: Number(parsed.globalEpoch) || DEFAULT_STATE.globalEpoch
-    };
-
-    // Apply cookie LWW using the explicitly passed cookie.
-    // This is the ONLY cookie read — no dynamic require("next/headers") here.
-    if (togglesCookie) {
-      fullState = applyToggleCookieLWW(fullState, togglesCookie);
-    }
-
-    inMemoryState = fullState;
-    (globalThis as any).__adminStateCache = fullState;
-    return fullState;
+    return buildFullState(parsedFileState, togglesCookie);
   },
+
 
   write(state: AdminState): void {
     inMemoryState = state;

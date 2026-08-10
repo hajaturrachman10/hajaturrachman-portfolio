@@ -62,8 +62,9 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
     setLoadingFeature(feature);
     setTransitioningAction(isEnabling ? "enabling" : "disabling");
 
-    // Give 3-second delay after clicking button as requested
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // Comfortable 400ms micro-delay for smooth progress bar transition
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
 
     try {
       // 1. Send API patch request

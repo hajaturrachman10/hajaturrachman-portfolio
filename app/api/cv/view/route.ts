@@ -8,7 +8,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const download = searchParams.get("download") === "true";
 
-  const result = cvService.getCVFile(token, download);
+  const result = await cvService.getCVFileAsync(token, download);
+
 
   if (!result.success) {
     return new Response(result.error, { status: result.status });

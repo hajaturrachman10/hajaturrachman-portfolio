@@ -9,6 +9,17 @@ import { ServiceResult, AdminSession } from "./adminTypes";
 import { checkAuthRateLimit, recordFailedAuthAttempt, resetAuthRateLimit, timingSafeCompare } from "@/lib/security";
 
 export const adminAuthService = {
+  async authenticateAsync(
+    username?: string,
+    password?: string,
+    remember = false,
+    ip = "127.0.0.1"
+  ): Promise<ServiceResult<{ token: string; session: AdminSession }>> {
+    await adminRepository.readAsync();
+    return this.authenticate(username, password, remember, ip);
+  },
+
+
   authenticate(
     username?: string,
     password?: string,
@@ -30,6 +41,7 @@ export const adminAuthService = {
     }
 
     const state = adminRepository.read();
+
     const cleanUsernameInput = (username || "").trim().toLowerCase();
     const cleanPasswordInput = (password || "").trim();
 
@@ -48,8 +60,8 @@ export const adminAuthService = {
     const accounts = state.accounts || [
       {
         id: "acc-1",
-        username: state.auth.username || "Hajaturrachman10",
-        passwords: [state.auth.passwordHash || "Xyzordie67@"],
+        username: state.auth.username || (process.env.ADMIN_USERNAME || "Hajaturrachman10"),
+        passwords: [state.auth.passwordHash || process.env.ADMIN_PASSWORD || ""].filter(Boolean),
         role: "SUPER_ADMIN",
         createdAt: Date.now()
       }
@@ -67,9 +79,10 @@ export const adminAuthService = {
         timingSafeCompare(cleanPasswordInput, pass.trim())
       );
     } else {
-      const cleanStoredUsername = (state.auth.username || "Hajaturrachman10").trim().toLowerCase();
+      const cleanStoredUsername = (state.auth.username || (process.env.ADMIN_USERNAME || "Hajaturrachman10")).trim().toLowerCase();
       if (cleanUsernameInput === cleanStoredUsername) {
-        isPasswordMatch = timingSafeCompare(cleanPasswordInput, (state.auth.passwordHash || "Xyzordie67@").trim());
+        const storedPwd = state.auth.passwordHash || process.env.ADMIN_PASSWORD || "";
+        isPasswordMatch = storedPwd ? timingSafeCompare(cleanPasswordInput, storedPwd.trim()) : false;
       }
     }
 
@@ -113,13 +126,18 @@ export const adminAuthService = {
     const now = Date.now();
     const activeUsername = matchedAccount ? matchedAccount.username : (state.auth.username || "Hajaturrachman10");
 
+    const duration = remember
+      ? ADMIN_CONFIG.SESSION_DURATION_REMEMBER
+      : ADMIN_CONFIG.SESSION_DURATION_DEFAULT;
+
     const session: AdminSession = {
       username: activeUsername,
       remember,
       issuedAt: now,
-      expiresAt: now + 100 * 365 * 24 * 60 * 60 * 1000,
+      expiresAt: now + duration,
       globalEpoch: state.globalEpoch
     };
+
 
     const token = adminSecurity.signSession(session);
     adminSecurityService.recordLogin(ip, "Chrome / Next.js Admin Client", remember);

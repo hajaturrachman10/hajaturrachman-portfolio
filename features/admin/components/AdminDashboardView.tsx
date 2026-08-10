@@ -257,7 +257,8 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <h1 className="font-display text-lg sm:text-xl font-black text-primary truncate flex items-center gap-2">
                 <span>{language === "de" ? "Admin-Kontrollzentrum" : "Pusat Kendali Admin"}</span>
-                <span className="text-xs sm:text-sm font-bold text-muted/70 font-mono">v2.4.6</span>
+                <span className="text-xs sm:text-sm font-bold text-muted/70 font-mono">v2.5.0</span>
+
               </h1>
             </div>
             <p className="text-[11px] sm:text-xs font-bold text-muted mt-0.5 truncate">

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const { username, password, remember } = body || {};
     const clientIp = getClientIp(request);
 
-    const result = adminAuthService.authenticate(username, password, Boolean(remember), clientIp);
+    const result = await adminAuthService.authenticateAsync(username, password, Boolean(remember), clientIp);
 
     if (!result.success) {
       const details = (result.error as any).details || {};

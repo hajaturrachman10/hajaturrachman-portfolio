@@ -32,14 +32,42 @@ export function ConfirmModal({
   onConfirm,
   onCancel
 }: ConfirmModalProps) {
-  // Lock body scroll when confirm modal is open
+  // Lock body scroll and trap keyboard focus when confirm modal is open
   useEffect(() => {
     if (!open) return;
     lockScroll();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onCancel();
+      } else if (e.key === "Tab") {
+        const modal = document.querySelector('[role="dialog"][aria-modal="true"]');
+        if (!modal) return;
+        const focusables = modal.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          last.focus();
+          e.preventDefault();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          first.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       unlockScroll();
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open]);
+  }, [open, onCancel]);
+
 
   return (
     <AnimatePresence>

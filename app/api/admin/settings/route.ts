@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminAuthService } from "@/services/admin/adminAuthService";
 import { adminSettingsService } from "@/services/admin/adminSettingsService";
+import { adminRepository } from "@/services/admin/adminRepository";
 import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
+
 
 export async function GET() {
   const cookieStore = cookies();
@@ -16,6 +18,7 @@ export async function GET() {
     );
   }
 
+  await adminRepository.readAsync();
   const result = adminSettingsService.getSettings();
   return NextResponse.json({ success: true, settings: result.data });
 }
@@ -31,6 +34,9 @@ export async function POST(request: Request) {
       { status: authCheck.error.status }
     );
   }
+
+  await adminRepository.readAsync();
+
 
   try {
     const body = await request.json();

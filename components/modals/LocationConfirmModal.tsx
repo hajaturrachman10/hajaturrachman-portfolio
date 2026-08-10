@@ -41,13 +41,39 @@ export function LocationConfirmModal({
       }
     };
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onCancel();
+      } else if (e.key === "Tab") {
+        const modal = document.querySelector('[role="dialog"][aria-modal="true"]');
+        if (!modal) return;
+        const focusables = modal.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          last.focus();
+          e.preventDefault();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          first.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
     window.addEventListener("touchmove", preventDefault, { passive: false });
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       unlockScroll();
       window.removeEventListener("touchmove", preventDefault);
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open]);
+  }, [open, onCancel]);
+
 
   if (!mounted) return null;
  
@@ -60,6 +86,7 @@ export function LocationConfirmModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
+          onClick={onCancel}
           role="dialog"
           aria-modal="true"
         >
@@ -72,8 +99,10 @@ export function LocationConfirmModal({
               stiffness: 420,
               damping: 26
             }}
+            onClick={(e) => e.stopPropagation()}
             className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden transform-gpu will-change-[transform,opacity]"
           >
+
             <div className="flex flex-col items-center text-center gap-4">
               <motion.div
                 whileHover="hover"

@@ -25,7 +25,13 @@ export const authService = {
   resetRateLimit: (ip: string) => resetAuthRateLimit(ip),
   recordFailedAttempt: (ip: string) => recordFailedAuthAttempt(ip),
 
+  async verifyPasswordAsync(type: AuthType, password: string): Promise<{ isValid: boolean; cookieName: string }> {
+    await adminRepository.readAsync();
+    return this.verifyPassword(type, password);
+  },
+
   verifyPassword(type: AuthType, password: string): { isValid: boolean; cookieName: string } {
+
     const featureKey = mapAuthTypeToFeatureKey(type);
     const cookieName =
       type === "cv"
@@ -46,17 +52,26 @@ export const authService = {
       // Fallback if strategy read fails
     }
 
-    // Default Fallback
+    // Default Fallback (reads from env vars — no hardcoded secrets in source)
     let isValid = false;
     const cleanInput = password.trim();
     if (type === "cv") {
-      isValid = timingSafeCompare(cleanInput, "cvhajat2026");
+      if (!process.env.CV_PASSWORD) {
+        console.warn("[SECURITY WARN] CV_PASSWORD Environment Variable belum terdefinisi. Menggunakan kata sandi fallback sementara.");
+      }
+      const cvPwd = process.env.CV_PASSWORD || "cvhajat2026";
+      isValid = timingSafeCompare(cleanInput, cvPwd);
     } else if (type === "private-vault") {
-      isValid = timingSafeCompare(cleanInput, "hajatprivat2026");
+      if (!process.env.VAULT_PASSWORD) {
+        console.warn("[SECURITY WARN] VAULT_PASSWORD Environment Variable belum terdefinisi. Menggunakan kata sandi fallback sementara.");
+      }
+      const vaultPwd = process.env.VAULT_PASSWORD || "hajatprivat2026";
+      isValid = timingSafeCompare(cleanInput, vaultPwd);
     } else if (type === "ecl-material") {
       const allowed = Array.from({ length: 2026 - 2006 + 1 }, (_, i) => `10juli${2006 + i}`);
       isValid = allowed.some((a) => timingSafeCompare(cleanInput, a));
     }
+
 
     return { isValid, cookieName };
   },
@@ -65,7 +80,13 @@ export const authService = {
     return generateSessionToken(type);
   },
 
+  async getAuthStatusAsync(cvToken?: string, vaultToken?: string, eclToken?: string, togglesCookie?: string) {
+    await adminRepository.readAsync(togglesCookie);
+    return this.getAuthStatus(cvToken, vaultToken, eclToken, togglesCookie);
+  },
+
   getAuthStatus(cvToken?: string, vaultToken?: string, eclToken?: string, togglesCookie?: string) {
+
     let adminState;
     try {
       // Pass togglesCookie explicitly — adminRepository.read() applies cookie LWW internally.

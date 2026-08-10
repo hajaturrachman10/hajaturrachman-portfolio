@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminAuthService } from "@/services/admin/adminAuthService";
 import { adminSecurityService } from "@/services/admin/adminSecurityService";
+import { adminRepository } from "@/services/admin/adminRepository";
 import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
+
 
 export async function POST(request: Request) {
   const cookieStore = cookies();
@@ -16,11 +18,14 @@ export async function POST(request: Request) {
     );
   }
 
+  await adminRepository.readAsync();
+
   try {
     const body = await request.json();
     const { password } = body || {};
 
     const result = adminSecurityService.verifySensitiveAction(password);
+
 
     if (!result.success) {
       return NextResponse.json(

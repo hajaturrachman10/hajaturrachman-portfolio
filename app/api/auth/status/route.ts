@@ -11,7 +11,8 @@ export async function GET() {
   const eclToken = cookies().get("ecl_unlocked")?.value;
   const togglesCookie = cookies().get("hajat_toggles_state")?.value;
 
-  const status = authService.getAuthStatus(cvToken, vaultToken, eclToken, togglesCookie);
+  const status = await authService.getAuthStatusAsync(cvToken, vaultToken, eclToken, togglesCookie);
+
 
   const response = NextResponse.json(status, {
     headers: {

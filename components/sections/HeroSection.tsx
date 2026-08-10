@@ -109,7 +109,8 @@ export function HeroSection() {
                   ease: "easeInOut",
                   delay: index * 0.2
                 }}
-                className="premium-card absolute hidden rounded-full px-4 py-2 text-xs font-black text-text sm:block"
+                className="premium-card absolute hidden rounded-full px-4 py-2 text-xs font-black text-text sm:block pointer-events-none select-none"
+
                 style={{
                   top: `${12 + index * 20}%`,
                   left: index % 2 === 0 ? "-3%" : "70%"

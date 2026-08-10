@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminAuthService } from "@/services/admin/adminAuthService";
 import { adminHealthService } from "@/services/admin/adminHealthService";
+import { adminRepository } from "@/services/admin/adminRepository";
 import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
+
 
 export async function GET() {
   const cookieStore = cookies();
@@ -16,7 +18,9 @@ export async function GET() {
     );
   }
 
+  await adminRepository.readAsync();
   const result = adminHealthService.getSystemHealth();
+
 
   return NextResponse.json({
     success: true,

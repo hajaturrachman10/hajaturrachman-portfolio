@@ -10,7 +10,9 @@ type CrossTabEvent =
   | "LOCKOUT_RESET"
   | "PUBLIC_SESSION_INVALID"
   | "RESOURCE_LOCKED"
-  | "RESOURCE_UNLOCKED";
+  | "RESOURCE_UNLOCKED"
+  | "PUBLIC_MESSAGE_SUBMITTED";
+
 
 export type ToggleChangedPayload = {
   feature: "vault" | "ecl" | "cv" | string;

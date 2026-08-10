@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 
 export default function PrivatePage() {
   return (
-    <main className="pt-28 sm:pt-[7.5rem] pb-16">
+    <main id="main-content" tabIndex={-1} className="pt-28 sm:pt-[7.5rem] pb-16 outline-none">
+
       <PrivateVaultSection />
     </main>
   );

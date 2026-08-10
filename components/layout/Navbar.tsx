@@ -185,6 +185,18 @@ export function Navbar() {
       if (typeof document !== "undefined") {
         (document.activeElement as HTMLElement)?.blur();
       }
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setMenuOpen(false);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+
+      return () => {
+        if (menuOpenClassTimeoutId) clearTimeout(menuOpenClassTimeoutId);
+        window.removeEventListener("keydown", handleKeyDown);
+      };
     } else {
       unlockScroll();
       menuOpenClassTimeoutId = setTimeout(() => {
@@ -195,6 +207,7 @@ export function Navbar() {
       if (menuOpenClassTimeoutId) clearTimeout(menuOpenClassTimeoutId);
     };
   }, [menuOpen]);
+
 
   const [activeHoverIndex, setActiveHoverIndex] = useState<number | null>(null);
 

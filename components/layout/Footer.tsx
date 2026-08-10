@@ -69,6 +69,8 @@ export function Footer() {
               onClick={() => handleCopy("hajaturrachman10@gmail.com", "email")}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-line bg-surface/80 hover:bg-canvas text-[11px] font-bold text-muted hover:text-primary transition-all cursor-pointer select-none active:scale-95"
               title={language === "id" ? "Salin Email Hajaturrachman" : "E-Mail von Hajaturrachman kopieren"}
+              aria-label={language === "id" ? "Salin Email Hajaturrachman" : "E-Mail von Hajaturrachman kopieren"}
+              aria-live="polite"
             >
               {copiedItem === "email" ? (
                 <motion.span
@@ -93,7 +95,10 @@ export function Footer() {
               onClick={() => handleCopy("+6285158518090", "phone")}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-line bg-surface/80 hover:bg-canvas text-[11px] font-bold text-muted hover:text-emerald-500 transition-all cursor-pointer select-none active:scale-95"
               title={language === "id" ? "Salin WhatsApp Hajaturrachman" : "WhatsApp-Nummer kopieren"}
+              aria-label={language === "id" ? "Salin WhatsApp Hajaturrachman" : "WhatsApp-Nummer kopieren"}
+              aria-live="polite"
             >
+
               {copiedItem === "phone" ? (
                 <motion.span
                   initial={{ opacity: 0, scale: 0.85 }}

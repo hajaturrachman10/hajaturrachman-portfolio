@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 
 const AdminContainer = dynamic(
-  () => import("@/features/admin").then((mod) => mod.AdminContainer),
+  () => import("@/features/admin/components/AdminContainer").then((mod) => mod.AdminContainer),
   { ssr: false }
 );
+
 
 export const metadata: Metadata = {
   title: "Pusat Kendali Admin — Hajaturrachman",
@@ -16,5 +17,10 @@ export const metadata: Metadata = {
 };
 
 export default function AdminPage() {
-  return <AdminContainer />;
+  return (
+    <main id="main-content" tabIndex={-1} className="outline-none">
+      <AdminContainer />
+    </main>
+  );
 }
+

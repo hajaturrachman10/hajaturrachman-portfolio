@@ -3,18 +3,21 @@ import { JourneySection } from "@/components/sections/JourneySection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
 import { TimelineSection } from "@/components/sections/TimelineSection";
-import { ReadingProgressBar } from "@/components/ui/ReadingProgressBar";
 
 export const metadata: Metadata = {
   title: "Cerita & Arah Hidup — Hajaturrachman",
   description: "Peta perjalanan hidup, riwayat pendidikan, pengalaman organisasi, kepemimpinan Duta Baca, motivasi karir, dan persiapan Ausbildung perawat di Jerman.",
   keywords: ["Perjalanan Hajat", "Riwayat Pendidikan Hajat", "Duta Baca Kabupaten Cirebon", "Germany Indonesia Professionals", "Ausbildung Jerman"],
+  alternates: {
+    canonical: "/journey"
+  }
 };
+
 
 export default function JourneyPage() {
   return (
-    <main className="pt-28 sm:pt-[7.5rem] pb-16 space-y-4">
-      <ReadingProgressBar />
+    <main id="main-content" tabIndex={-1} className="pt-28 sm:pt-[7.5rem] pb-16 space-y-4 outline-none">
+
       <JourneySection />
       <AboutSection />
       <SkillsSection />
@@ -22,3 +25,4 @@ export default function JourneyPage() {
     </main>
   );
 }
+

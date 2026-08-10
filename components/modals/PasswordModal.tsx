@@ -17,7 +17,8 @@ import {
   UnlockKeyhole,
   Loader2
 } from "lucide-react";
-import { FormEvent, useEffect, useState, useRef } from "react";
+import { FormEvent, useEffect, useState, useRef, useCallback } from "react";
+
 import { useLanguage } from "@/components/providers/LanguageContext";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { cn } from "@/lib/utils";
@@ -66,20 +67,49 @@ export function PasswordModal({
   const shakeControls = useAnimation();
 
   // Secure Close Handler to clear values and blur to prevent Google Password Manager popups
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setPassword("");
     inputRef.current?.blur();
     onClose();
-  };
+  }, [onClose]);
 
-  // Lock body scroll when password modal is open
+  // Lock body scroll and trap keyboard focus when password modal is open
   useEffect(() => {
     if (!open) return;
     lockScroll();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+      } else if (e.key === "Tab") {
+        const modal = document.querySelector('[role="dialog"][aria-modal="true"]');
+        if (!modal) return;
+        const focusables = modal.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          last.focus();
+          e.preventDefault();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          first.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       unlockScroll();
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open]);
+  }, [open, handleClose]);
+
+
 
   // Load attempts from localStorage and reset form state when modal opens
   useEffect(() => {
@@ -208,14 +238,15 @@ export function PasswordModal({
       setIsShakeError(false);
       setPassword("");
 
-      // Reset server IP rate limit map
+      // Reset server IP rate limit map (Requires current input password or admin session)
       try {
         await fetch("/api/auth/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "reset", type })
+          body: JSON.stringify({ action: "reset", type, password })
         });
       } catch {}
+
 
       tapCountRef.current = 0;
     } else {

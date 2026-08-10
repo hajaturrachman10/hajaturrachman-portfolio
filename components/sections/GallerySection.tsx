@@ -157,6 +157,7 @@ function GalleryModal({ item, onClose }: { item: GalleryItem | null; onClose: ()
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.28, ease: "easeOut" }}
+          onClick={onClose}
           role="dialog"
           aria-modal="true"
         >
@@ -165,6 +166,7 @@ function GalleryModal({ item, onClose }: { item: GalleryItem | null; onClose: ()
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+            onClick={(e) => e.stopPropagation()}
             className="premium-card mx-auto w-full max-w-6xl overflow-hidden rounded-4xl"
           >
           <div className="flex items-center justify-between gap-4 border-b border-line p-4">
@@ -214,7 +216,7 @@ function GalleryModal({ item, onClose }: { item: GalleryItem | null; onClose: ()
                   }}
                   transition={{ type: "spring", stiffness: 450, damping: 18 }}
                   className="focus-ring grid h-11 w-11 place-items-center rounded-full bg-white/86 text-slate-900 shadow-card backdrop-blur-xl cursor-pointer border-0"
-                  aria-label="Sebelumnya"
+                  aria-label={language === "id" ? "Sebelumnya" : "Vorheriges"}
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </motion.button>
@@ -231,12 +233,13 @@ function GalleryModal({ item, onClose }: { item: GalleryItem | null; onClose: ()
                   }}
                   transition={{ type: "spring", stiffness: 450, damping: 18 }}
                   className="focus-ring grid h-11 w-11 place-items-center rounded-full bg-white/86 text-slate-900 shadow-card backdrop-blur-xl cursor-pointer border-0"
-                  aria-label="Berikutnya"
+                  aria-label={language === "id" ? "Berikutnya" : "Nächstes"}
                 >
                   <ChevronRight className="h-5 w-5" />
                 </motion.button>
               </MagneticButton>
             </div>
+
             <div className="flex flex-row overflow-x-auto md:grid md:max-h-[32rem] md:overflow-y-auto md:pr-1 gap-2.5 sm:gap-3 scrollbar-none pb-2 md:pb-0 max-w-full">
               {item.media.map((media, index) => (
                 <motion.button

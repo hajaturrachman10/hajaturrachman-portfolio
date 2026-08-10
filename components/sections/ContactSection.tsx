@@ -71,7 +71,7 @@ export function ContactSection() {
         // Dispatch real-time cross-tab event so Admin Dashboard Messages tab updates instantly across tabs/devices
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("contact_message_submitted"));
-          broadcastCrossTabEvent("PUBLIC_MESSAGE_SUBMITTED" as any, { name, timestamp: Date.now() });
+          broadcastCrossTabEvent("PUBLIC_MESSAGE_SUBMITTED", { name, timestamp: Date.now() });
         }
       } else {
         const errMsg = data.error || (language === "id" ? "Gagal mengirim pesan. Silakan coba lagi." : "Senden fehlgeschlagen. Bitte erneut versuchen.");
@@ -162,7 +162,18 @@ export function ContactSection() {
           </div>
 
           <form onSubmit={handleSubmit} className="premium-card rounded-4xl p-5 sm:p-8" autoComplete="off">
+            {/* Honeypot Bot Trap Field */}
+            <input
+              type="text"
+              name="website_url"
+              className="hidden"
+              tabIndex={-1}
+              aria-hidden="true"
+              autoComplete="off"
+              defaultValue=""
+            />
             <div className="grid gap-4 sm:grid-cols-2">
+
               <label className="grid gap-2">
                 <span className="text-sm font-black">{language === "id" ? "Nama" : "Name"}</span>
                 <input

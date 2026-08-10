@@ -8,7 +8,8 @@ import { SectionHeader } from "@/components/layout/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { useLanguage } from "@/components/providers/LanguageContext";
-import { subscribeCrossTabSync } from "@/lib/crossTabSync";
+import { useFeatureSync } from "@/hooks/useFeatureSync";
+
 
 type UnavailableCardProps = {
   docId: string;
@@ -33,10 +34,10 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [docName, language, router]);
-
-  // Real-time tab sync and cross-device polling
-  useEffect(() => {
-    const handleRedirect = () => {
+  // Real-time tab sync and cross-device polling via centralized hook
+  const featureKey = `ecl_doc${docId}` as "ecl_doc1" | "ecl_doc2" | "ecl_doc3";
+  useFeatureSync(featureKey, (unlocked) => {
+    if (unlocked) {
       const docUrls: Record<string, string> = {
         "1": "https://docs.google.com/document/d/1KHzF7IriKkR2p4oFFRq_XQx3IXHL6k5Dky1wp5c8HOo/edit?usp=sharing",
         "2": "https://docs.google.com/document/d/1h_Io7Tl451P8otFz5q_3nS7xyepxJ3FckjAvvW03U0U/edit?usp=sharing",
@@ -44,54 +45,9 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
       };
       const targetUrl = docUrls[docId] || "/ecl-b2";
       window.location.href = targetUrl;
-    };
+    }
+  });
 
-    // 1. Listen for cross-tab sync toggle events
-    const unsubscribe = subscribeCrossTabSync((msg) => {
-      if (msg.event === "TOGGLE_CHANGED") {
-        const togglesMap = msg.data?.togglesMap || msg.payload?.togglesMap;
-        if (togglesMap) {
-          const docKey = `ecl_doc${docId}` as keyof typeof togglesMap;
-          if (togglesMap[docKey] === true) {
-            handleRedirect();
-          }
-        }
-      }
-    });
-
-    // 2. Poll server every 4 seconds to support cross-device synchronization (e.g. phone vs desktop)
-    const checkServerStatus = async () => {
-      try {
-        const res = await fetch("/api/auth/status", { cache: "no-store" });
-        if (res.ok) {
-          const data = await res.json();
-          
-          // Sync client-side toggles if available in response
-          if (data.toggles) {
-            syncLocalToggles(data.toggles, data.globalEpoch);
-          }
-
-          const docKey = `doc${docId}` as "doc1" | "doc2" | "doc3";
-          if (data.docToggles?.[docKey] === true) {
-            handleRedirect();
-          }
-        }
-      } catch {
-        // Ignore
-      }
-    };
-
-    const interval = setInterval(() => {
-      if (typeof document !== "undefined" && document.visibilityState === "visible") {
-        checkServerStatus();
-      }
-    }, 4000);
-
-    return () => {
-      unsubscribe();
-      clearInterval(interval);
-    };
-  }, [docId]);
 
   return (
     <div className="container-page flex flex-col items-center">

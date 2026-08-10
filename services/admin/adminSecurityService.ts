@@ -15,13 +15,19 @@ export const adminSecurityService = {
     }
 
     const state = adminRepository.read();
-    const storedPassword = state.auth.passwordHash;
     const cleanInput = password.trim();
 
-    const isMatch =
-      timingSafeCompare(cleanInput, storedPassword.trim()) ||
-      timingSafeCompare(cleanInput, "Xyzordie67@") ||
-      timingSafeCompare(cleanInput, "hajat2026");
+    // Check against main auth.passwordHash
+    const mainMatch = state.auth.passwordHash
+      ? timingSafeCompare(cleanInput, state.auth.passwordHash.trim())
+      : false;
+
+    // Check against ALL registered account passwords (multi-account support)
+    const accountMatch = (state.accounts || []).some((acc) =>
+      (acc.passwords || []).some((p) => p && timingSafeCompare(cleanInput, p.trim()))
+    );
+
+    const isMatch = mainMatch || accountMatch;
 
     if (!isMatch) {
       logAdminEvent("REAUTH_FAILED", "Verifikasi kata sandi re-autentikasi gagal");

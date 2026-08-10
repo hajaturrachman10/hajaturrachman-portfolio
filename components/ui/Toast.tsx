@@ -140,6 +140,8 @@ function SingleToast({ item, removeToast }: { item: ToastMessage; removeToast: (
 
   return (
     <motion.div
+      role="status"
+      aria-live="polite"
       layout
       initial={{ opacity: 0, y: 16, x: 24, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, x: 0, scale: 1 }}
@@ -147,6 +149,7 @@ function SingleToast({ item, removeToast }: { item: ToastMessage; removeToast: (
       transition={{ type: "spring", stiffness: 350, damping: 28 }}
       className={`pointer-events-auto relative overflow-hidden rounded-2xl border backdrop-blur-2xl p-4 shadow-2xl transform-gpu will-change-[transform,opacity] ${borderColors[type]}`}
     >
+
       <div className="flex items-start gap-3">
         {icons[type]}
         <div className="flex-1 min-w-0 pr-2">

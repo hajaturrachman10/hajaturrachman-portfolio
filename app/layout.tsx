@@ -152,11 +152,12 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://wixqhbechyvfvwsklfak.supabase.co" />
+        <link rel="dns-prefetch" href="https://wixqhbechyvfvwsklfak.supabase.co" />
         <link rel="dns-prefetch" href="https://api.qrserver.com" />
+
         <link rel="icon" href="/favicon.ico" sizes="any" />
+
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="thumbnail" content={`${currentSiteUrl}/assets/profile.jpg`} />
@@ -257,6 +258,12 @@ export default function RootLayout({
         />
 
         <Providers>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2.5 focus:bg-primary focus:text-white focus:font-black focus:rounded-2xl focus:shadow-2xl focus:outline-none focus:ring-4 focus:ring-primary/50"
+          >
+            Lompat ke konten utama
+          </a>
           <ScrollProgress />
           <ScrollRestoration />
           <PageRestoreOverlay />
@@ -264,6 +271,7 @@ export default function RootLayout({
           <PageTransition>{children}</PageTransition>
           <Footer />
         </Providers>
+
       </body>
     </html>
   );
