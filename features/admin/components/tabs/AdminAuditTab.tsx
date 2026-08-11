@@ -58,9 +58,19 @@ export function AdminAuditTab() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-6"
+    >
       {/* Standar Top Header Card (Seragam 1:1) */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden"
+      >
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -91,9 +101,14 @@ export function AdminAuditTab() {
             <span>Segarkan</span>
           </button>
         </MagneticButton>
-      </div>
+      </motion.div>
 
-      <div className="premium-card p-6 rounded-3xl border border-line bg-surface">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-6 rounded-3xl border border-line bg-surface"
+      >
         <div className="flex items-center justify-between pb-4 border-b border-line mb-4">
           <div className="flex items-center gap-3">
             <motion.div
@@ -110,19 +125,34 @@ export function AdminAuditTab() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <Loader2 className="h-6 w-6 text-primary animate-spin" />
-            <p className="text-xs font-bold text-muted">Memuat rekam jejak audit log...</p>
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="soft-card p-4 rounded-2xl border border-line bg-surface/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
+                  <div className="h-9 w-9 rounded-xl skeleton-shimmer shrink-0" />
+                  <div className="space-y-2 w-full sm:w-64">
+                    <div className="h-4 w-32 rounded skeleton-shimmer" />
+                    <div className="h-3 w-48 sm:w-56 rounded skeleton-shimmer" />
+                  </div>
+                </div>
+                <div className="h-3.5 w-24 rounded skeleton-shimmer shrink-0 self-end sm:self-center" />
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 p-1">
             {displayLogs.map((log, idx) => (
               <motion.div
                 key={log.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.25, delay: idx * 0.04 }}
-                className="soft-card p-4 rounded-2xl border border-line bg-surface/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                whileHover={{ y: -3, scale: 1.008 }}
+                whileTap={{ scale: 0.985 }}
+                transition={{ type: "spring", stiffness: 380, damping: 20 }}
+                className="soft-card group p-4 rounded-2xl border border-line bg-surface/50 hover:bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs hover:shadow-md hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
               >
                 <div className="flex items-center gap-3">
                   <div className="icon-orbit grid h-9 w-9 place-items-center rounded-xl border border-line bg-primary/10 text-primary shrink-0">
@@ -141,8 +171,7 @@ export function AdminAuditTab() {
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
-

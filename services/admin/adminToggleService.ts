@@ -1,9 +1,10 @@
+import crypto from "crypto";
 import { adminRepository } from "./adminRepository";
 import { adminValidator } from "./adminValidator";
 import { adminConfigurationService } from "./adminConfigurationService";
 import { ADMIN_ERRORS } from "./adminErrors";
 import { logAdminEvent } from "./adminAuditLogger";
-import { FeatureType, FeatureToggleState, ServiceResult } from "./adminTypes";
+import { FeatureType, FeatureToggleState, ServiceResult, ConfigSnapshot, AdminState } from "./adminTypes";
 
 export const adminToggleService = {
   getFeatureState(feature: FeatureType): ServiceResult<FeatureToggleState> {
@@ -31,23 +32,22 @@ export const adminToggleService = {
       return { success: false, error: ADMIN_ERRORS.FEATURE_NOT_FOUND };
     }
 
-    // Capture snapshot before modifying config
-    const current = adminRepository.read();
-    adminConfigurationService.createSnapshot(
-      current.auth.username,
-      `Perubahan Toggle ${feature.toUpperCase()} ke ${protectedStatus ? "PROTECTED" : "UNPROTECTED"}`
-    );
-
     const now = Date.now();
+    // 1. First update feature toggle state
     const updatedState = adminRepository.update((draft) => {
-      const wasProtected = draft.toggles[feature]?.protected;
       draft.toggles[feature] = {
         protected: protectedStatus,
         updatedAt: now
       };
-
       return draft;
     });
+
+    // 2. Create snapshot of updated configuration
+    adminConfigurationService.createSnapshot(
+      updatedState.auth.username || "Hajaturrachman10",
+      `Perubahan Toggle ${feature.toUpperCase()} ke ${protectedStatus ? "PROTECTED (ON)" : "UNPROTECTED (OFF)"}`,
+      updatedState
+    );
 
     logAdminEvent(
       "TOGGLE_CHANGED",

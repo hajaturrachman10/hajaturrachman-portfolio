@@ -263,7 +263,7 @@ export function ECLMaterialSection() {
               "grid h-12 w-12 place-items-center rounded-2xl border shadow-glow",
               isTransitionRed
                 ? "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
-                : "border-blue-500/30 bg-blue-500/10 text-blue-500 shadow-blue-500/20"
+                : "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-emerald-500/20"
             )}>
               <motion.div
                 animate={{ rotate: 360 }}
@@ -279,13 +279,13 @@ export function ECLMaterialSection() {
                 "inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 border",
                 isTransitionRed
                   ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                  : "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                  : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
               )}>
                 <span>PENEGASAN ADMINISTRATOR</span>
               </div>
               <h4 className={cn(
                 "font-display text-sm sm:text-base font-black",
-                isTransitionRed ? "text-rose-500" : "text-blue-500"
+                isTransitionRed ? "text-rose-500" : "text-emerald-500"
               )}>
                 {adminTransition.type === "document"
                   ? (adminTransition.isEnabling
@@ -299,10 +299,10 @@ export function ECLMaterialSection() {
 
             <div className={cn(
               "w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border",
-              isTransitionRed ? "bg-rose-500/15 border-rose-500/20" : "bg-blue-500/15 border-blue-500/20"
+              isTransitionRed ? "bg-rose-500/15 border-rose-500/20" : "bg-emerald-500/15 border-emerald-500/20"
             )}>
               <motion.div
-                className={cn("h-full rounded-full", isTransitionRed ? "bg-rose-500" : "bg-blue-500")}
+                className={cn("h-full rounded-full", isTransitionRed ? "bg-rose-500" : "bg-emerald-500")}
                 initial={{ width: "0%" }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 1.4, ease: "easeInOut" }}
@@ -369,10 +369,10 @@ export function ECLMaterialSection() {
 
             <div>
               <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                <span>OTENTIKASI</span>
+                <span>AKSES MATERI ECL</span>
               </div>
               <h4 className="font-display text-sm sm:text-base font-black text-emerald-500">
-                {language === "id" ? "Memulihkan Sesi Aman..." : "Sitzung wird wiederhergestellt..."}
+                {language === "id" ? "Memverifikasi Akses ECL Material..." : "ECL-Material wird wiederhergestellt..."}
               </h4>
             </div>
 

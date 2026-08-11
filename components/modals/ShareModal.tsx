@@ -241,17 +241,9 @@ export function ShareModal({ open, onClose, title = "Portofolio Hajaturrachman",
             <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-line bg-surface/60 flex flex-col items-center gap-4 text-center relative overflow-hidden shrink-0">
               <div className="h-44 w-44 sm:h-52 sm:w-52 rounded-2xl bg-white p-3 shadow-xl flex items-center justify-center border border-slate-200 relative overflow-hidden shrink-0">
                 {!qrLoaded && (
-                  <div className="absolute inset-0 bg-slate-100/90 backdrop-blur-xs flex flex-col items-center justify-center gap-2 p-3 text-center z-10">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-                      className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-xs"
-                    >
-                      <RefreshCw className="h-5 w-5" />
-                    </motion.div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 animate-pulse">
-                      Memuat Kode QR...
-                    </span>
+                  <div className="absolute inset-0 skeleton-shimmer z-10 flex flex-col items-center justify-center gap-2.5 p-4 text-center">
+                    <div className="h-12 w-12 rounded-xl border border-line/40 bg-surface/40 skeleton-shimmer" />
+                    <span className="text-[10px] font-black text-muted uppercase tracking-wider">Menyiapkan QR...</span>
                   </div>
                 )}
 

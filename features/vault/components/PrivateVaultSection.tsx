@@ -301,13 +301,13 @@ export function PrivateVaultSection() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[380px] sm:min-h-[420px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
+              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
             >
               <div className={cn(
                 "grid h-12 w-12 place-items-center rounded-2xl border shadow-glow",
                 adminTransition.isEnabling
-                  ? "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
-                  : "border-blue-500/30 bg-blue-500/10 text-blue-500 shadow-blue-500/20"
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-emerald-500/20"
+                  : "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
               )}>
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -322,14 +322,14 @@ export function PrivateVaultSection() {
                 <div className={cn(
                   "inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 border",
                   adminTransition.isEnabling
-                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                    : "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                    ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                    : "bg-rose-500/10 text-rose-500 border-rose-500/20"
                 )}>
                   <span>PENEGASAN ADMINISTRATOR</span>
                 </div>
                 <h4 className={cn(
                   "font-display text-sm sm:text-base font-black",
-                  adminTransition.isEnabling ? "text-rose-500" : "text-blue-500"
+                  adminTransition.isEnabling ? "text-emerald-500" : "text-rose-500"
                 )}>
                   {adminTransition.isEnabling
                     ? "Proteksi Dipulihkan oleh Administrator..."
@@ -339,10 +339,10 @@ export function PrivateVaultSection() {
 
               <div className={cn(
                 "w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border",
-                adminTransition.isEnabling ? "bg-rose-500/15 border-rose-500/20" : "bg-blue-500/15 border-blue-500/20"
+                adminTransition.isEnabling ? "bg-emerald-500/15 border-emerald-500/20" : "bg-rose-500/15 border-rose-500/20"
               )}>
                 <motion.div
-                  className={cn("h-full rounded-full", adminTransition.isEnabling ? "bg-rose-500" : "bg-blue-500")}
+                  className={cn("h-full rounded-full", adminTransition.isEnabling ? "bg-emerald-500" : "bg-rose-500")}
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
                   transition={{ duration: 1.4, ease: "easeInOut" }}
@@ -357,7 +357,7 @@ export function PrivateVaultSection() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[380px] sm:min-h-[420px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
+              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
             >
               <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
                 <motion.div
@@ -395,7 +395,7 @@ export function PrivateVaultSection() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[380px] sm:min-h-[420px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
+              className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none"
             >
               <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20">
                 <motion.div
@@ -409,10 +409,10 @@ export function PrivateVaultSection() {
 
               <div>
                 <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                  <span>OTENTIKASI</span>
+                  <span>ENKRIPSI VAULT PRIBADI</span>
                 </div>
                 <h4 className="font-display text-sm sm:text-base font-black text-emerald-500">
-                  {language === "id" ? "Memulihkan Sesi Aman..." : "Sitzung wird wiederhergestellt..."}
+                  {language === "id" ? "Memverifikasi Enkripsi Vault..." : "Tresor-Zugriff wird wiederhergestellt..."}
                 </h4>
               </div>
 

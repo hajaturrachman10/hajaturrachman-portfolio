@@ -11,30 +11,48 @@ export function AdminContainer() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [adminUsername, setAdminUsername] = useState("hajat_admin");
+  const [isRememberedSession, setIsRememberedSession] = useState(true);
 
   const checkSession = useCallback(async () => {
-    const startTime = Date.now();
     try {
       const res = await fetch("/api/admin/auth/session");
       if (res.ok) {
         const data = await res.json();
         if (data.authenticated) {
-          setAuthenticated(true);
           if (data.user) setAdminUsername(data.user);
-        } else {
-          setAuthenticated(false);
+
+          const isRemembered = typeof window !== "undefined" ? localStorage.getItem("remember_session_admin") !== "false" : true;
+          setIsRememberedSession(isRemembered);
+
+          if (isRemembered) {
+            // REMEMBER SESSION ACTIVE: Show smooth Emerald Pemulihan Sesi overlay before unlocking
+            setAuthenticated(true);
+            await new Promise((r) => setTimeout(r, 1000));
+            setCheckingAuth(false);
+          } else {
+            // REMEMBER SESSION INACTIVE: Show smooth Rose Penutupan Sesi overlay & auto-logout
+            setAuthenticated(true);
+            await new Promise((r) => setTimeout(r, 1000));
+            try {
+              await fetch("/api/admin/auth/logout", { method: "POST" });
+            } catch {
+              // Ignore
+            }
+            if (typeof window !== "undefined") {
+              localStorage.removeItem("admin_active_tab");
+            }
+            setAuthenticated(false);
+            setCheckingAuth(false);
+          }
+          return;
         }
-      } else {
-        setAuthenticated(false);
       }
+      // If unauthenticated (locked state) — immediately render LoginView without restoration overlay
+      setAuthenticated(false);
+      setCheckingAuth(false);
     } catch {
       setAuthenticated(false);
-    } finally {
-      const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, 1000 - elapsed);
-      setTimeout(() => {
-        setCheckingAuth(false);
-      }, remaining);
+      setCheckingAuth(false);
     }
   }, []);
 
@@ -50,30 +68,35 @@ export function AdminContainer() {
 
   const handleLogout = async () => {
     try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("admin_active_tab");
+      }
       await fetch("/api/admin/auth/logout", { method: "POST" });
     } catch {
       // Logout error handled
     } finally {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("admin_active_tab");
+      }
       setAuthenticated(false);
     }
   };
 
   if (checkingAuth) {
-    const isRemembered = typeof window !== "undefined" ? localStorage.getItem("remember_session_admin") !== "false" : true;
     return (
-      <div className="min-h-screen grid place-items-center px-4 py-16 bg-background">
+      <div className="container-page pt-24 sm:pt-28 pb-16 min-h-[calc(100vh-2rem)] flex flex-col items-center justify-center relative overflow-hidden">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[260px] sm:min-h-[300px] flex flex-col items-center justify-center text-center gap-4 max-w-md w-full border border-line bg-surface select-none shadow-2xl"
+          className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none shadow-card"
         >
           <div className={cn(
-            "grid h-12 w-12 place-items-center rounded-2xl border",
-            isRemembered
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/20"
-              : "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20"
+            "grid h-12 w-12 place-items-center rounded-2xl border shadow-glow",
+            isRememberedSession
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-emerald-500/20"
+              : "border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-rose-500/20"
           )}>
             <motion.div
               animate={{ rotate: 360 }}
@@ -87,29 +110,29 @@ export function AdminContainer() {
           <div>
             <div className={cn(
               "inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 border",
-              isRemembered
+              isRememberedSession
                 ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
                 : "bg-rose-500/10 text-rose-500 border-rose-500/20"
             )}>
-              <span>{isRemembered ? "OTENTIKASI ADMIN" : "ENKRIPSI SESI ADMIN"}</span>
+              <span>{isRememberedSession ? "PEMULIHAN SESI ADMIN" : "PENUTUPAN SESI ADMIN"}</span>
             </div>
             <h4 className={cn(
               "font-display text-sm sm:text-base font-black",
-              isRemembered ? "text-emerald-500" : "text-rose-500"
+              isRememberedSession ? "text-emerald-500" : "text-rose-500"
             )}>
-              {isRemembered ? "Memulihkan Sesi Aman..." : "Mengamankan Sesi..."}
+              {isRememberedSession ? "Memulihkan Sesi Admin Aktif..." : "Mengakhiri Sesi & Menghapus Token..."}
             </h4>
           </div>
 
           <div className={cn(
             "w-full max-w-[160px] h-1.5 rounded-full overflow-hidden border",
-            isRemembered ? "bg-emerald-500/15 border-emerald-500/20" : "bg-rose-500/15 border-rose-500/20"
+            isRememberedSession ? "bg-emerald-500/15 border-emerald-500/20" : "bg-rose-500/15 border-rose-500/20"
           )}>
             <motion.div
-              className={cn("h-full rounded-full", isRemembered ? "bg-emerald-500" : "bg-rose-500")}
+              className={cn("h-full rounded-full", isRememberedSession ? "bg-emerald-500" : "bg-rose-500")}
               initial={{ width: "0%" }}
               animate={{ width: "100%" }}
-              transition={{ duration: 1.1, ease: "easeInOut" }}
+              transition={{ duration: 1.0, ease: "easeInOut" }}
             />
           </div>
         </motion.div>

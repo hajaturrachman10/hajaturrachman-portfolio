@@ -13,10 +13,10 @@ export function Reveal({ children, className, delay = 0, id, amount = 0.04 }: Re
   return (
     <motion.section
       id={id}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true, amount }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}

@@ -9,10 +9,11 @@ export async function GET() {
   const cvToken = cookies().get("cv_unlocked")?.value;
   const vaultToken = cookies().get("vault_unlocked")?.value;
   const eclToken = cookies().get("ecl_unlocked")?.value;
-  const togglesCookie = cookies().get("hajat_toggles_state")?.value;
 
-  const status = await authService.getAuthStatusAsync(cvToken, vaultToken, eclToken, togglesCookie);
-
+  // SECURITY: togglesCookie is no longer passed to the service.
+  // Toggle state is read exclusively from server-side adminRepository (Supabase/GlobalThis cache).
+  // This prevents client-side cookie manipulation attacks.
+  const status = await authService.getAuthStatusAsync(cvToken, vaultToken, eclToken);
 
   const response = NextResponse.json(status, {
     headers: {
@@ -22,10 +23,9 @@ export async function GET() {
     }
   });
 
-  // Propagate the authoritative toggle state back as a cookie.
-  // This ensures consistency across serverless containers — any container that
-  // serves the correct state will write it to the user's cookie, so subsequent
-  // requests to any container will have the correct state via cookie LWW.
+  // Propagate the authoritative toggle state back as a cookie for client-side UI sync.
+  // This is safe: we WRITE the server's authoritative state TO the cookie (not the other way around).
+  // The client reads this to update UI (BroadcastChannel, etc.) — the server never trusts it back.
   if (status.toggles) {
     try {
       const togglesPayload = JSON.stringify({ toggles: status.toggles, globalEpoch: status.globalEpoch });
@@ -33,7 +33,7 @@ export async function GET() {
         path: "/",
         maxAge: 365 * 24 * 60 * 60,
         sameSite: "lax",
-        httpOnly: false // Must be readable by client-side syncLocalToggles
+        httpOnly: false // Must be readable by client-side for UI sync only
       });
     } catch {
       // Ignore if cookie setting fails

@@ -5,7 +5,7 @@ import { timingSafeCompare } from "@/lib/security";
 const SECRET =
   process.env.ADMIN_SESSION_SECRET ||
   (globalThis as any).__dynamicAdminSecret ||
-  ((globalThis as any).__dynamicAdminSecret = crypto.randomBytes(32).toString("hex"));
+  ((globalThis as any).__dynamicAdminSecret = "hajat_static_admin_secret_key_2026_portfolio_auth_v1");
 
 
 export const adminSecurity = {

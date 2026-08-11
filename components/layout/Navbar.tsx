@@ -50,104 +50,36 @@ export function Navbar() {
 
   useEffect(() => {
     if (pathname !== "/") return;
-    if (menuOpen) return;
 
-    // Delay the observer setup slightly to prevent layout measurement lag during menu close transition
-    const timeoutId = setTimeout(() => {
-      const sections = ["home", "chapters", "contact"];
-      const observerOptions = {
-        root: null,
-        rootMargin: "-40% 0px -40% 0px",
-        threshold: 0,
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        // If scroll is locked, ignore observer updates
-        const isLocked = typeof document !== "undefined" && (document.body.style.position === "fixed" || document.body.classList.contains("modal-open"));
-        if (isLocked) return;
-
-        // Check if we are near the bottom of the page
-        const isAtBottom = typeof window !== "undefined" && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
-
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            if (id === "home" || id === "chapters") {
-              if (!isAtBottom) {
-                setActiveSection("/");
-              }
-            } else if (id === "contact") {
-              setActiveSection("/#contact");
-            }
-          }
-        });
-      }, observerOptions);
-
-      sections.forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) observer.observe(el);
-      });
-
-      // Store observer reference on window to cleanup properly
-      (window as any)._navbarObserver = observer;
-    }, 350);
-
-    return () => {
-      clearTimeout(timeoutId);
-      const observer = (window as any)._navbarObserver;
-      if (observer) {
-        const sections = ["home", "chapters", "contact"];
-        sections.forEach((id) => {
-          const el = document.getElementById(id);
-          if (el) observer.unobserve(el);
-        });
-        delete (window as any)._navbarObserver;
-      }
-    };
-  }, [pathname, menuOpen]);
-
-  useEffect(() => {
-    let scrollTimer: NodeJS.Timeout | null = null;
-
-    function handleScroll() {
-      // If scroll is locked (e.g. mobile menu or modals open), ignore scroll events
+    function checkActiveSection() {
       const isLocked = typeof document !== "undefined" && (document.body.style.position === "fixed" || document.body.classList.contains("modal-open"));
       if (isLocked) return;
 
-      if (typeof document !== "undefined") {
-        // Blur JS focus
-        if (document.activeElement && document.activeElement !== document.body) {
-          (document.activeElement as HTMLElement)?.blur();
-        }
-        // Force WebKit/Safari/Chrome mobile engines to strip touch hover state immediately
-        document.body.classList.add("is-scrolling");
-
-        if (scrollTimer) clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => {
-          document.body.classList.remove("is-scrolling");
-        }, 150);
-      }
-
-      setScrolled(window.scrollY > 18);
-      if (pathname === "/") {
-        const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
-        if (isAtBottom) {
+      const contactEl = document.getElementById("contact");
+      if (contactEl) {
+        const rect = contactEl.getBoundingClientRect();
+        if (rect.top <= window.innerHeight * 0.55) {
           setActiveSection("/#contact");
-        } else if (window.scrollY < 50) {
-          setActiveSection("/");
+          return;
         }
       }
+      setActiveSection("/");
     }
+
+    let rafId: number;
+    function handleScroll() {
+      setScrolled(window.scrollY > 18);
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(checkActiveSection);
+    }
+
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("touchmove", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll, { passive: true });
     return () => {
-      if (scrollTimer) clearTimeout(scrollTimer);
-      if (typeof document !== "undefined") {
-        document.body.classList.remove("is-scrolling");
-      }
+      cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("touchmove", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
   }, [pathname]);
 
@@ -230,10 +162,9 @@ export function Navbar() {
 
   return (
     <motion.header
-      key={`navbar-header-${pathname}`}
-      initial={{ opacity: 0, y: -24 }}
+      initial={{ opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-x-0 top-0 z-50 px-4 pt-4"
     >
       <nav

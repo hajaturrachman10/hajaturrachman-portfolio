@@ -75,16 +75,19 @@ export function ScrollRestoration() {
       }
 
       if (targetHash) {
-        const el = document.getElementById(targetHash);
-        if (el) {
-          el.scrollIntoView({ behavior: "instant" as ScrollBehavior });
-          setTimeout(() => {
-            if (!userInteracted) {
-              el.scrollIntoView({ behavior: "smooth" });
-            }
-          }, 80);
-          sessionStorage.removeItem("portfolio_scroll_target_hash");
-        }
+        sessionStorage.removeItem("portfolio_scroll_target_hash");
+        const performInstantTargetScroll = () => {
+          if (userInteracted) return;
+          const el = document.getElementById(targetHash);
+          if (el) {
+            const yOffset = -104;
+            const y = Math.max(0, el.getBoundingClientRect().top + window.scrollY + yOffset);
+            window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+          }
+        };
+
+        performInstantTargetScroll();
+        requestAnimationFrame(performInstantTargetScroll);
         return;
       }
 
@@ -124,17 +127,21 @@ export function ScrollRestoration() {
       }
     }
 
+    let scrollSaveTimer: NodeJS.Timeout | null = null;
     const handleScroll = () => {
       if (document.body.style.position === "fixed") return;
 
-      const currentY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-      const docHeight = getDocHeight();
-      const maxScrollY = Math.max(0, docHeight - window.innerHeight);
+      if (scrollSaveTimer) clearTimeout(scrollSaveTimer);
+      scrollSaveTimer = setTimeout(() => {
+        const currentY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+        const docHeight = getDocHeight();
+        const maxScrollY = Math.max(0, docHeight - window.innerHeight);
 
-      const atBottom = maxScrollY > 0 && currentY >= maxScrollY - 70;
+        const atBottom = maxScrollY > 0 && currentY >= maxScrollY - 70;
 
-      sessionStorage.setItem(storageKey, currentY.toString());
-      sessionStorage.setItem(bottomKey, atBottom ? "true" : "false");
+        sessionStorage.setItem(storageKey, currentY.toString());
+        sessionStorage.setItem(bottomKey, atBottom ? "true" : "false");
+      }, 150);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

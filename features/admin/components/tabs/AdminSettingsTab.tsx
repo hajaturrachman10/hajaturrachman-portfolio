@@ -347,9 +347,19 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-6 w-full"
+    >
       {/* Standar Top Header Card */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden"
+      >
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -376,10 +386,15 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
             <span className="font-display text-xs font-black text-primary">{accounts.length} Akun</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Section 1: Multi-Admin Accounts & Multi-Password Management Hub */}
-      <div className="premium-card p-6 sm:p-7 rounded-3xl border border-line bg-surface flex flex-col gap-6 relative overflow-hidden shadow-card">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-6 sm:p-7 rounded-3xl border border-line bg-surface flex flex-col gap-6 relative shadow-card"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-line pb-4 gap-4 relative z-10">
           <div className="flex items-center gap-3">
             <div className="icon-orbit grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-blue-500/25 bg-blue-500/10 text-blue-500">
@@ -512,15 +527,18 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
         </AnimatePresence>
 
         {/* Daftar Akun Admin Active */}
-        <div className="flex flex-col gap-4 relative z-10">
-          {accounts.map((acc) => {
+        <div className="flex flex-col gap-4 relative z-10 p-1 sm:p-1.5">
+          {accounts.map((acc, accIdx) => {
             const isAddPassActive = activeAddPassAccId === acc.id;
 
             return (
               <motion.div
                 key={acc.id}
+                initial={{ opacity: 0, y: 14, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
                 layout="position"
-                className="p-5 rounded-2xl border border-line bg-surface/90 flex flex-col gap-4 shadow-xs relative overflow-hidden"
+                className="p-5 rounded-2xl border border-line bg-surface/90 hover:bg-surface flex flex-col gap-4 shadow-xs hover:border-primary/30 transition-colors duration-150"
               >
                 {/* Header Akun */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line pb-3">
@@ -532,7 +550,7 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
                       <div className="flex flex-wrap items-center gap-2">
                         <h4 className="font-display text-sm font-black text-primary truncate">{acc.username}</h4>
                         <span className={cn(
-                          "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm shrink-0",
+                          "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-xs shrink-0",
                           acc.role === "SUPER_ADMIN"
                             ? "bg-rose-600 text-white border-rose-500/40 shadow-rose-600/20"
                             : acc.role === "ADMIN"
@@ -550,43 +568,35 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
 
                   {/* Actions Header Akun */}
                   <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <MagneticButton className="flex-1 sm:flex-none">
-                      <motion.button
-                        type="button"
-                        onClick={() => setActiveAddPassAccId(isAddPassActive ? null : acc.id)}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        className={cn(
-                          "w-full px-3 py-1.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all duration-300 cursor-pointer select-none border",
-                          isAddPassActive
-                            ? "border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white"
-                            : "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-600 hover:text-white"
-                        )}
+                    <button
+                      type="button"
+                      onClick={() => setActiveAddPassAccId(isAddPassActive ? null : acc.id)}
+                      className={cn(
+                        "w-full sm:w-auto px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all duration-100 ease-out active:scale-[0.98] cursor-pointer select-none border",
+                        isAddPassActive
+                          ? "border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white"
+                          : "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-600 hover:text-white"
+                      )}
+                    >
+                      <motion.div
+                        animate={{ rotate: isAddPassActive ? 135 : 0 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                        className="shrink-0"
                       >
-                        <motion.div
-                          animate={{ rotate: isAddPassActive ? 135 : 0 }}
-                          transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                          className="shrink-0"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </motion.div>
-                        <span>{isAddPassActive ? "Tutup Form" : "Tambah Password"}</span>
-                      </motion.button>
-                    </MagneticButton>
+                        <Plus className="h-3.5 w-3.5" />
+                      </motion.div>
+                      <span>{isAddPassActive ? "Tutup Form" : "Tambah Password"}</span>
+                    </button>
 
                     {accounts.length > 1 && (
-                      <MagneticButton className="flex-1 sm:flex-none">
-                        <motion.button
-                          type="button"
-                          onClick={() => handleDeleteAccount(acc)}
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                          className="w-full px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          <span>Hapus Akun</span>
-                        </motion.button>
-                      </MagneticButton>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteAccount(acc)}
+                        className="px-3 py-1.5 rounded-xl text-xs font-black border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-600 hover:text-white transition-all duration-100 ease-out active:scale-[0.98] cursor-pointer select-none flex items-center justify-center gap-1.5"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Hapus Akun</span>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -664,10 +674,15 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
       {/* Section 2: Universal Resource Password Policy Engine Panel */}
-      <div className="premium-card p-6 sm:p-7 rounded-3xl border border-line bg-surface flex flex-col gap-6 relative overflow-hidden shadow-card">
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-6 sm:p-7 rounded-3xl border border-line bg-surface flex flex-col gap-6 relative shadow-card"
+      >
         <div className="flex items-center justify-between border-b border-line pb-4 relative z-10">
           <div className="flex items-center gap-3">
             <div className="icon-orbit grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-primary/25 bg-primary/10 text-primary">
@@ -703,10 +718,10 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
                     type="button"
                     onClick={() => setSelectedResource(res.key as FeatureType)}
                     className={cn(
-                      "relative py-2.5 rounded-xl text-xs font-black transition-all select-none flex items-center justify-center gap-1.5 cursor-pointer",
+                      "relative py-2.5 px-3 rounded-xl text-xs font-black transition-colors duration-100 ease-out active:scale-[0.985] select-none flex items-center justify-center gap-1.5 cursor-pointer border shrink-0 whitespace-nowrap",
                       isActive
-                        ? "bg-primary text-white shadow-md shadow-primary/20"
-                        : "text-muted hover:text-primary hover:bg-surface"
+                        ? "bg-primary text-white border-primary/50 shadow-xs"
+                        : "bg-surface/50 text-muted border-line/70 hover:text-primary hover:bg-surface hover:border-primary/30"
                     )}
                   >
                     <span>{res.label}</span>
@@ -1004,7 +1019,7 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
             </MagneticButton>
           </div>
         </form>
-      </div>
+      </motion.div>
 
       {/* Confirmation Modal Standard */}
       <ConfirmModal
@@ -1018,6 +1033,6 @@ export function AdminSettingsTab({ currentUsername, onRefresh }: AdminSettingsTa
         onConfirm={modalConfig.action}
         onCancel={() => setModalConfig((prev) => ({ ...prev, open: false }))}
       />
-    </div>
+    </motion.div>
   );
 }

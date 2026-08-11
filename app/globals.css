@@ -85,7 +85,6 @@ body {
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 3.5rem;
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }

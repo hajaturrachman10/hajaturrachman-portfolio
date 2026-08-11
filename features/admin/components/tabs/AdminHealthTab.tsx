@@ -26,9 +26,19 @@ export function AdminHealthTab({ health }: AdminHealthTabProps) {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-6"
+    >
       {/* Standar Top Header Card (Seragam 1:1) */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden"
+      >
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -51,15 +61,16 @@ export function AdminHealthTab({ health }: AdminHealthTabProps) {
         <span className="px-4 py-1.5 rounded-full text-xs font-black bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-wider shrink-0">
           {health.status}
         </span>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {items.map((check, idx) => (
           <motion.div
             key={check.label}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, delay: idx * 0.05 }}
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            whileHover={{ y: -3, scale: 1.005 }}
+            transition={{ duration: 0.35, delay: 0.1 + idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
             className="premium-card p-5 rounded-2xl border border-line bg-surface flex items-center justify-between"
           >
             <div>
@@ -80,6 +91,6 @@ export function AdminHealthTab({ health }: AdminHealthTabProps) {
           </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

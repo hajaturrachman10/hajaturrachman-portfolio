@@ -21,7 +21,7 @@ export function HeroSection() {
   return (
     <section
       id="home"
-      className="relative isolate flex min-h-screen items-center overflow-hidden pb-16 pt-28 sm:pt-[7.5rem]"
+      className="relative isolate flex flex-col justify-center overflow-hidden pt-24 sm:pt-[6.5rem] pb-6 sm:pb-10"
     >
       <ParticleBackground />
 

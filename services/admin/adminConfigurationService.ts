@@ -20,13 +20,18 @@ export const adminConfigurationService = {
     const version = adminSnapshotRepository.getNextVersion();
     const configHash = this.calculateConfigurationHash(currentState);
 
+    const cleanState: AdminState = {
+      ...currentState,
+      snapshots: []
+    };
+
     const snapshot: ConfigSnapshot = {
       version,
       createdAt: Date.now(),
       createdBy,
       message,
       configHash,
-      state: currentState
+      state: cleanState
     };
 
     adminSnapshotRepository.addSnapshot(snapshot);

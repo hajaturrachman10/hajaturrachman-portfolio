@@ -15,7 +15,8 @@ import {
   Sparkles,
   Timer,
   UnlockKeyhole,
-  Loader2
+  Loader2,
+  X
 } from "lucide-react";
 import { FormEvent, useEffect, useState, useRef, useCallback } from "react";
 
@@ -64,10 +65,37 @@ export function PasswordModal({
   const [lastTap, setLastTap] = useState(0);
   
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalBoxRef = useRef<HTMLDivElement>(null);
   const shakeControls = useAnimation();
+
+  // Clear error message & error styling when user clicks anywhere outside an active input field (inside or outside modal card)
+  useEffect(() => {
+    if (!open) return;
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target || !target.closest) return;
+      if (!target.closest("input, textarea, button")) {
+        if (error || isShakeError || isEmptyWarning) {
+          setError("");
+          setIsShakeError(false);
+          setIsEmptyWarning(false);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [open, error, isShakeError, isEmptyWarning]);
+
 
   // Secure Close Handler to clear values and blur to prevent Google Password Manager popups
   const handleClose = useCallback(() => {
+
     setPassword("");
     inputRef.current?.blur();
     onClose();
@@ -386,6 +414,7 @@ export function PasswordModal({
           aria-modal="true"
         >
           <motion.div
+            ref={modalBoxRef}
             initial={{ opacity: 0, y: 25, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 25, scale: 0.93 }}
@@ -396,6 +425,7 @@ export function PasswordModal({
             }}
             className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden transform-gpu will-change-[transform,opacity]"
           >
+
             <AnimatePresence mode="wait">
               {success ? (
                 /* SUCCESS STATE VIEW */
@@ -675,13 +705,11 @@ export function PasswordModal({
                       </motion.div>
                     ) : (
                       /* ACTIVE PASSWORD INPUT FORM VIEW */
-                      <motion.div
-                        layout
-                        key="password-form"
-                        initial={{ opacity: 0, y: 15, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -15, scale: 0.98 }}
-                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          handleSubmit();
+                        }}
                         className="mt-6"
                       >
                           <motion.div animate={shakeControls} className="flex flex-col gap-4">
@@ -710,7 +738,7 @@ export function PasswordModal({
                                   autoCorrect="off"
                                   spellCheck={false}
                                   className={cn(
-                                    "input pl-11 pr-12 text-left transition-all duration-300 w-full",
+                                    "input pl-11 pr-24 text-left transition-all duration-300 w-full",
                                     (isShakeError || Boolean(error)) &&
                                       (isEmptyWarning
                                         ? "!border-amber-500 ring-4 ring-amber-500/25 shadow-glow shadow-amber-500/20 text-amber-500 dark:text-amber-400 bg-amber-500/5"
@@ -746,15 +774,41 @@ export function PasswordModal({
                                   disabled={loading}
                                   ref={inputRef}
                                 />
-                                <button
-                                  type="button"
+                                 <AnimatePresence>
+                                   {password && (
+                                     <motion.button
+                                       key="clear-password-btn"
+                                       type="button"
+                                       initial={{ opacity: 0, scale: 0.4, rotate: -60, y: "-50%" }}
+                                       animate={{ opacity: 1, scale: 1, rotate: 0, y: "-50%" }}
+                                       exit={{ opacity: 0, scale: 0.4, rotate: 60, y: "-50%" }}
+                                       whileHover={{ scale: 1.1, rotate: 90 }}
+                                       whileTap={{ scale: 0.85, rotate: 180 }}
+                                       transition={{ type: "spring", stiffness: 450, damping: 24 }}
+                                       onMouseDown={(e) => e.preventDefault()}
+                                       onClick={() => {
+                                         setPassword("");
+                                         setError("");
+                                         setIsShakeError(false);
+                                         setIsEmptyWarning(false);
+                                         inputRef.current?.focus();
+                                       }}
+                                       className="absolute right-[48px] top-1/2 grid h-8 w-8 place-items-center rounded-full bg-surface-hover/90 hover:bg-rose-500/20 text-muted hover:text-rose-500 dark:hover:text-rose-400 border border-line/70 hover:border-rose-500/40 shadow-xs backdrop-blur-xs transition-colors cursor-pointer"
+                                       aria-label="Hapus kata sandi"
+                                     >
+                                       <X className="h-3.5 w-3.5" />
+                                     </motion.button>
+                                   )}
+                                 </AnimatePresence>
+                                 <button
+                                   type="button"
                                   onMouseDown={(e) => {
                                     // Prevent input from losing focus and closing keyboard
                                     e.preventDefault();
                                   }}
                                   onClick={handleEyeToggle}
                                   disabled={loading}
-                                  className="focus-ring absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted transition hover:bg-primary/10 hover:text-text disabled:opacity-50"
+                                  className="focus-ring absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-muted transition hover:bg-primary/10 hover:text-text disabled:opacity-50"
                                   aria-label={showPassword ? (language === "id" ? "Sembunyikan kata sandi" : "Passwort ausblenden") : (language === "id" ? "Lihat kata sandi" : "Passwort anzeigen")}
                                 >
                                   <AnimatePresence mode="wait" initial={false}>
@@ -809,7 +863,7 @@ export function PasswordModal({
 
                           <MagneticButton className="w-full">
                             <motion.button
-                              type="button"
+                              type="submit"
                               onClick={() => handleSubmit()}
                               disabled={loading}
                               whileHover="hover"
@@ -874,7 +928,7 @@ export function PasswordModal({
                               {language === "id" ? "Lupa kata sandi? Hubungi via WhatsApp." : "Passwort vergessen? Per WhatsApp kontaktieren."}
                             </a>
                           </p>
-                        </motion.div>
+                        </form>
                       )}
                     </AnimatePresence>
                   </motion.div>

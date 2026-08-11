@@ -89,7 +89,13 @@ export function AdminMessagesTab() {
     // Do not fetch while a deletion is in progress (prevent race condition)
     if (!force && isDeleting) return;
     try {
-      const res = await fetch("/api/messages");
+      const res = await fetch(`/api/messages?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache"
+        }
+      });
       if (res.ok) {
         setFetchError(false);
         const data = await res.json();
@@ -188,20 +194,28 @@ export function AdminMessagesTab() {
     if (id) {
       // 2. Client guard recording (stores id + fingerprint in localStorage)
       const targetMsg = messages.find((m) => m.id === id);
-      if (targetMsg) {
-        addClientDeletedSig(id);
-        const fp = `${(targetMsg.email || "").toLowerCase().trim()}::${(targetMsg.message || "").toLowerCase().trim().substring(0, 150)}`;
-        addClientDeletedSig(fp);
+      const targetFp = targetMsg ? `${(targetMsg.email || "").toLowerCase().trim()}::${(targetMsg.message || "").toLowerCase().trim().substring(0, 150)}` : null;
+
+      addClientDeletedSig(id);
+      if (targetFp) {
+        addClientDeletedSig(targetFp);
       }
 
-      // 3. Optimistically remove message from local list
-      setMessages((prev) => prev.filter((m) => m.id !== id));
+      // 3. Optimistically remove message from local list by BOTH id and fingerprint
+      setMessages((prev) => prev.filter((m) => {
+        if (m.id === id) return false;
+        if (targetFp) {
+          const mFp = `${(m.email || "").toLowerCase().trim()}::${(m.message || "").toLowerCase().trim().substring(0, 150)}`;
+          if (mFp === targetFp) return false;
+        }
+        return true;
+      }));
+
       if (selectedMessageId === id) {
         setSelectedMessageId("");
       }
 
       // 4. Pause heartbeat polling to prevent race condition
-      //    (polling could re-fetch the message before Supabase DELETE finishes)
       setIsDeleting(true);
 
       // 5. Perform network delete request
@@ -212,8 +226,8 @@ export function AdminMessagesTab() {
       } catch (err) {
         console.error("Gagal menghapus pesan:", err);
       } finally {
-        // 6. Resume polling after 5 seconds (Supabase propagation buffer)
-        setTimeout(() => setIsDeleting(false), 5000);
+        // 6. Resume polling after 2.5 seconds
+        setTimeout(() => setIsDeleting(false), 2500);
       }
     }
   };
@@ -295,9 +309,19 @@ export function AdminMessagesTab() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-6"
+    >
       {/* Standar Top Header Card dengan Terintegrasi Interactive Metric Filter Pills */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden"
+      >
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -322,44 +346,41 @@ export function AdminMessagesTab() {
           {filterTabs.map((tab) => {
             const isActive = statusFilter === tab.key;
             return (
-              <MagneticButton key={tab.key} className="w-full sm:w-auto">
-                <motion.button
-                  type="button"
-                  onClick={() => setStatusFilter(tab.key)}
-                  whileHover="hover"
-                  whileTap="press"
-                  variants={{
-                    hover: { scale: 1.03, y: -1 },
-                    press: { scale: 0.97 }
-                  }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  className={cn(
-                    "px-3 sm:px-3.5 py-2 rounded-2xl text-[11px] sm:text-xs font-black transition-all cursor-pointer select-none flex items-center justify-between sm:justify-start gap-2 border w-full sm:w-auto",
-                    isActive
-                      ? tab.activeClass
-                      : tab.inactiveClass
-                  )}
-                >
-                  <span>{tab.label}</span>
-                  <span className={cn(
-                    "px-2 py-0.5 rounded-full text-[11px] font-black",
-                    isActive
-                      ? "bg-white/20 text-white"
-                      : tab.badgeInactiveClass
-                  )}>
-                    {tab.count}
-                  </span>
-                </motion.button>
-              </MagneticButton>
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setStatusFilter(tab.key)}
+                className={cn(
+                  "px-3 sm:px-3.5 py-2 rounded-2xl text-[11px] sm:text-xs font-black transition-colors duration-100 ease-out active:scale-[0.985] cursor-pointer select-none flex items-center justify-between sm:justify-start gap-2 border w-full sm:w-auto shrink-0 whitespace-nowrap",
+                  isActive
+                    ? tab.activeClass
+                    : tab.inactiveClass
+                )}
+              >
+                <span>{tab.label}</span>
+                <span className={cn(
+                  "px-2 py-0.5 rounded-full text-[11px] font-black",
+                  isActive
+                    ? "bg-white/20 text-white"
+                    : tab.badgeInactiveClass
+                )}>
+                  {tab.count}
+                </span>
+              </button>
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Master-Detail Layout (Grid Sejajar 100% dari Atas) */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
         {/* Left Column: Search Bar + Inbox List Card (5 cols - Responsive Height & 675px Desktop) */}
-        <div className="md:col-span-5 premium-card p-4 sm:p-5 rounded-3xl border border-line bg-surface shadow-card flex flex-col gap-3.5 relative overflow-hidden h-[540px] sm:h-[600px] md:h-[675px]">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="md:col-span-5 premium-card p-4 sm:p-5 rounded-3xl border border-line bg-surface shadow-card flex flex-col gap-3.5 relative overflow-hidden h-[540px] sm:h-[600px] md:h-[675px]"
+        >
           {/* Search Input Bar (Fixed at Top) */}
           <div className="relative w-full shrink-0">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none" />
@@ -372,8 +393,26 @@ export function AdminMessagesTab() {
               spellCheck={false}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-field pl-10 pr-4 h-[42px] text-xs font-medium w-full rounded-2xl"
+              className="input-field pl-10 pr-10 h-[42px] text-xs font-medium w-full rounded-2xl transition-all"
             />
+            <AnimatePresence>
+              {searchQuery && (
+                <motion.button
+                  type="button"
+                  initial={{ opacity: 0, scale: 0.4, rotate: -60, y: "-50%" }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0, y: "-50%" }}
+                  exit={{ opacity: 0, scale: 0.4, rotate: 60, y: "-50%" }}
+                  whileHover={{ scale: 1.15, rotate: 90 }}
+                  whileTap={{ scale: 0.85, rotate: 180 }}
+                  transition={{ type: "spring", stiffness: 450, damping: 24 }}
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 rounded-full p-1 bg-surface-hover/90 hover:bg-rose-500/20 text-muted hover:text-rose-500 border border-line/70 shadow-xs backdrop-blur-xs transition-colors cursor-pointer flex items-center justify-center"
+                  aria-label="Hapus pencarian"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Subheader status bar (Fixed at Top) */}
@@ -437,9 +476,9 @@ export function AdminMessagesTab() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={() => setSelectedMessageId(msg.id)}
-                    whileHover={{ scale: 1.006, x: 2 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ duration: 0.15 }}
+                    whileHover={{ y: -2, scale: 1.008 }}
+                    whileTap={{ scale: 0.985 }}
+                    transition={{ type: "spring", stiffness: 380, damping: 20 }}
                     className={cn(
                       "p-4 rounded-2xl border cursor-pointer transition-all duration-200 flex items-start gap-3.5 relative overflow-hidden select-none shrink-0",
                       isSelected
@@ -504,10 +543,15 @@ export function AdminMessagesTab() {
               })}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Right Column: Full-Height Reader Panel (7 cols - Sejajar 100% dari Paling Atas Grid) */}
-        <div className="md:col-span-7">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          className="md:col-span-7"
+        >
           {selectedMessage ? (
             <motion.div
               key={selectedMessage.id}
@@ -875,7 +919,7 @@ export function AdminMessagesTab() {
               </div>
             </motion.div>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* Delete Confirmation Modal */}
@@ -890,6 +934,6 @@ export function AdminMessagesTab() {
         onConfirm={confirmDelete}
         onCancel={() => setDeleteModalOpen(false)}
       />
-    </div>
+    </motion.div>
   );
 }

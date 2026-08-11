@@ -43,8 +43,15 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     const id = Math.random().toString(36).substring(2, 9);
     const newToast: ToastMessage = { id, type: "info", duration: 3000, ...toastData };
     
-    setToasts((prev) => [...prev, newToast]);
+    setToasts((prev) => {
+      const updated = [...prev, newToast];
+      if (updated.length > 2) {
+        return updated.slice(updated.length - 2);
+      }
+      return updated;
+    });
   }, []);
+
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));

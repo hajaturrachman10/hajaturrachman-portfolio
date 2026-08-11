@@ -4,17 +4,15 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, LogOut, LayoutDashboard, ToggleLeft, Shield, BarChart3, Settings, Activity, ListFilter, History, AlertTriangle, Sparkles, RefreshCw, ArrowLeft, Mail, Loader2 } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import dynamic from "next/dynamic";
-
-const AdminOverviewTab = dynamic(() => import("./tabs/AdminOverviewTab").then((m) => m.AdminOverviewTab));
-const AdminFeaturesTab = dynamic(() => import("./tabs/AdminFeaturesTab").then((m) => m.AdminFeaturesTab));
-const AdminSecurityTab = dynamic(() => import("./tabs/AdminSecurityTab").then((m) => m.AdminSecurityTab));
-const AdminStatisticsTab = dynamic(() => import("./tabs/AdminStatisticsTab").then((m) => m.AdminStatisticsTab));
-const AdminMessagesTab = dynamic(() => import("./tabs/AdminMessagesTab").then((m) => m.AdminMessagesTab));
-const AdminSettingsTab = dynamic(() => import("./tabs/AdminSettingsTab").then((m) => m.AdminSettingsTab));
-const AdminHealthTab = dynamic(() => import("./tabs/AdminHealthTab").then((m) => m.AdminHealthTab));
-const AdminAuditTab = dynamic(() => import("./tabs/AdminAuditTab").then((m) => m.AdminAuditTab));
-const AdminConfigHistoryTab = dynamic(() => import("./tabs/AdminConfigHistoryTab").then((m) => m.AdminConfigHistoryTab));
+import { AdminOverviewTab } from "./tabs/AdminOverviewTab";
+import { AdminFeaturesTab } from "./tabs/AdminFeaturesTab";
+import { AdminSecurityTab } from "./tabs/AdminSecurityTab";
+import { AdminStatisticsTab } from "./tabs/AdminStatisticsTab";
+import { AdminMessagesTab } from "./tabs/AdminMessagesTab";
+import { AdminSettingsTab } from "./tabs/AdminSettingsTab";
+import { AdminHealthTab } from "./tabs/AdminHealthTab";
+import { AdminAuditTab } from "./tabs/AdminAuditTab";
+import { AdminConfigHistoryTab } from "./tabs/AdminConfigHistoryTab";
 import { AdminStats, FeatureType, FeatureToggleState } from "@/services/admin/adminTypes";
 import { SystemHealthReport } from "@/services/admin/adminHealthService";
 import { subscribeCrossTabSync } from "@/lib/crossTabSync";
@@ -44,11 +42,6 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
     }
     return "overview";
   });
-
-  // Internal Sub-tab states for consolidated tabs
-  const [overviewSubTab, setOverviewSubTab] = useState<"analytics" | "health">("analytics");
-  const [securitySubTab, setSecuritySubTab] = useState<"features" | "sessions">("features");
-  const [settingsSubTab, setSettingsSubTab] = useState<"account" | "history" | "audit">("account");
 
   const handleTabChange = (tab: AdminTabKey) => {
     setActiveTab(tab);
@@ -109,18 +102,6 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
     };
   }, [confirmLogout]);
 
-  // Securing check on mount if remember_session_admin is false
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = localStorage.getItem("remember_session_admin");
-    if (stored === "false") {
-      setIsSecuringSession(true);
-      const timer = setTimeout(() => {
-        onLogout();
-      }, 1100);
-      return () => clearTimeout(timer);
-    }
-  }, [onLogout]);
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -200,13 +181,13 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
 
   if (isSecuringSession) {
     return (
-      <div className="container-page pt-28 sm:pt-32 pb-16 min-h-screen grid place-items-center">
+      <div className="container-page pt-24 sm:pt-28 pb-16 min-h-[calc(100vh-2rem)] flex flex-col items-center justify-center relative overflow-hidden">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-10 min-h-[260px] sm:min-h-[300px] flex flex-col items-center justify-center text-center gap-4 max-w-md w-full border border-line bg-surface select-none shadow-2xl"
+          className="premium-card rounded-3xl sm:rounded-4xl p-6 sm:p-8 min-h-[340px] sm:min-h-[380px] flex flex-col items-center justify-center text-center gap-3.5 w-full border border-line bg-surface select-none shadow-card"
         >
           <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-500 shadow-glow shadow-rose-500/20">
             <motion.div
@@ -220,10 +201,10 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
 
           <div>
             <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider mb-1 bg-rose-500/10 text-rose-500 border border-rose-500/20">
-              <span>ENKRIPSI SESI ADMIN</span>
+              <span>PENUTUPAN SESI ADMIN</span>
             </div>
             <h4 className="font-display text-sm sm:text-base font-black text-rose-500">
-              Mengamankan Sesi...
+              Mengakhiri Sesi & Menghapus Token...
             </h4>
           </div>
 
@@ -232,7 +213,7 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
               className="bg-rose-500 h-full rounded-full"
               initial={{ width: "0%" }}
               animate={{ width: "100%" }}
-              transition={{ duration: 1.1, ease: "easeInOut" }}
+              transition={{ duration: 0.85, ease: "easeInOut" }}
             />
           </div>
         </motion.div>
@@ -241,7 +222,7 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
   }
 
   return (
-    <div className="container-page pt-28 sm:pt-32 pb-16 min-h-screen flex flex-col gap-5 sm:gap-6 overflow-hidden">
+    <div className="container-page pt-24 sm:pt-28 pb-16 min-h-[calc(100vh-2rem)] flex flex-col gap-5 sm:gap-6 overflow-hidden">
       {/* Admin Top Header */}
       <header className={cn(
         "premium-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 shadow-card transition-all duration-500",
@@ -320,261 +301,71 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
       </header>
 
       {/* Simplified Top Navigation Tabs (4 Clean Tabs) */}
-      <nav className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-1 select-none">
+      <nav className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-2 px-1 select-none">
         {navTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
           return (
-            <MagneticButton key={tab.key} className="w-full">
-              <button
-                type="button"
-                onClick={() => handleTabChange(tab.key)}
-                className={`w-full relative px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-200 cursor-pointer select-none ${
-                  isActive
-                    ? "bg-primary text-surface shadow-md shadow-primary/25 border border-primary/50"
-                    : "bg-surface/70 text-muted border border-line hover:text-primary hover:bg-surface shadow-xs"
-                }`}
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span>{language === "id" ? tab.label.id : tab.label.de}</span>
-              </button>
-            </MagneticButton>
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => handleTabChange(tab.key)}
+              className={`w-full relative px-2.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer select-none transition-all duration-100 ease-out active:scale-[0.985] ${
+                isActive
+                  ? "bg-primary text-surface border border-primary/50 shadow-xs"
+                  : "bg-surface/70 text-muted border border-line hover:text-primary hover:bg-surface hover:border-primary/40"
+              }`}
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="truncate min-w-0">{language === "id" ? tab.label.id : tab.label.de}</span>
+            </button>
           );
         })}
       </nav>
 
       {/* Tab Content Panel */}
-      <main className="w-full">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="flex flex-col gap-6"
-          >
-            {/* 1. OVERVIEW & ANALYTICS TAB */}
-            {activeTab === "overview" && (
-              <div className="flex flex-col gap-6">
-                <AdminOverviewTab
-                  stats={stats}
-                  toggles={toggles}
-                  healthStatus={health?.status || "OK"}
-                />
+      <main className="w-full p-1 sm:p-1.5 min-h-[450px]">
+        <div className="flex flex-col gap-6">
+          {/* 1. OVERVIEW & ANALYTICS TAB */}
+          {activeTab === "overview" && (
+            <div className="flex flex-col gap-6">
+              <AdminOverviewTab
+                stats={stats}
+                toggles={toggles}
+                healthStatus={health?.status || "OK"}
+              />
+              <AdminStatisticsTab stats={stats} onRefresh={fetchDashboardData} />
+              <AdminHealthTab health={health} />
+            </div>
+          )}
 
-                {/* Sub-Pills for Overview detail view */}
-                <div className="flex items-center justify-between gap-3 border-b border-line pb-3">
-                  <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
-                    <button
-                      type="button"
-                      onClick={() => setOverviewSubTab("analytics")}
-                      className={cn(
-                        "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5",
-                        overviewSubTab === "analytics"
-                          ? "bg-primary/10 text-primary border border-primary/30"
-                          : "text-muted hover:text-primary border border-transparent"
-                      )}
-                    >
-                      <BarChart3 className="h-3.5 w-3.5" />
-                      <span>Grafik & Analisis Pengunjung</span>
-                    </button>
+          {/* 2. PROTEKSI & KEAMANAN TAB */}
+          {activeTab === "security" && (
+            <div className="flex flex-col gap-6">
+              <AdminFeaturesTab toggles={toggles} onRefresh={fetchDashboardData} />
+              <AdminSecurityTab onLogout={() => setConfirmLogout(true)} />
+            </div>
+          )}
 
-                    <button
-                      type="button"
-                      onClick={() => setOverviewSubTab("health")}
-                      className={cn(
-                        "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5",
-                        overviewSubTab === "health"
-                          ? "bg-primary/10 text-primary border border-primary/30"
-                          : "text-muted hover:text-primary border border-transparent"
-                      )}
-                    >
-                      <Activity className="h-3.5 w-3.5" />
-                      <span>Diagnostik Kesehatan System</span>
-                    </button>
-                  </div>
-                </div>
+          {/* 3. KOTAK MASUK TAB */}
+          {activeTab === "messages" && (
+            <div className="flex flex-col gap-6">
+              <AdminMessagesTab />
+            </div>
+          )}
 
-                <AnimatePresence mode="wait">
-                  {overviewSubTab === "analytics" ? (
-                    <motion.div
-                      key="analytics"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <AdminStatisticsTab stats={stats} onRefresh={fetchDashboardData} />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="health"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <AdminHealthTab health={health} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
-
-            {/* 2. PROTEKSI & KEAMANAN TAB */}
-            {activeTab === "security" && (
-              <div className="flex flex-col gap-6">
-                {/* Sub-Pills for Protection & Security */}
-                <div className="flex items-center gap-2 border-b border-line pb-3 overflow-x-auto scrollbar-none">
-                  <button
-                    type="button"
-                    onClick={() => setSecuritySubTab("features")}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
-                      securitySubTab === "features"
-                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
-                        : "text-muted hover:text-primary border border-transparent"
-                    )}
-                  >
-                    <ToggleLeft className="h-4 w-4" />
-                    <span>Sakelar Proteksi Fitur & Dokumen</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSecuritySubTab("sessions")}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
-                      securitySubTab === "sessions"
-                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
-                        : "text-muted hover:text-primary border border-transparent"
-                    )}
-                  >
-                    <Shield className="h-4 w-4" />
-                    <span>Keamanan Sesi & Reset IP Lockout</span>
-                  </button>
-                </div>
-
-                <AnimatePresence mode="wait">
-                  {securitySubTab === "features" ? (
-                    <motion.div
-                      key="features"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <AdminFeaturesTab toggles={toggles} onRefresh={fetchDashboardData} />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="sessions"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <AdminSecurityTab onLogout={() => setConfirmLogout(true)} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
-
-            {/* 3. KOTAK MASUK TAB */}
-            {activeTab === "messages" && <AdminMessagesTab />}
-
-            {/* 4. PENGATURAN & LOG TAB */}
-            {activeTab === "settings" && (
-              <div className="flex flex-col gap-6">
-                {/* Sub-Pills for Settings & Logs */}
-                <div className="flex items-center gap-2 border-b border-line pb-3 overflow-x-auto scrollbar-none">
-                  <button
-                    type="button"
-                    onClick={() => setSettingsSubTab("account")}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
-                      settingsSubTab === "account"
-                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
-                        : "text-muted hover:text-primary border border-transparent"
-                    )}
-                  >
-                    <Settings className="h-4 w-4" />
-                    <span>Pengaturan Akun & Akses</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSettingsSubTab("history")}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
-                      settingsSubTab === "history"
-                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
-                        : "text-muted hover:text-primary border border-transparent"
-                    )}
-                  >
-                    <History className="h-4 w-4" />
-                    <span>Riwayat Snapshot Konfig</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSettingsSubTab("audit")}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2",
-                      settingsSubTab === "audit"
-                        ? "bg-primary/10 text-primary border border-primary/30 shadow-xs"
-                        : "text-muted hover:text-primary border border-transparent"
-                    )}
-                  >
-                    <ListFilter className="h-4 w-4" />
-                    <span>Catatan Log Audit</span>
-                  </button>
-                </div>
-
-                <AnimatePresence mode="wait">
-                  {settingsSubTab === "account" && (
-                    <motion.div
-                      key="account"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <AdminSettingsTab
-                        currentUsername={adminUsername}
-                        onRefresh={fetchDashboardData}
-                      />
-                    </motion.div>
-                  )}
-                  {settingsSubTab === "history" && (
-                    <motion.div
-                      key="history"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <AdminConfigHistoryTab />
-                    </motion.div>
-                  )}
-                  {settingsSubTab === "audit" && (
-                    <motion.div
-                      key="audit"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <AdminAuditTab />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+          {/* 4. PENGATURAN & LOG TAB */}
+          {activeTab === "settings" && (
+            <div className="flex flex-col gap-6">
+              <AdminSettingsTab
+                currentUsername={adminUsername}
+                onRefresh={fetchDashboardData}
+              />
+              <AdminConfigHistoryTab />
+              <AdminAuditTab />
+            </div>
+          )}
+        </div>
       </main>
 
       {/* PRIORITAS 9: Logout Confirmation Modal */}
@@ -621,9 +412,11 @@ export function AdminDashboardView({ adminUsername, onLogout }: AdminDashboardVi
                   <MagneticButton className="w-full">
                     <motion.button
                       type="button"
-                      onClick={() => {
+                      onClick={async () => {
                         setConfirmLogout(false);
+                        setIsSecuringSession(true);
                         localStorage.removeItem("remember_session_admin");
+                        await new Promise((resolve) => setTimeout(resolve, 850));
                         onLogout();
                       }}
                       whileHover="hover"

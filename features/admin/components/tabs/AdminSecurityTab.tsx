@@ -18,7 +18,11 @@ type AdminSecurityTabProps = {
 };
 
 export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
-  const [securityData, setSecurityData] = useState<any>(null);
+  const [securityData, setSecurityData] = useState<any>({
+    lastLogin: { ip: "127.0.0.1", time: new Date().toISOString() },
+    loginHistory: { failedCountToday: 0, totalFailed: 0, successCountToday: 1, totalSuccess: 1 },
+    snapshotCount: 0
+  });
   const [loading, setLoading] = useState(false);
   const notify = (type: "success" | "error", text: string) => {
     toast({ message: text, type: type === "error" ? "error" : "success" });
@@ -154,9 +158,19 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-6"
+    >
       {/* Standar Top Header Card (Seragam 1:1) */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden"
+      >
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -193,10 +207,15 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
             <span>Ekspor Konfigurasi (.json)</span>
           </motion.button>
         </MagneticButton>
-      </div>
+      </motion.div>
 
       {/* Security Overview Dashboard */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface"
+      >
         <div className="flex items-center justify-between border-b border-line pb-4 mb-4">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary shrink-0" />
@@ -204,11 +223,14 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-1 sm:p-1.5">
           <motion.div
-            whileHover={{ y: -2, scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-            className="p-4 rounded-2xl bg-surface/50 border border-line flex flex-col justify-between transition-all"
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            whileHover={{ y: -4, scale: 1.01 }}
+            whileTap={{ scale: 0.985 }}
+            transition={{ type: "spring", stiffness: 380, damping: 20 }}
+            className="group p-4 rounded-2xl bg-surface/50 border border-line flex flex-col justify-between shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
           >
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-muted">Last Login IP</span>
@@ -225,9 +247,12 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
           </motion.div>
 
           <motion.div
-            whileHover={{ y: -2, scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-            className="p-4 rounded-2xl bg-surface/50 border border-line flex flex-col justify-between transition-all"
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            whileHover={{ y: -4, scale: 1.01 }}
+            whileTap={{ scale: 0.985 }}
+            transition={{ type: "spring", stiffness: 380, damping: 20 }}
+            className="group p-4 rounded-2xl bg-surface/50 border border-line flex flex-col justify-between shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
           >
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-muted">Failed Logins (Hari ini)</span>
@@ -242,9 +267,12 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
           </motion.div>
 
           <motion.div
-            whileHover={{ y: -2, scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-            className="p-4 rounded-2xl bg-surface/50 border border-line flex flex-col justify-between transition-all"
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            whileHover={{ y: -4, scale: 1.01 }}
+            whileTap={{ scale: 0.985 }}
+            transition={{ type: "spring", stiffness: 380, damping: 20 }}
+            className="group p-4 rounded-2xl bg-surface/50 border border-line flex flex-col justify-between shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
           >
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-muted">Successful Logins</span>
@@ -259,9 +287,12 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
           </motion.div>
 
           <motion.div
-            whileHover={{ y: -2, scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-            className="p-4 rounded-2xl bg-surface/50 border border-line flex flex-col justify-between transition-all"
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            whileHover={{ y: -4, scale: 1.01 }}
+            whileTap={{ scale: 0.985 }}
+            transition={{ type: "spring", stiffness: 380, damping: 20 }}
+            className="group p-4 rounded-2xl bg-surface/50 border border-line flex flex-col justify-between shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
           >
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-muted">Snapshot Count</span>
@@ -273,11 +304,18 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
             <span className="text-[10px] font-bold text-muted mt-0.5">Historical Versions</span>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Dangerous Action Safety Layer */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="premium-card p-6 rounded-3xl border border-line bg-surface flex flex-col justify-between">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1 sm:p-1.5">
+        <motion.div
+          initial={{ opacity: 0, y: 18, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          whileHover={{ y: -4, scale: 1.01 }}
+          whileTap={{ scale: 0.985 }}
+          transition={{ type: "spring", stiffness: 380, damping: 20 }}
+          className="premium-card group p-6 rounded-3xl border border-line bg-surface flex flex-col justify-between shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
+        >
           <div>
             <motion.div
               whileHover={{ scale: 1.06, rotate: 6 }}
@@ -316,9 +354,16 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
               </motion.button>
             </MagneticButton>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="premium-card p-6 rounded-3xl border border-line bg-surface flex flex-col justify-between">
+        <motion.div
+          initial={{ opacity: 0, y: 18, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          whileHover={{ y: -4, scale: 1.01 }}
+          whileTap={{ scale: 0.985 }}
+          transition={{ type: "spring", stiffness: 380, damping: 20 }}
+          className="premium-card group p-6 rounded-3xl border border-line bg-surface flex flex-col justify-between shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
+        >
           <div>
             <motion.div
               whileHover={{ scale: 1.06, rotate: 6 }}
@@ -357,7 +402,7 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
               </motion.button>
             </MagneticButton>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <ConfirmModal
@@ -371,6 +416,6 @@ export function AdminSecurityTab({ onLogout }: AdminSecurityTabProps) {
         onConfirm={modalConfig.action}
         onCancel={() => setModalConfig((prev) => ({ ...prev, open: false }))}
       />
-    </div>
+    </motion.div>
   );
 }

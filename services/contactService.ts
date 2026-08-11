@@ -186,6 +186,15 @@ export const contactService = {
           messages = [];
         }
       }
+      const fp = `${payload.email.toLowerCase().trim()}::${payload.message.toLowerCase().trim().substring(0, 150)}`;
+      // Remove any existing duplicate entry with same fingerprint or temp ID before unshifting
+      messages = messages.filter((m: any) => {
+        if (!m) return false;
+        if (m.id === msgId || m.id === canonicalId) return false;
+        const existingFp = `${(m.email || "").toLowerCase().trim()}::${(m.message || "").toLowerCase().trim().substring(0, 150)}`;
+        return existingFp !== fp;
+      });
+
       messages.unshift({
         id: canonicalId,
         name: payload.name,

@@ -2,39 +2,39 @@ import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://hajat.vercel.app";
-  const now = new Date();
+  const lastUpdated = new Date("2026-08-12");
 
   return [
     {
       url: `${baseUrl}`,
-      lastModified: now,
+      lastModified: lastUpdated,
       changeFrequency: "daily",
       priority: 1.0,
     },
-
     {
       url: `${baseUrl}/journey`,
-      lastModified: now,
+      lastModified: lastUpdated,
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/projects`,
-      lastModified: now,
+      lastModified: lastUpdated,
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/gallery`,
-      lastModified: now,
+      lastModified: lastUpdated,
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
       url: `${baseUrl}/ecl-b2`,
-      lastModified: now,
+      lastModified: lastUpdated,
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.85,
     },
   ];
 }
+

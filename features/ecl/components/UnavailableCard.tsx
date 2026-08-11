@@ -147,54 +147,27 @@ export function UnavailableCard({ docId, docNames }: UnavailableCardProps) {
   );
 }
 
-// Client-side helper function to perform Conflict-Free Last-Write-Wins synchronization of admin toggles
+// Client-side helper: store server-authoritative toggle state for UI purposes only.
+// Server is ALWAYS the source of truth — no client-side LWW merge performed.
+// The server no longer trusts the cookie for toggle decisions (security fix).
 function syncLocalToggles(serverToggles: any, serverEpoch: number) {
   if (typeof window === "undefined" || !serverToggles) return;
-  
-  const raw = localStorage.getItem("hajat_toggles_state");
-  let localData: any = null;
-  if (raw) {
-    try {
-      localData = JSON.parse(raw);
-    } catch {
-      localData = null;
-    }
-  }
 
-  // Restructure legacy flat format if necessary
-  if (localData && !localData.toggles) {
-    localData = {
-      toggles: Object.keys(localData).reduce((acc, key) => {
-        acc[key] = { protected: localData[key], updatedAt: 0 };
-        return acc;
-      }, {} as any),
-      globalEpoch: 0
-    };
-  }
-
-  const merged = {
-    toggles: { ...serverToggles },
-    globalEpoch: Math.max(serverEpoch || 0, localData?.globalEpoch || 0)
+  const payload = {
+    toggles: serverToggles,
+    globalEpoch: serverEpoch || 0
   };
 
-  if (localData?.toggles) {
-    Object.keys(localData.toggles).forEach((key) => {
-      const serverVal = serverToggles[key];
-      const localVal = localData.toggles[key];
-      if (serverVal && localVal) {
-        const serverTime = Number(serverVal.updatedAt) || 0;
-        const localTime = Number(localVal.updatedAt) || 0;
-        
-        if (localTime > serverTime) {
-          merged.toggles[key] = {
-            protected: localVal.protected,
-            updatedAt: localTime
-          };
-        }
-      }
-    });
+  try {
+    localStorage.setItem("hajat_toggles_state", JSON.stringify(payload));
+  } catch {
+    // localStorage may be unavailable
   }
 
-  localStorage.setItem("hajat_toggles_state", JSON.stringify(merged));
-  document.cookie = `hajat_toggles_state=${encodeURIComponent(JSON.stringify(merged))}; path=/; max-age=31536000; SameSite=Lax`;
+  try {
+    document.cookie = `hajat_toggles_state=${encodeURIComponent(JSON.stringify(payload))}; path=/; max-age=31536000; SameSite=Lax`;
+  } catch {
+    // Ignore cookie write errors
+  }
 }
+

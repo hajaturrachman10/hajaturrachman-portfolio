@@ -58,9 +58,12 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
   ];
 
   const handleToggle = async (feature: FeatureType, currentStatus: boolean) => {
-    const isEnabling = !currentStatus;
+    const isDocFeature = feature.startsWith("ecl_doc");
+    // For main features: turning protected ON (currentStatus = false -> true) is "enabling protection".
+    // For doc features: turning protected OFF (currentStatus = true -> false) is "enabling document".
+    const isEnablingAction = isDocFeature ? currentStatus === true : !currentStatus;
     setLoadingFeature(feature);
-    setTransitioningAction(isEnabling ? "enabling" : "disabling");
+    setTransitioningAction(isEnablingAction ? "enabling" : "disabling");
 
     // Comfortable 400ms micro-delay for smooth progress bar transition
     await new Promise((resolve) => setTimeout(resolve, 400));
@@ -89,14 +92,21 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
           }
         }
 
+        const toastActionText = isDocFeature
+          ? (!currentStatus ? "DIPERBARUI JADI NONAKTIF" : "DIPERBARUI JADI AKTIF")
+          : (!currentStatus ? "DIPROTEKSI DENGAN SANDI" : "DIBUKA UNTUK PUBLIK");
+
         toast({
-          message: `Fitur ${feature.toUpperCase()} berhasil ${!currentStatus ? "DIPROTEKSI DENGAN SANDI" : "DIBUKA UNTUK PUBLIK"}`,
-          type: !currentStatus ? "indigo" : "cyan"
+          message: `Fitur ${feature.toUpperCase()} berhasil ${toastActionText}`,
+          type: isEnablingAction ? "indigo" : "cyan"
         });
 
         // 3. Broadcast event & trigger server refresh
-        const isDocFeature = feature.startsWith("ecl_doc");
-        const isUnlockedForPublic = isDocFeature ? !currentStatus : currentStatus;
+        // For main features: unlocked = !currentStatus (was protected, now open)
+        // For doc features: currentStatus=isProtected=true means locked. After toggle we OPEN it.
+        //   new protected=false, so unlocked=true. But since we send !currentStatus to protected,
+        //   the unlocked state = !(!currentStatus) = currentStatus for docs.
+        const isUnlockedForPublic = isDocFeature ? currentStatus : !currentStatus;
 
         broadcastCrossTabEvent("TOGGLE_CHANGED", {
           feature,
@@ -122,17 +132,22 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
   const mainFeatures = featuresList.filter((f) => !f.isDoc);
   const docFeatures = featuresList.filter((f) => f.isDoc);
 
-  const renderCard = (item: typeof featuresList[0]) => {
+  const renderCard = (item: typeof featuresList[0], idx: number = 0) => {
     const isProtected = localOverrides[item.type] !== undefined
       ? localOverrides[item.type]!
       : toggles ? toggles[item.type]?.protected ?? true : true;
     const isLoading = loadingFeature === item.type;
+    const isActiveOrProtected = item.isDoc ? !isProtected : isProtected;
 
     return (
       <motion.div
         key={item.type}
-        whileHover={{ y: -2 }}
-        className="premium-card relative p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-line bg-surface flex flex-col justify-between gap-4 sm:gap-6 shadow-sm overflow-hidden"
+        initial={{ opacity: 0, y: 18, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        whileHover={{ y: -4, scale: 1.01 }}
+        whileTap={{ scale: 0.985 }}
+        transition={{ type: "spring", stiffness: 380, damping: 20 }}
+        className="premium-card group relative p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-line bg-surface flex flex-col justify-between gap-4 sm:gap-6 shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity] overflow-hidden"
       >
         {/* In-Card Transition Animation Overlay (Non-fullscreen) */}
         <AnimatePresence>
@@ -177,7 +192,7 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
                 >
                   {item.isDoc
                     ? (transitioningAction === "enabling" ? "Mengaktifkan Dokumen..." : "Menonaktifkan Dokumen...")
-                    : (transitioningAction === "enabling" ? "Menerapkan Proteksi..." : "Menyinkronkan Status...")}
+                    : (transitioningAction === "enabling" ? "Menerapkan Proteksi..." : "Membuka Akses Publik...")}
                 </h4>
               </div>
 
@@ -210,23 +225,23 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
               whileTap={{ scale: 0.94, rotate: 3 }}
               transition={{ type: "spring", stiffness: 450, damping: 18 }}
               className={`icon-orbit grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl sm:rounded-2xl border ${
-                isProtected
+                isActiveOrProtected
                   ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-500"
                   : "border-rose-500/25 bg-rose-500/10 text-rose-500"
               } cursor-pointer select-none`}
             >
-              {isProtected ? <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" /> : <ShieldAlert className="h-5 w-5 sm:h-6 sm:w-6" />}
+              {isActiveOrProtected ? <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" /> : <ShieldAlert className="h-5 w-5 sm:h-6 sm:w-6" />}
             </motion.div>
 
             <span
               className={`px-2.5 py-0.5 sm:px-3.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${
-                isProtected
+                isActiveOrProtected
                   ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                   : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
               }`}
             >
               {item.isDoc
-                ? (isProtected ? "Dokumen Aktif" : "Dokumen Nonaktif")
+                ? (isProtected ? "Dokumen Nonaktif" : "Dokumen Aktif")
                 : (isProtected ? "Proteksi Aktif" : "Proteksi Nonaktif")}
             </span>
           </div>
@@ -250,21 +265,21 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
               transition={{ type: "spring", stiffness: 380, damping: 12 }}
               className={cn(
                 "button-primary focus-ring w-full py-3 text-xs sm:text-sm font-black flex items-center justify-center gap-2 border-0 select-none cursor-pointer disabled:opacity-50",
-                isProtected
+                isActiveOrProtected
                   ? "!bg-none !bg-rose-600 hover:!bg-rose-500 active:!bg-rose-700 !text-white shadow-md shadow-rose-600/20"
                   : "!bg-none !bg-emerald-600 hover:!bg-emerald-500 active:!bg-emerald-700 !text-white shadow-md shadow-emerald-600/20"
               )}
             >
               {isLoading ? (
                 <RefreshCw className="h-4 w-4 animate-spin shrink-0" />
-              ) : isProtected ? (
+              ) : isActiveOrProtected ? (
                 <ToggleRight className="h-4 w-4 shrink-0" />
               ) : (
                 <ToggleLeft className="h-4 w-4 shrink-0" />
               )}
               <span>
                 {item.isDoc
-                  ? (isProtected ? "Nonaktifkan Dokumen" : "Aktifkan Dokumen")
+                  ? (isProtected ? "Aktifkan Dokumen" : "Nonaktifkan Dokumen")
                   : (isProtected ? "Matikan Proteksi" : "Aktifkan Proteksi")}
               </span>
             </motion.button>
@@ -275,9 +290,19 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
   };
 
   return (
-    <div className="flex flex-col gap-8 w-full">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-8 w-full"
+    >
       {/* Standar Top Header Card (Seragam 1:1) */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden"
+      >
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -296,7 +321,7 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Group 1: Halaman & Fitur Utama */}
       <div className="flex flex-col gap-4">
@@ -306,8 +331,8 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
             Akses Proteksi Halaman & Fitur Utama
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {mainFeatures.map((item) => renderCard(item))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 p-1 sm:p-1.5">
+          {mainFeatures.map((item, idx) => renderCard(item, idx))}
         </div>
       </div>
 
@@ -319,10 +344,10 @@ export function AdminFeaturesTab({ toggles, onRefresh }: AdminFeaturesTabProps) 
             Status Akses Berkas & Dokumen ECL
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {docFeatures.map((item) => renderCard(item))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 p-1 sm:p-1.5">
+          {docFeatures.map((item, idx) => renderCard(item, idx + mainFeatures.length))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -41,8 +41,26 @@ export function GallerySection() {
             ? "Enam galeri utama disiapkan sebagai arsip foto dan video perjalanan, karya, literasi, sekolah, dan mimpi masa depan."
             : "Sechs Hauptgalerien stehen als Foto- und Videoarchiv für Deutschvorbereitung, Projekte, Schule und Zukunftsträume bereit."}
         />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {publicGallery.map((item, index) => (
+        {!mounted ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div key={n} className="premium-card overflow-hidden rounded-4xl p-0 flex flex-col justify-between">
+                <div className="aspect-[4/3] w-full skeleton-shimmer" />
+                <div className="p-6 space-y-3">
+                  <div className="flex gap-4 items-center">
+                    <div className="h-12 w-12 rounded-2xl skeleton-shimmer shrink-0" />
+                    <div className="space-y-2 w-full">
+                      <div className="h-5 w-3/4 rounded skeleton-shimmer" />
+                      <div className="h-3.5 w-1/2 rounded skeleton-shimmer" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {publicGallery.map((item, index) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 24 }}
@@ -114,6 +132,7 @@ export function GallerySection() {
             </motion.div>
           ))}
         </div>
+        )}
       </Reveal>
       <GalleryModal item={selected} onClose={() => setSelected(null)} />
     </>

@@ -4,12 +4,16 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   swcMinify: true,
+  productionBrowserSourceMaps: false,
   experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion"]
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+    optimizeCss: false
   },
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 604800,
+    deviceSizes: [360, 640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       {
         protocol: "https",
@@ -33,6 +37,24 @@ const nextConfig = {
         ]
       },
       {
+        source: "/fonts/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        source: "/(.*\\.svg)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800"
+          }
+        ]
+      },
+      {
         source: "/(.*)",
         headers: [
           {
@@ -43,7 +65,6 @@ const nextConfig = {
             key: "X-Frame-Options",
             value: "SAMEORIGIN"
           },
-
           {
             key: "X-Content-Type-Options",
             value: "nosniff"

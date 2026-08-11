@@ -83,9 +83,19 @@ export function AdminOverviewTab({ stats, toggles, healthStatus }: AdminOverview
   ];
 
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-6 w-full"
+    >
       {/* Standar Top Header Card (Seragam 1:1) */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden"
+      >
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -104,19 +114,21 @@ export function AdminOverviewTab({ stats, toggles, healthStatus }: AdminOverview
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* 8 Primary KPI Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 p-1 sm:p-1.5">
         {cards.map((item, idx) => {
           const Icon = item.icon;
           return (
             <motion.div
               key={item.label}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: idx * 0.05 }}
-              className="premium-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-line bg-surface flex flex-col justify-between"
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              whileHover={{ y: -4, scale: 1.01 }}
+              whileTap={{ scale: 0.985 }}
+              transition={{ type: "spring", stiffness: 380, damping: 20 }}
+              className="premium-card group p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-line bg-surface flex flex-col justify-between shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-muted">{item.label}</span>
@@ -139,6 +151,6 @@ export function AdminOverviewTab({ stats, toggles, healthStatus }: AdminOverview
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -14,13 +14,15 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+  preload: true,
 });
 
 const poppins = Poppins({
-  weight: ["500", "600", "700", "800", "900"],
+  weight: ["600", "700", "800", "900"],
   subsets: ["latin"],
   variable: "--font-poppins",
   display: "swap",
+  preload: true,
 });
 
 const currentSiteUrl = (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_SITE_URL) || "https://hajat.vercel.app";
@@ -152,12 +154,14 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://wixqhbechyvfvwsklfak.supabase.co" />
         <link rel="dns-prefetch" href="https://wixqhbechyvfvwsklfak.supabase.co" />
         <link rel="dns-prefetch" href="https://api.qrserver.com" />
+        <link rel="preload" as="image" href="/assets/profile.jpg" fetchPriority="high" />
 
         <link rel="icon" href="/favicon.ico" sizes="any" />
-
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="thumbnail" content={`${currentSiteUrl}/assets/profile.jpg`} />

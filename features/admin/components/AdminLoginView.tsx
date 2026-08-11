@@ -21,8 +21,11 @@ import {
   FolderLock,
   BookOpen,
   Activity,
-  Loader2
+  Loader2,
+  Check,
+  X
 } from "lucide-react";
+
 import { useRouter } from "next/navigation";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { Reveal } from "@/components/ui/Reveal";
@@ -50,12 +53,49 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
   const [isUsernameError, setIsUsernameError] = useState(false);
   const [isPasswordError, setIsPasswordError] = useState(false);
   const [isEmptyWarning, setIsEmptyWarning] = useState(false);
+  const [isUnlockingSuccess, setIsUnlockingSuccess] = useState(false);
+  const [rememberSession, setRememberSession] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("remember_session_admin") !== "false";
+    }
+    return true;
+  });
 
   const usernameRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const tapCountRef = useRef(0);
   const tapTimerRef = useRef<NodeJS.Timeout | null>(null);
   const shakeControls = useAnimation();
+
+  // Clear error messages and error field styling when clicking anywhere outside an active input field (inside or outside card)
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target || !target.closest) return;
+      if (!target.closest("input, textarea, button")) {
+        if (errorMsg || isEmptyWarning || isShakeError || isUsernameError || isPasswordError) {
+          setErrorMsg("");
+          setIsEmptyWarning(false);
+          setIsShakeError(false);
+          setIsUsernameError(false);
+          setIsPasswordError(false);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [errorMsg, isEmptyWarning, isShakeError, isUsernameError, isPasswordError]);
+
+
 
   // Dynamic Browser Tab Title updating for Admin Login
   useEffect(() => {
@@ -162,6 +202,12 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
     router.push("/");
   };
 
+  const triggerFormSubmit = () => {
+    if (formRef.current) {
+      formRef.current.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+    }
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (loading || isBlocked) return;
@@ -244,8 +290,20 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
         return;
       }
 
+      // Enable remember session by default and reset active tab on fresh login
+      if (typeof window !== "undefined") {
+        localStorage.setItem("remember_session_admin", "true");
+        localStorage.removeItem("admin_active_tab");
+      }
       broadcastCrossTabEvent("ADMIN_LOGIN");
-      onLoginSuccess();
+
+      // Play 1:1 CV/Vault style unlocking motion overlay card before entering Dashboard
+      setIsUnlockingSuccess(true);
+      setTimeout(() => {
+        onLoginSuccess();
+      }, 1100);
+
+
     } catch {
       setErrorMsg("Gagal terhubung ke server. Periksa koneksi internet Anda.");
       setIsShakeError(true);
@@ -341,7 +399,8 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
         {/* RIGHT COLUMN: Admin Login Card */}
         <div className="md:col-span-6 flex justify-center md:justify-end w-full">
           <Reveal className="w-full max-w-lg">
-            <motion.div className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden">
+            <motion.div ref={cardRef} className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden">
+
           {/* Header Icon Orbit */}
           <div className="flex flex-col items-center text-center gap-4">
             <motion.div
@@ -555,7 +614,7 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                 transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                 className="mt-6"
               >
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4" autoComplete="off">
+                <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4" autoComplete="off">
                   {/* Decoy fields to block Chrome / Google Password Manager popups */}
                   <input type="text" name="fake_user" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
                   <input type="password" name="fake_pass" style={{ display: "none" }} tabIndex={-1} autoComplete="new-password" />
@@ -589,6 +648,21 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                             if (errorMsg) setErrorMsg("");
                             if (isShakeError) setIsShakeError(false);
                           }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              const trimmedUser = username.trim();
+                              const trimmedPass = password.trim();
+
+                              if (trimmedUser && trimmedPass) {
+                                triggerFormSubmit();
+                              } else if (!trimmedPass) {
+                                inputRef.current?.focus();
+                              } else if (!trimmedUser) {
+                                triggerFormSubmit();
+                              }
+                            }
+                          }}
                           onFocus={() => {
                             if (errorMsg) setErrorMsg("");
                             if (isEmptyWarning) setIsEmptyWarning(false);
@@ -598,14 +672,41 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                           }}
                           placeholder="Masukkan nama pengguna admin"
                           className={cn(
-                            "input pl-11 pr-4 text-left transition-all duration-300 w-full",
+                            "input pl-11 pr-12 text-left transition-all duration-300 w-full",
                             (isShakeError || isUsernameError) &&
                               (isEmptyWarning
                                 ? "!border-amber-500 ring-4 ring-amber-500/25 shadow-glow shadow-amber-500/20 text-amber-500 dark:text-amber-400 bg-amber-500/5"
                                 : "!border-rose-500 ring-4 ring-rose-500/25 shadow-glow shadow-rose-500/20 text-rose-500 dark:text-rose-400 bg-rose-500/5")
                           )}
                         />
+                        <AnimatePresence>
+                          {username && (
+                            <motion.button
+                              key="clear-username-btn"
+                              type="button"
+                              initial={{ opacity: 0, scale: 0.4, rotate: -60, y: "-50%" }}
+                              animate={{ opacity: 1, scale: 1, rotate: 0, y: "-50%" }}
+                              exit={{ opacity: 0, scale: 0.4, rotate: 60, y: "-50%" }}
+                              whileHover={{ scale: 1.15, rotate: 90 }}
+                              whileTap={{ scale: 0.85, rotate: 180 }}
+                              transition={{ type: "spring", stiffness: 450, damping: 24 }}
+                              onClick={() => {
+                                setUsername("");
+                                if (isEmptyWarning) setIsEmptyWarning(false);
+                                if (isUsernameError) setIsUsernameError(false);
+                                if (errorMsg) setErrorMsg("");
+                                usernameRef.current?.focus();
+                              }}
+                              className="absolute right-2.5 top-1/2 rounded-full p-1 bg-surface-hover/90 hover:bg-rose-500/20 text-muted hover:text-rose-500 dark:hover:text-rose-400 border border-line/70 hover:border-rose-500/40 shadow-xs backdrop-blur-xs transition-colors cursor-pointer flex items-center justify-center"
+                              aria-label="Hapus nama pengguna"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </motion.button>
+                          )}
+                        </AnimatePresence>
                       </div>
+
+
                     </label>
 
                     {/* Password Field */}
@@ -627,7 +728,7 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                           autoCorrect="off"
                           spellCheck={false}
                           className={cn(
-                            "input pl-11 pr-12 text-left transition-all duration-300 w-full",
+                            "input pl-11 pr-24 text-left transition-all duration-300 w-full",
                             (isShakeError || isPasswordError) &&
                               (isEmptyWarning
                                 ? "!border-amber-500 ring-4 ring-amber-500/25 shadow-glow shadow-amber-500/20 text-amber-500 dark:text-amber-400 bg-amber-500/5"
@@ -636,6 +737,21 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                           placeholder="Masukkan kata sandi admin"
                           value={password}
                           onChange={handlePasswordChange}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              const trimmedUser = username.trim();
+                              const trimmedPass = password.trim();
+
+                              if (trimmedUser && trimmedPass) {
+                                triggerFormSubmit();
+                              } else if (!trimmedUser) {
+                                usernameRef.current?.focus();
+                              } else if (!trimmedPass) {
+                                triggerFormSubmit();
+                              }
+                            }
+                          }}
                           onFocus={() => {
                             if (errorMsg) setErrorMsg("");
                             if (isEmptyWarning) setIsEmptyWarning(false);
@@ -646,12 +762,38 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
                           disabled={loading}
                           ref={inputRef}
                         />
+                        <AnimatePresence>
+                          {password && (
+                            <motion.button
+                              key="clear-password-btn"
+                              type="button"
+                              initial={{ opacity: 0, scale: 0.4, rotate: -60, y: "-50%" }}
+                              animate={{ opacity: 1, scale: 1, rotate: 0, y: "-50%" }}
+                              exit={{ opacity: 0, scale: 0.4, rotate: 60, y: "-50%" }}
+                              whileHover={{ scale: 1.1, rotate: 90 }}
+                              whileTap={{ scale: 0.85, rotate: 180 }}
+                              transition={{ type: "spring", stiffness: 450, damping: 24 }}
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => {
+                                setPassword("");
+                                if (isEmptyWarning) setIsEmptyWarning(false);
+                                if (isPasswordError) setIsPasswordError(false);
+                                if (errorMsg) setErrorMsg("");
+                                inputRef.current?.focus();
+                              }}
+                              className="absolute right-[48px] top-1/2 grid h-8 w-8 place-items-center rounded-full bg-surface-hover/90 hover:bg-rose-500/20 text-muted hover:text-rose-500 dark:hover:text-rose-400 border border-line/70 hover:border-rose-500/40 shadow-xs backdrop-blur-xs transition-colors cursor-pointer"
+                              aria-label="Hapus kata sandi"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </motion.button>
+                          )}
+                        </AnimatePresence>
                         <button
                           type="button"
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={handleEyeToggle}
                           disabled={loading}
-                          className="focus-ring absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-muted transition hover:bg-primary/10 hover:text-text disabled:opacity-50"
+                          className="focus-ring absolute right-2.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-muted transition hover:bg-primary/10 hover:text-text disabled:opacity-50"
                           aria-label={showPassword ? "Sembunyikan kata sandi" : "Lihat kata sandi"}
                         >
                           <AnimatePresence mode="wait" initial={false}>
@@ -764,6 +906,65 @@ export function AdminLoginView({ onLoginSuccess }: AdminLoginViewProps) {
           </AnimatePresence>
         </motion.div>
       </Reveal>
+      {/* FULLSCREEN 1:1 "AKSES DIBERIKAN" OVERLAY MODAL (100% EXACT MATCH WITH PASSWORD MODAL) */}
+      <AnimatePresence>
+        {isUnlockingSuccess && (
+          <motion.div
+            className="modal-backdrop fixed inset-0 z-[120] grid place-items-center px-4 py-8 transform-gpu will-change-[opacity]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            role="dialog"
+            aria-modal="true"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 25, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 25, scale: 0.93 }}
+              transition={{
+                type: "spring",
+                stiffness: 420,
+                damping: 26
+              }}
+              className="premium-card w-full max-w-lg rounded-3xl sm:rounded-4xl p-5 sm:p-8 border border-line bg-surface shadow-2xl relative overflow-hidden transform-gpu will-change-[transform,opacity]"
+            >
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col items-center py-6 text-center"
+              >
+                <motion.div
+                  animate={{ rotate: [0, 12, -12, 0], scale: [1, 1.15, 1] }}
+                  transition={{ duration: 0.75, ease: "easeInOut" }}
+                  className="relative grid h-20 w-20 place-items-center rounded-3xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-500 shadow-glow shadow-emerald-500/25"
+                >
+                  <Sparkles className="h-10 w-10 animate-pulse" />
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.2 }}
+                    className="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-emerald-500 text-white shadow-md"
+                  >
+                    <Check className="h-3.5 w-3.5 stroke-[3]" />
+                  </motion.div>
+                </motion.div>
+
+                <h3 className="mt-6 font-display text-3xl font-black gradient-text">
+                  Akses Diberikan
+                </h3>
+
+                <p className="mt-3 font-bold leading-7 text-muted max-w-xs">
+                  Kata sandi & kredensial admin terverifikasi. Selamat datang.
+                </p>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   </div>
 </div>

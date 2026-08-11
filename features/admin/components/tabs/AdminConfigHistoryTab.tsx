@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { History, RotateCcw, Eye, ShieldCheck, Clock, AlertCircle, CheckCircle2, Hash, RefreshCw } from "lucide-react";
+import { History, RotateCcw, Eye, ShieldCheck, Clock, AlertCircle, CheckCircle2, Hash, RefreshCw, Loader2 } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import dynamic from "next/dynamic";
 
@@ -11,7 +11,7 @@ const ConfirmModal = dynamic(
   { ssr: false }
 );
 import { ConfigSnapshot } from "@/services/admin/adminTypes";
-import { broadcastCrossTabEvent } from "@/lib/crossTabSync";
+import { broadcastCrossTabEvent, subscribeCrossTabSync } from "@/lib/crossTabSync";
 import { toast } from "@/components/ui/Toast";
 
 export function AdminConfigHistoryTab() {
@@ -51,6 +51,29 @@ export function AdminConfigHistoryTab() {
 
   useEffect(() => {
     fetchHistory();
+
+    const handleFocus = () => fetchHistory();
+    window.addEventListener("focus", handleFocus);
+
+    const unsubscribe = subscribeCrossTabSync((msg) => {
+      if (
+        msg.event === "TOGGLE_CHANGED" ||
+        msg.event === "CONFIG_RESTORED" ||
+        msg.event === "CONFIG_UPDATED" ||
+        msg.event === "STRATEGY_UPDATED" ||
+        msg.event === "SNAPSHOT_CREATED"
+      ) {
+        fetchHistory();
+      }
+    });
+
+    const interval = setInterval(fetchHistory, 5000);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, [fetchHistory]);
 
   const handleRestore = (snapshot: ConfigSnapshot) => {
@@ -82,9 +105,19 @@ export function AdminConfigHistoryTab() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col gap-6"
+    >
       {/* Standar Top Header Card (Seragam 1:1) */}
-      <div className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-5 sm:p-6 rounded-3xl border border-line bg-surface shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden"
+      >
         <div className="flex items-center gap-3.5 relative z-10">
           <motion.div
             whileHover={{ scale: 1.06, rotate: 6 }}
@@ -103,9 +136,14 @@ export function AdminConfigHistoryTab() {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="premium-card p-6 rounded-3xl border border-line bg-surface">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="premium-card p-6 rounded-3xl border border-line bg-surface"
+      >
         <div className="flex items-center justify-between border-b border-line pb-4 mb-6">
           <div className="flex items-center gap-3">
             <motion.div
@@ -124,44 +162,28 @@ export function AdminConfigHistoryTab() {
         </div>
 
         {loading ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={{ duration: 0.25 }}
-            className="premium-card rounded-3xl p-8 sm:p-12 border border-line bg-surface/60 flex flex-col items-center justify-center text-center gap-4 relative overflow-hidden my-4 shadow-card select-none"
-          >
-            {/* Glowing Spinning Orbit Icon */}
-            <div className="relative">
-              <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl animate-pulse" />
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1.8, ease: "linear" }}
-                className="icon-orbit grid h-14 w-14 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary shadow-glow shadow-primary/20 relative z-10"
+          <div className="grid gap-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="soft-card p-5 rounded-2xl border border-line bg-surface/50 space-y-4"
               >
-                <RefreshCw className="h-7 w-7" />
-              </motion.div>
-            </div>
-
-            <div>
-              <h4 className="font-display text-base font-black text-primary">
-                Memuat Data Histori Snapshot...
-              </h4>
-              <p className="text-xs font-bold text-muted mt-1 max-w-sm">
-                Menghubungkan ke basis data snapshot terenkripsi & memverifikasi integritas hash.
-              </p>
-            </div>
-
-            {/* Animated Glowing Progress Bar */}
-            <div className="w-full max-w-xs h-1.5 rounded-full overflow-hidden border border-line bg-surface/90 relative mt-1">
-              <motion.div
-                className="bg-gradient-to-r from-primary via-cyan-500 to-primary h-full rounded-full"
-                initial={{ x: "-100%" }}
-                animate={{ x: "100%" }}
-                transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}
-              />
-            </div>
-          </motion.div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-6 w-20 rounded-full skeleton-shimmer" />
+                    <div className="h-5 w-32 rounded skeleton-shimmer" />
+                  </div>
+                  <div className="h-4 w-28 rounded skeleton-shimmer hidden sm:block" />
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                  <div className="h-8 rounded-xl skeleton-shimmer" />
+                  <div className="h-8 rounded-xl skeleton-shimmer" />
+                  <div className="h-8 rounded-xl skeleton-shimmer" />
+                  <div className="h-8 rounded-xl skeleton-shimmer" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : snapshots.length === 0 ? (
           <div className="empty-state">
             <History className="h-8 w-8 text-muted mx-auto mb-2 opacity-50" />
@@ -171,13 +193,16 @@ export function AdminConfigHistoryTab() {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {snapshots.map((item) => (
+          <div className="flex flex-col gap-4 p-1">
+            {snapshots.map((item, idx) => (
               <motion.div
                 key={item.version}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="premium-card p-5 rounded-2xl border border-line bg-surface flex flex-col md:flex-row md:items-center justify-between gap-4"
+                initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.985 }}
+                transition={{ type: "spring", stiffness: 380, damping: 20 }}
+                className="premium-card group p-5 rounded-2xl border border-line bg-surface flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-card hover:shadow-xl hover:border-primary/30 transition-all duration-300 transform-gpu will-change-[transform,opacity]"
               >
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center gap-2.5">
@@ -230,7 +255,7 @@ export function AdminConfigHistoryTab() {
             ))}
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Snapshot Preview Modal */}
       <AnimatePresence>
@@ -297,6 +322,6 @@ export function AdminConfigHistoryTab() {
         onConfirm={restoreModalConfig.action}
         onCancel={() => setRestoreModalConfig((prev) => ({ ...prev, open: false }))}
       />
-    </div>
+    </motion.div>
   );
 }

@@ -7,6 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 // Use admin client for admin state persistence (bypasses RLS on admin_config table)
 const supabase = supabaseAdmin;
 
+const IS_PRODUCTION = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
 
 const DEV_STORAGE_PATH = path.join(process.cwd(), "data", "adminState.json");
 const TMP_STORAGE_PATH = path.join(os.tmpdir(), "hajat_adminState.json");
@@ -16,6 +17,9 @@ let lastFileMtimeMs: number = (globalThis as any).__adminStateMtime || 0;
 
 function getFileMtime(): number {
   try {
+    if (!IS_PRODUCTION && fs.existsSync(DEV_STORAGE_PATH)) {
+      return fs.statSync(DEV_STORAGE_PATH).mtimeMs;
+    }
     if (fs.existsSync(TMP_STORAGE_PATH)) {
       return fs.statSync(TMP_STORAGE_PATH).mtimeMs;
     }
@@ -56,7 +60,7 @@ const DEFAULT_STATE: AdminState = {
     ecl: { type: "YEAR_RANGE", base: "10juli", startYear: 2006, endYear: 2026 }
   },
   toggles: {
-    // updatedAt: 0 ensures any real admin change (with actual timestamp) always wins LWW
+    // updatedAt: 0 ensures any real admin change (with actual timestamp) always wins
     cv: { protected: true, updatedAt: 0 },
     vault: { protected: true, updatedAt: 0 },
     ecl: { protected: true, updatedAt: 0 },
@@ -72,6 +76,7 @@ const DEFAULT_STATE: AdminState = {
     eclUnlocks: 0,
     contactSubmissions: 0
   },
+  snapshots: [],
   lastLogin: {
     time: Date.now(),
     ip: "127.0.0.1",
@@ -88,61 +93,11 @@ const DEFAULT_STATE: AdminState = {
 };
 
 
-/**
- * Apply cookie Last-Write-Wins (LWW) merge onto the given state.
- * The cookie is passed explicitly from the request context (no dynamic require).
- * This ensures toggle changes from admin propagate to all serverless containers
- * even if they don't have the file on their filesystem.
- */
-function applyToggleCookieLWW(state: AdminState, togglesCookie: string): AdminState {
-  try {
-    const cookieData = JSON.parse(decodeURIComponent(togglesCookie));
-    if (!cookieData || typeof cookieData !== "object") return state;
-
-    const togglesSource = cookieData.toggles && typeof cookieData.toggles === "object"
-      ? cookieData.toggles          // nested format: { toggles: { ecl: { protected, updatedAt } }, globalEpoch }
-      : cookieData;                 // legacy flat format: { ecl: { protected, updatedAt } }
-
-    const newToggles = { ...state.toggles };
-    let changed = false;
-
-    Object.keys(togglesSource).forEach((key) => {
-      const k = key as keyof typeof newToggles;
-      if (!newToggles[k]) return;
-
-      const cookieEntry = togglesSource[key];
-      if (!cookieEntry) return;
-
-      // Cookie entry can be { protected: bool, updatedAt: number } or just a boolean
-      const cookieTime = typeof cookieEntry === "object" ? (Number(cookieEntry.updatedAt) || 0) : 0;
-      const cookieProtected = typeof cookieEntry === "object" ? Boolean(cookieEntry.protected) : Boolean(cookieEntry);
-      const dbTime = Number(newToggles[k].updatedAt) || 0;
-
-      if (cookieTime > dbTime) {
-        newToggles[k] = { protected: cookieProtected, updatedAt: cookieTime };
-        changed = true;
-      }
-    });
-
-    if (!changed) return state;
-
-    let newEpoch = state.globalEpoch;
-    if (cookieData.toggles) {
-      const cookieEpoch = Number(cookieData.globalEpoch) || 0;
-      if (cookieEpoch > newEpoch) newEpoch = cookieEpoch;
-    }
-
-    return { ...state, toggles: newToggles, globalEpoch: newEpoch };
-  } catch {
-    return state;
-  }
-}
-
-function buildFullState(parsedFileState: any, togglesCookie?: string): AdminState {
+function buildFullState(parsedFileState: any): AdminState {
   const parsed = parsedFileState || {};
   const loginHistory = { ...DEFAULT_STATE.loginHistory, ...parsed.loginHistory };
 
-  let fullState: AdminState = {
+  const fullState: AdminState = {
     auth: { ...DEFAULT_STATE.auth, ...parsed.auth },
     accounts: parsed.accounts && parsed.accounts.length > 0 ? parsed.accounts : defaultAccounts,
     strategies: { ...DEFAULT_STATE.strategies, ...parsed.strategies },
@@ -154,10 +109,6 @@ function buildFullState(parsedFileState: any, togglesCookie?: string): AdminStat
     snapshots: Array.isArray(parsed.snapshots) ? parsed.snapshots : []
   };
 
-  if (togglesCookie) {
-    fullState = applyToggleCookieLWW(fullState, togglesCookie);
-  }
-
   inMemoryState = fullState;
   (globalThis as any).__adminStateCache = fullState;
   return fullState;
@@ -166,34 +117,25 @@ function buildFullState(parsedFileState: any, togglesCookie?: string): AdminStat
 export const adminRepository = {
   /**
    * Async read admin state with Supabase cloud fallback (critical for Vercel cold-starts).
+   * In production: always prefer Supabase as source of truth over /tmp filesystem.
+   * SECURITY: Never accepts toggle state from client cookies — server state only.
    */
-  async readAsync(togglesCookie?: string): Promise<AdminState> {
-    if (inMemoryState) {
-      if (togglesCookie) return applyToggleCookieLWW(inMemoryState, togglesCookie);
+  async readAsync(): Promise<AdminState> {
+    // In production: if in-memory cache is warm, use it (it was populated from Supabase)
+    if (inMemoryState && IS_PRODUCTION) {
       return inMemoryState;
     }
 
-    const currentMtime = getFileMtime();
-    if (fs.existsSync(TMP_STORAGE_PATH) || fs.existsSync(DEV_STORAGE_PATH)) {
-      try {
-        let raw = "";
-        if (fs.existsSync(TMP_STORAGE_PATH)) {
-          raw = fs.readFileSync(TMP_STORAGE_PATH, "utf-8");
-          lastFileMtimeMs = fs.statSync(TMP_STORAGE_PATH).mtimeMs;
-        } else if (fs.existsSync(DEV_STORAGE_PATH)) {
-          raw = fs.readFileSync(DEV_STORAGE_PATH, "utf-8");
-          lastFileMtimeMs = fs.statSync(DEV_STORAGE_PATH).mtimeMs;
-        }
-        if (raw) {
-          return buildFullState(JSON.parse(raw), togglesCookie);
-        }
-      } catch {
-        // Ignore read error — fall through to Supabase
+    // In-memory cache hit for dev (fast path)
+    if (inMemoryState && !IS_PRODUCTION) {
+      const currentMtime = getFileMtime();
+      if (currentMtime > 0 && currentMtime <= lastFileMtimeMs) {
+        return inMemoryState;
       }
     }
 
-    // Serverless cold-start fallback: fetch state from Supabase admin_config table
-    if (supabase) {
+    // PRODUCTION: Supabase is the primary source of truth (serverless containers share one DB)
+    if (IS_PRODUCTION && supabase) {
       try {
         const { data, error } = await supabase
           .from("admin_config")
@@ -202,33 +144,82 @@ export const adminRepository = {
           .maybeSingle();
 
         if (!error && data?.state) {
-          return buildFullState(data.state, togglesCookie);
+          return buildFullState(data.state);
         }
       } catch (err) {
         console.error("Gagal membaca adminState dari Supabase:", err);
       }
     }
 
-    return buildFullState(null, togglesCookie);
+    // DEV / LOCAL: Read from filesystem (Prioritize DEV_STORAGE_PATH first in dev)
+    if (fs.existsSync(DEV_STORAGE_PATH) || fs.existsSync(TMP_STORAGE_PATH)) {
+      try {
+        let raw = "";
+        if (!IS_PRODUCTION && fs.existsSync(DEV_STORAGE_PATH)) {
+          raw = fs.readFileSync(DEV_STORAGE_PATH, "utf-8");
+          lastFileMtimeMs = fs.statSync(DEV_STORAGE_PATH).mtimeMs;
+        } else if (fs.existsSync(TMP_STORAGE_PATH)) {
+          raw = fs.readFileSync(TMP_STORAGE_PATH, "utf-8");
+          lastFileMtimeMs = fs.statSync(TMP_STORAGE_PATH).mtimeMs;
+        } else if (fs.existsSync(DEV_STORAGE_PATH)) {
+          raw = fs.readFileSync(DEV_STORAGE_PATH, "utf-8");
+          lastFileMtimeMs = fs.statSync(DEV_STORAGE_PATH).mtimeMs;
+        }
+        if (raw) {
+          return buildFullState(JSON.parse(raw));
+        }
+      } catch {
+        // Ignore read error — fall through to Supabase
+      }
+    }
+
+    // Non-production Supabase fallback
+    if (!IS_PRODUCTION && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("admin_config")
+          .select("state")
+          .eq("id", "config_root")
+          .maybeSingle();
+
+        if (!error && data?.state) {
+          return buildFullState(data.state);
+        }
+      } catch (err) {
+        console.error("Gagal membaca adminState dari Supabase:", err);
+      }
+    }
+
+    return buildFullState(null);
   },
 
   /**
-   * Sync read admin state (uses in-memory cache or local file, with fallback).
+   * Sync read admin state (uses in-memory cache or local file).
+   * SECURITY: Never accepts toggle state from client cookies — server state only.
    */
-  read(togglesCookie?: string): AdminState {
-    const currentMtime = getFileMtime();
-
-    if (inMemoryState && currentMtime > 0 && currentMtime <= lastFileMtimeMs) {
-      if (togglesCookie) {
-        return applyToggleCookieLWW(inMemoryState, togglesCookie);
+  read(): AdminState {
+    // Return warm in-memory cache if available
+    if (inMemoryState) {
+      // In dev: validate against file mtime
+      if (!IS_PRODUCTION) {
+        const currentMtime = getFileMtime();
+        if (currentMtime > 0 && currentMtime <= lastFileMtimeMs) {
+          return inMemoryState;
+        }
+      } else {
+        // In production: in-memory GlobalThis is the only reliable sync cache
+        return inMemoryState;
       }
-      return inMemoryState;
     }
 
+    // DEV: Try reading from filesystem (Prefer DEV_STORAGE_PATH first in dev)
     let parsedFileState: any = null;
     try {
       let raw = "";
-      if (fs.existsSync(TMP_STORAGE_PATH)) {
+      if (!IS_PRODUCTION && fs.existsSync(DEV_STORAGE_PATH)) {
+        raw = fs.readFileSync(DEV_STORAGE_PATH, "utf-8");
+        lastFileMtimeMs = fs.statSync(DEV_STORAGE_PATH).mtimeMs;
+      } else if (fs.existsSync(TMP_STORAGE_PATH)) {
         raw = fs.readFileSync(TMP_STORAGE_PATH, "utf-8");
         lastFileMtimeMs = fs.statSync(TMP_STORAGE_PATH).mtimeMs;
       } else if (fs.existsSync(DEV_STORAGE_PATH)) {
@@ -241,14 +232,30 @@ export const adminRepository = {
       // Ignore read errors — fall through to use DEFAULT_STATE
     }
 
-    return buildFullState(parsedFileState, togglesCookie);
+    return buildFullState(parsedFileState);
   },
 
 
-  write(state: AdminState): void {
+  async write(state: AdminState): Promise<void> {
     inMemoryState = state;
     (globalThis as any).__adminStateCache = state;
 
+    // PRODUCTION: Supabase is the primary persistent store — await for consistency
+    if (IS_PRODUCTION && supabase) {
+      try {
+        const { error } = await supabase
+          .from("admin_config")
+          .upsert({ id: "config_root", state, updated_at: new Date().toISOString() });
+        if (error) {
+          console.error("Supabase admin_config write error:", error.message);
+        }
+      } catch (err) {
+        console.error("Gagal menyimpan adminState ke Supabase:", err);
+      }
+      return; // In production, skip filesystem writes (read-only on Vercel)
+    }
+
+    // DEV: Write to local filesystem first, then async to Supabase
     try {
       const dir = path.dirname(DEV_STORAGE_PATH);
       if (!fs.existsSync(dir)) {
@@ -257,9 +264,8 @@ export const adminRepository = {
       fs.writeFileSync(DEV_STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
       lastFileMtimeMs = getFileMtime();
       (globalThis as any).__adminStateMtime = lastFileMtimeMs;
-      return;
     } catch {
-      // Dev directory read-only on Vercel Serverless
+      // Dev directory read-only — try /tmp
     }
 
     try {
@@ -268,12 +274,11 @@ export const adminRepository = {
         fs.mkdirSync(tmpDir, { recursive: true });
       }
       fs.writeFileSync(TMP_STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
-      lastFileMtimeMs = getFileMtime();
-      (globalThis as any).__adminStateMtime = lastFileMtimeMs;
     } catch (err) {
-      console.error("Gagal menyimpan adminState ke serverless tmp:", err);
+      console.error("Gagal menyimpan adminState ke /tmp:", err);
     }
 
+    // Also async-write to Supabase in dev for cross-device sync
     if (supabase) {
       supabase
         .from("admin_config")
@@ -287,12 +292,65 @@ export const adminRepository = {
   update(updater: (draft: AdminState) => AdminState): AdminState {
     const current = this.read();
     const updated = updater(current);
-    this.write(updated);
+    // In production, fire-and-forget write (sync update path — caller can await separately)
+    if (IS_PRODUCTION && supabase) {
+      inMemoryState = updated;
+      (globalThis as any).__adminStateCache = updated;
+      // Async Supabase write — non-blocking for sync callers
+      supabase
+        .from("admin_config")
+        .upsert({ id: "config_root", state: updated, updated_at: new Date().toISOString() })
+        .then(({ error }) => {
+          if (error) console.error("Supabase admin_config update error:", error.message);
+        });
+      return updated;
+    }
+    // Dev: use synchronous filesystem write
+    this.writeSync(updated);
     return updated;
   },
 
+  /**
+   * Synchronous write for dev environment only.
+   */
+  writeSync(state: AdminState): void {
+    inMemoryState = state;
+    (globalThis as any).__adminStateCache = state;
+
+    try {
+      const dir = path.dirname(DEV_STORAGE_PATH);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(DEV_STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
+      lastFileMtimeMs = getFileMtime();
+      (globalThis as any).__adminStateMtime = lastFileMtimeMs;
+    } catch {
+      // Dev directory read-only
+    }
+
+    try {
+      const tmpDir = path.dirname(TMP_STORAGE_PATH);
+      if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      }
+      fs.writeFileSync(TMP_STORAGE_PATH, JSON.stringify(state, null, 2), "utf-8");
+    } catch (err) {
+      console.error("Gagal menyimpan adminState ke /tmp:", err);
+    }
+
+    if (supabase) {
+      supabase
+        .from("admin_config")
+        .upsert({ id: "config_root", state, updated_at: new Date().toISOString() })
+        .then(({ error }) => {
+          if (error) console.error("Supabase admin_config write error:", error.message);
+        });
+    }
+  },
+
   reset(): AdminState {
-    this.write(DEFAULT_STATE);
+    this.writeSync(DEFAULT_STATE);
     return DEFAULT_STATE;
   }
 };

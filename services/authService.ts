@@ -80,23 +80,25 @@ export const authService = {
     return generateSessionToken(type);
   },
 
-  async getAuthStatusAsync(cvToken?: string, vaultToken?: string, eclToken?: string, togglesCookie?: string) {
-    await adminRepository.readAsync(togglesCookie);
-    return this.getAuthStatus(cvToken, vaultToken, eclToken, togglesCookie);
+  /**
+   * Get auth status purely from server-side state.
+   * SECURITY: Never uses client-provided toggle cookies — server state only.
+   */
+  async getAuthStatusAsync(cvToken?: string, vaultToken?: string, eclToken?: string) {
+    await adminRepository.readAsync();
+    return this.getAuthStatus(cvToken, vaultToken, eclToken);
   },
 
-  getAuthStatus(cvToken?: string, vaultToken?: string, eclToken?: string, togglesCookie?: string) {
+  getAuthStatus(cvToken?: string, vaultToken?: string, eclToken?: string) {
 
     let adminState;
     try {
-      // Pass togglesCookie explicitly — adminRepository.read() applies cookie LWW internally.
-      // This is the ONLY correct way; do NOT re-parse the cookie here as well.
-      adminState = adminRepository.read(togglesCookie);
+      // Read directly from server state — no client cookie contamination
+      adminState = adminRepository.read();
     } catch {
       adminState = null;
     }
 
-    // adminRepository.read() already merged the cookie LWW — use adminState.toggles directly
     const isCvProtected = adminState ? (adminState.toggles?.cv?.protected ?? true) : true;
     const isVaultProtected = adminState ? (adminState.toggles?.vault?.protected ?? true) : true;
     const isEclProtected = adminState ? (adminState.toggles?.ecl?.protected ?? true) : true;
@@ -114,9 +116,9 @@ export const authService = {
         ecl: !isEclProtected
       },
       docToggles: {
-        doc1: isDoc1Protected,
-        doc2: isDoc2Protected,
-        doc3: isDoc3Protected
+        doc1: !isDoc1Protected,
+        doc2: !isDoc2Protected,
+        doc3: !isDoc3Protected
       },
       toggles: adminState ? adminState.toggles : null,
       globalEpoch: adminState ? adminState.globalEpoch : null
