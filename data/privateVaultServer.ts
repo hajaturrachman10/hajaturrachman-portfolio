@@ -102,7 +102,7 @@ export const privateVaultData = {
       title: "Pacar",
       summary: "Hubungan personal yang suportif dan saling menjaga untuk mendukung impian masa depan masing-masing.",
       people: [
-        { name: "Amel", role: "Pacar", image: "/assets/people/amel.svg", story: "Amel adalah sosok yang suportif, kalem, baik, pekerja keras, dan religius. Hubungan ini menjadi ruang belajar untuk saling menjaga dan mendukung masa depan." }
+        { name: "Amel", role: "Pacar", image: "/assets/people/amel.jpg", story: "Amel adalah sosok yang suportif, kalem, baik, pekerja keras, dan religius. Hubungan ini menjadi ruang belajar untuk saling menjaga dan mendukung masa depan." }
       ],
       content: [
         "Hubungan ini dimulai sejak 16 Mei 2023.",

@@ -14,6 +14,8 @@ const TMP_STORAGE_PATH = path.join(os.tmpdir(), "hajat_adminState.json");
 
 let inMemoryState: AdminState | null = (globalThis as any).__adminStateCache || null;
 let lastFileMtimeMs: number = (globalThis as any).__adminStateMtime || 0;
+let lastSupabaseFetchMs: number = (globalThis as any).__adminStateSupabaseTime || 0;
+const SUPABASE_CACHE_TTL_MS = 2500; // 2.5s TTL to guarantee fresh state across Vercel serverless containers
 
 function getFileMtime(): number {
   try {
@@ -116,14 +118,34 @@ function buildFullState(parsedFileState: any): AdminState {
 
 export const adminRepository = {
   /**
-   * Async read admin state with Supabase cloud fallback (critical for Vercel cold-starts).
-   * In production: always prefer Supabase as source of truth over /tmp filesystem.
+   * Async read admin state with Supabase cloud fallback (critical for Vercel cold-starts and multi-instance sync).
+   * In production: always query Supabase if TTL expired to prevent stale toggle overrides.
    * SECURITY: Never accepts toggle state from client cookies — server state only.
    */
   async readAsync(): Promise<AdminState> {
-    // In production: if in-memory cache is warm, use it (it was populated from Supabase)
-    if (inMemoryState && IS_PRODUCTION) {
-      return inMemoryState;
+    const now = Date.now();
+
+    // PRODUCTION / CLOUD: Supabase is the primary authoritative source of truth across serverless lambdas
+    if (supabase) {
+      if (inMemoryState && (now - lastSupabaseFetchMs < SUPABASE_CACHE_TTL_MS)) {
+        return inMemoryState;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("admin_config")
+          .select("state")
+          .eq("id", "config_root")
+          .maybeSingle();
+
+        if (!error && data?.state) {
+          lastSupabaseFetchMs = now;
+          (globalThis as any).__adminStateSupabaseTime = now;
+          return buildFullState(data.state);
+        }
+      } catch (err) {
+        console.error("Gagal membaca adminState dari Supabase:", err);
+      }
     }
 
     // In-memory cache hit for dev (fast path)
@@ -134,21 +156,9 @@ export const adminRepository = {
       }
     }
 
-    // PRODUCTION: Supabase is the primary source of truth (serverless containers share one DB)
-    if (IS_PRODUCTION && supabase) {
-      try {
-        const { data, error } = await supabase
-          .from("admin_config")
-          .select("state")
-          .eq("id", "config_root")
-          .maybeSingle();
-
-        if (!error && data?.state) {
-          return buildFullState(data.state);
-        }
-      } catch (err) {
-        console.error("Gagal membaca adminState dari Supabase:", err);
-      }
+    // Return warm in-memory cache if available before reading file
+    if (inMemoryState && IS_PRODUCTION) {
+      return inMemoryState;
     }
 
     // DEV / LOCAL: Read from filesystem (Prioritize DEV_STORAGE_PATH first in dev)

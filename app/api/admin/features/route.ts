@@ -5,6 +5,9 @@ import { adminToggleService } from "@/services/admin/adminToggleService";
 import { adminRepository } from "@/services/admin/adminRepository";
 import { ADMIN_CONFIG } from "@/services/admin/adminConfig";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   await adminRepository.readAsync();
   const result = adminToggleService.getAllFeatureStates();

@@ -44,6 +44,7 @@ const sectionIcons: Record<string, any> = {
 };
 
 import { VaultMemoryCarousel } from "./VaultMemoryCarousel";
+import { AmelRelationshipCard } from "./AmelRelationshipCard";
 
 function VaultSkeleton() {
   return (
@@ -81,6 +82,7 @@ export function PrivateVaultSection() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loadingData, setLoadingData] = useState(false);
   const [vaultData, setVaultData] = useState<any>(null);
+  const vaultDataRef = useRef<any>(null);
   const [activeSection, setActiveSection] = useState("family");
   const [isLocking, setIsLocking] = useState(false);
   const [rememberSession, setRememberSession] = useState(false);
@@ -92,14 +94,17 @@ export function PrivateVaultSection() {
     }
   }, []);
 
-  async function fetchVaultData() {
-    setLoadingData(true);
+  async function fetchVaultData(showLoading = false) {
+    if (showLoading || !vaultDataRef.current) {
+      setLoadingData(true);
+    }
     try {
       const response = await fetch("/api/vault/data");
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
           setVaultData(result.data);
+          vaultDataRef.current = result.data;
         }
       }
     } catch (err) {
@@ -170,13 +175,10 @@ export function PrivateVaultSection() {
                   setIsLocking(false);
                 }
               } else {
-                setIsUnlocking(true);
-                setCheckingAuth(false);
                 await fetchVaultData();
-                await new Promise((resolve) => setTimeout(resolve, 1500));
                 if (isMounted) {
                   setUnlocked(true);
-                  setIsUnlocking(false);
+                  setCheckingAuth(false);
                 }
               }
             } else {
@@ -271,6 +273,7 @@ export function PrivateVaultSection() {
       if (response.ok) {
         setUnlocked(false);
         setVaultData(null);
+        vaultDataRef.current = null;
       }
     } catch (err) {
       console.error("Gagal mengunci vault:", err);
@@ -279,7 +282,7 @@ export function PrivateVaultSection() {
     }
   }
 
-  const active = vaultData?.sections?.find((section: any) => section.id === activeSection);
+  const active = vaultData?.sections?.find((section: any) => section.id === activeSection) || privateVault?.sections?.find((section: any) => section.id === activeSection);
 
   return (
     <>
@@ -606,33 +609,25 @@ export function PrivateVaultSection() {
               </div>
 
               {/* Animated Category Tabs: 2x2 Grid on Mobile, Flex on Desktop */}
-              <div className="mt-6 sm:mt-8 grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+              <div className="mt-4 sm:mt-6 grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
                 {privateVault.sections.map((section) => {
                   const Icon = sectionIcons[section.id] || sectionIcons.family;
                   const isCatActive = activeSection === section.id;
                   return (
-                    <MagneticButton key={section.id} className="w-full sm:w-auto">
-                      <motion.button
-                        type="button"
-                        whileHover="hover"
-                        whileTap="press"
-                        variants={{
-                          hover: { scale: 1.04, y: -2 },
-                          press: { scale: 0.96 }
-                        }}
-                        transition={{ type: "spring", stiffness: 380, damping: 12 }}
-                        onClick={() => setActiveSection(section.id)}
-                        className={cn(
-                          "focus-ring inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl border px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-black transition cursor-pointer select-none w-full sm:w-auto text-center truncate",
-                          isCatActive
-                            ? "border-primary bg-primary text-white shadow-glow shadow-primary/25"
-                            : "border-line bg-surface/80 text-muted hover:border-primary/60 hover:text-text"
-                        )}
-                      >
-                        <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-                        <span className="truncate">{section.title}</span>
-                      </motion.button>
-                    </MagneticButton>
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() => setActiveSection(section.id)}
+                      className={cn(
+                        "focus-ring inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl border px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-black transition-all duration-200 cursor-pointer select-none w-full sm:w-auto text-center truncate active:scale-95 hover:scale-[1.02] touch-manipulation",
+                        isCatActive
+                          ? "border-primary bg-primary text-white shadow-glow shadow-primary/25"
+                          : "border-line bg-surface/80 text-muted hover:border-primary/60 hover:text-text active:bg-surface"
+                      )}
+                    >
+                      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                      <span className="truncate">{section.title}</span>
+                    </button>
                   );
                 })}
               </div>
@@ -645,6 +640,7 @@ export function PrivateVaultSection() {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -15 }}
+                    transition={{ duration: 0.2 }}
                     className="mt-5 sm:mt-6 rounded-3xl sm:rounded-4xl border border-line bg-surface/80 p-4 sm:p-6"
                   >
                     <VaultSkeleton />
@@ -652,16 +648,16 @@ export function PrivateVaultSection() {
                 ) : (
                   <motion.div
                     key={active.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.99 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -20, scale: 0.99 }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -15 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className="mt-5 sm:mt-6 rounded-3xl sm:rounded-4xl border border-line bg-surface/80 p-4 sm:p-7"
                   >
                     {/* Active Section Header (Mobile Responsive Layout) */}
                     <div className="flex flex-row items-center gap-3 sm:gap-4">
                       <motion.div 
-                        whileHover={{ scale: 1.1, rotate: 8 }}
+                        whileHover={{ scale: 1.08, rotate: 6 }}
                         transition={{ type: "spring", stiffness: 400, damping: 12 }}
                         className="icon-orbit grid h-11 w-11 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl border border-line bg-primary/10 text-primary"
                       >
@@ -676,75 +672,104 @@ export function PrivateVaultSection() {
                       </div>
                     </div>
 
-                    <div className="mt-6 sm:mt-8">
-                      {/* Swipeable Photo Memory Carousel */}
-                      {active.memories && active.memories.length > 0 && (
-                        <VaultMemoryCarousel title={active.title} memories={active.memories} />
-                      )}
+                    {active.id === "relationship" ? (
+                      <div className="mt-4 sm:mt-8 space-y-4 sm:space-y-6">
+                        <AmelRelationshipCard
+                          person={active.people[0]}
+                          content={active.content}
+                        />
 
-                      {/* Staggered Animated People Grid */}
-                      <motion.div 
-                        initial="hidden"
-                        animate="show"
-                        variants={{
-                          hidden: { opacity: 0 },
-                          show: {
-                            opacity: 1,
-                            transition: { staggerChildren: 0.09 }
-                          }
-                        }}
-                        className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                      >
-                        {active.people.map((person: any) => (
-                          <motion.article
-                            key={person.name}
-                            variants={{
-                              hidden: { opacity: 0, y: 25, scale: 0.96 },
-                              show: { opacity: 1, y: 0, scale: 1 }
-                            }}
-                            whileHover={{ y: -6, scale: 1.015 }}
-                            transition={{ type: "spring", stiffness: 350, damping: 18 }}
-                            className="overflow-hidden rounded-3xl sm:rounded-4xl border border-line bg-surface flex flex-col justify-between group shadow-soft transition-all hover:border-primary/40"
-                          >
-                            <div>
-                              <div className="relative aspect-[16/10] sm:aspect-[4/3] overflow-hidden">
-                                <ImageWithShimmer
-                                  src={person.image}
-                                  alt={person.name}
-                                  fill
-                                  sizes="(max-width: 768px) 100vw, 33vw"
-                                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                                />
-                              </div>
-                              <div className="p-4 sm:p-6">
-                                <p className="font-display text-lg sm:text-xl font-black">{person.name}</p>
-                                <p className="mt-1 text-[11px] sm:text-xs font-black uppercase tracking-[0.16em] text-primary">
-                                  {person.role}
-                                </p>
-                                <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm font-bold leading-6 sm:leading-7 text-muted">
-                                  {person.story}
-                                </p>
-                              </div>
-                            </div>
-                          </motion.article>
-                        ))}
-                      </motion.div>
-                    </div>
+                        {/* Swipeable Photo Memory Carousel */}
+                        {active.memories && active.memories.length > 0 && (
+                          <VaultMemoryCarousel title={active.title} memories={active.memories} />
+                        )}
 
-                    {/* Animated Story Paragraphs */}
-                    <div className="mt-5 sm:mt-6 grid gap-2.5 sm:gap-3">
-                      {active.content.map((paragraph: string, idx: number) => (
-                        <motion.p
-                          key={paragraph}
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.35, delay: 0.15 + idx * 0.06 }}
-                          className="rounded-2xl sm:rounded-3xl border border-line bg-surface p-3.5 sm:p-4 text-xs sm:text-base font-bold leading-6 sm:leading-8 text-muted"
+                        {/* Animated Story Paragraphs */}
+                        <div className="grid gap-2.5 sm:gap-3">
+                          {active.content.map((paragraph: string, idx: number) => (
+                            <motion.p
+                              key={paragraph}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              className="rounded-2xl sm:rounded-3xl border border-line bg-surface p-3.5 sm:p-4 text-xs sm:text-base font-bold leading-6 sm:leading-8 text-muted"
+                            >
+                              {paragraph}
+                            </motion.p>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-6 sm:mt-8">
+                        {/* Swipeable Photo Memory Carousel */}
+                        {active.memories && active.memories.length > 0 && (
+                          <VaultMemoryCarousel title={active.title} memories={active.memories} />
+                        )}
+
+                        {/* Staggered Animated People Grid */}
+                        <motion.div 
+                          initial="hidden"
+                          animate="show"
+                          variants={{
+                            hidden: { opacity: 0 },
+                            show: {
+                              opacity: 1,
+                              transition: { staggerChildren: 0.06 }
+                            }
+                          }}
+                          className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                         >
-                          {paragraph}
-                        </motion.p>
-                      ))}
-                    </div>
+                          {active.people.map((person: any) => (
+                            <motion.article
+                              key={person.name}
+                              variants={{
+                                hidden: { opacity: 0, y: 15 },
+                                show: { opacity: 1, y: 0 }
+                              }}
+                              whileHover={{ y: -4, scale: 1.01 }}
+                              transition={{ type: "spring", stiffness: 350, damping: 18 }}
+                              className="overflow-hidden rounded-3xl sm:rounded-4xl border border-line bg-surface flex flex-col justify-between group shadow-soft transition-all hover:border-primary/40"
+                            >
+                              <div>
+                                <div className="relative aspect-[16/10] sm:aspect-[4/3] overflow-hidden">
+                                  <ImageWithShimmer
+                                    src={person.image}
+                                    alt={person.name}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                                  />
+                                </div>
+                                <div className="p-4 sm:p-6">
+                                  <p className="font-display text-lg sm:text-xl font-black">{person.name}</p>
+                                  <p className="mt-1 text-[11px] sm:text-xs font-black uppercase tracking-[0.16em] text-primary">
+                                    {person.role}
+                                  </p>
+                                  <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm font-bold leading-6 sm:leading-7 text-muted">
+                                    {person.story}
+                                  </p>
+                                </div>
+                              </div>
+                            </motion.article>
+                          ))}
+                        </motion.div>
+
+                        {/* Animated Story Paragraphs */}
+                        <div className="mt-5 sm:mt-6 grid gap-2.5 sm:gap-3">
+                          {active.content.map((paragraph: string, idx: number) => (
+                            <motion.p
+                              key={paragraph}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              className="rounded-2xl sm:rounded-3xl border border-line bg-surface p-3.5 sm:p-4 text-xs sm:text-base font-bold leading-6 sm:leading-8 text-muted"
+                            >
+                              {paragraph}
+                            </motion.p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
